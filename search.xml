@@ -1,21 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Hello World</title>
-    <url>/2020/03/20/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+    <title>Git基本概念和底层原理</title>
+    <url>/2020/03/20/Git%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E5%92%8C%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/</url>
+    <content><![CDATA[<h1 id="GIT和SVN的主要区别"><a href="#GIT和SVN的主要区别" class="headerlink" title="GIT和SVN的主要区别"></a>GIT和SVN的主要区别</h1><ol>
+<li>存储方式不一样</li>
+<li>使用方式不一样</li>
+<li>管理模式不一样</li>
+</ol>
+<p><strong>1、存储方式区别</strong><br>   GIT把内容按元数据方式存储类似k/v数据库，而SVN是按文件(新版svn已改成元数据存储)<br>       演示git 存储过程演示</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> .git/objects/df/</span><br><span class="line">git cat-file -p df70460b4b4aece5915caf5c68d12f560a9fe3e4</span><br><span class="line"><span class="built_in">echo</span> <span class="string">'version1'</span> &gt; text.txt</span><br><span class="line">git <span class="built_in">hash</span>-object -w text.txt</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+<p><strong>2、使用方式区别</strong><br>    从本地把文件推送远程服务，SVN只需要commint 而GIT需要 add、commint、push 三个步骤<br>SVN基本使用过程<br><img src="https://img-blog.csdnimg.cn/20200207220323296.png" alt="在这里插入图片描述"><br>Git基本使用过程<br><img src="https://img-blog.csdnimg.cn/2020020722041424.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM2NzQ0Njk1,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br><strong>3、版本管理模式区别</strong><br>git 是一个分布式的版本管理系统，而要SVN是一个远程集中式的管理系统</p>
+<p>集中式<br><img src="https://img-blog.csdnimg.cn/202002072204584.png" alt="在这里插入图片描述"><br>分布式<br><img src="https://img-blog.csdnimg.cn/202002072205124.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM2NzQ0Njk1,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h1 id="二、GIT-核心命令使用"><a href="#二、GIT-核心命令使用" class="headerlink" title="二、GIT 核心命令使用"></a>二、GIT 核心命令使用</h1><p>主要内容:</p>
+<ol>
+<li>git 客户端安装配置</li>
+<li>整体认识GIT的基本使用</li>
+<li>分支管理</li>
+<li>标签管理</li>
+<li>远程仓库配置</li>
+</ol>
+<p><strong>1、安装git 客户端安装</strong><br>官方客户端： httpsd://git-scm.com/downloads<br>其它客户端：<a href="https://tortoisegit.org/download/" target="_blank" rel="noopener">https://tortoisegit.org/download/</a></p>
+<p><strong>2、认识GIT的基本使用</strong></p>
+<ol>
+<li>git 项目创建与克隆</li>
+<li>文件提交与推送<br>完整模拟从项目添加到push 过程<ul>
+<li>创建项目 </li>
+<li>初始化git仓库</li>
+<li>提交文件 </li>
+<li>远程关联 </li>
+<li>push 至远程仓库</li>
+</ul>
+</li>
+</ol>
+<p><strong>本地初始化GIT 仓库:</strong><br>#基于远程仓库克隆至本地</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> &lt;remote_url&gt;</span><br></pre></td></tr></table></figure>
+<p>#当前目录初始化为git 本地仓库</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git init  &lt;directory&gt;</span><br></pre></td></tr></table></figure>
+<p>基于mvn 模板创建项目<br>mvn archetype:generate</p>
+<p>本地添加<br>#添加指定文件至暂存区</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git add &lt;fileName&gt;</span><br></pre></td></tr></table></figure>
+<p>#添加指定目录至暂存区</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git add &lt;directory&gt;</span><br></pre></td></tr></table></figure>
+<p>#添加所有</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git add -A</span><br></pre></td></tr></table></figure>
+<p>#将指定目录及子目录移除出暂存区</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git rm --cached &lt;target&gt; -r</span><br></pre></td></tr></table></figure>
+<p>#将该文件从commit后撤回到add后</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git rm &lt;target&gt;</span><br></pre></td></tr></table></figure>
+<p>#添加忽略配置文件 .gitignore</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 以'#'开始的行，被视为注释.                                                                                                                          </span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 忽略掉所有文件名是 foo.txt的文件.</span></span><br><span class="line"></span><br><span class="line">foo.txt</span><br><span class="line"></span><br><span class="line"><span class="comment"># 忽略所有生成的 html文件,</span></span><br><span class="line"></span><br><span class="line">*.html</span><br><span class="line"></span><br><span class="line"><span class="comment"># foo.html是手工维护的，所以例外.</span></span><br><span class="line"></span><br><span class="line">!foo.html</span><br><span class="line"></span><br><span class="line"><span class="comment"># 忽略所有.o和 .a文件.</span></span><br><span class="line"></span><br><span class="line">*.[oa]</span><br><span class="line">配置语法：</span><br><span class="line">以斜杠“/”开头表示目录；</span><br><span class="line">以星号“*”通配多个字符；</span><br><span class="line">以问号“?”通配单个字符</span><br><span class="line">以方括号“[]”包含单个字符的匹配列表；</span><br><span class="line">以叹号“!”表示不忽略(跟踪)匹配到的文件或目录；</span><br></pre></td></tr></table></figure>
+<p>本地提交<br>#提交至本地仓库</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git commit &lt;file&gt; -m <span class="string">'提交评论'</span></span><br></pre></td></tr></table></figure>
+<p>#快捷提交至本地仓库 <em>新增文件不能直接用此命令</em></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git commit -am <span class="string">'快添加与提交'</span></span><br></pre></td></tr></table></figure>
+<p>#查看修改历史</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git blame 文件名 // 查看该文件的修改历史</span><br><span class="line">git blame -L 100,10 文件名 // 从100行开始，到110行 逐行查看文件的修改历史</span><br></pre></td></tr></table></figure>
+<p>#对比工作区，暂存区，仓库的差异</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git diff // 查看变更 工作区与暂存区的差异比对</span><br><span class="line">git diff --cached // 暂存区与提交版本的差异</span><br><span class="line">git diff HEAD // 工作区与仓库中最后一次提交版本的差别</span><br><span class="line">git diff 版本哈希值 版本哈希值 // 查看这2个版本哈希之间的区别</span><br><span class="line">或者 git diff HEAD~数字 HEAD~数字</span><br><span class="line">git tag tt HEAD~4 给倒数第5次提交打一个tag tag名字是tt</span><br><span class="line">git diff tt 就是倒数第5个版本与第一个版本之间的差异</span><br><span class="line">git diff --cached tt 暂存区与倒数第5个版本之间的比对</span><br></pre></td></tr></table></figure>
+<p>#回撤操作</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git commit --amend -m <span class="string">"提交信息"</span> // 回撤上一次提交并与本次工作区一起提交</span><br><span class="line">git reset HEAD~2 --hard // 回撤2步</span><br><span class="line">git reset --files // 从仓库回撤到暂存区</span><br><span class="line">git reset HEAD // 回撤暂存区内容到工作目录</span><br><span class="line">git reset HEAD --soft 回撤提交到暂存区</span><br><span class="line">git reset HEAD --hard // 回撤提交 放弃变更 (慎用)</span><br><span class="line">git reset HEAD^  // 回撤仓库最后一次提交</span><br><span class="line">git reset --hard commitid // 回撤到该次提交id的位置</span><br><span class="line"></span><br><span class="line">git push -f -u origin 分支名 所有内容都回撤完了 将回撤后的操作强制推送到远程分支</span><br></pre></td></tr></table></figure>
+<p>#标签操作</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git tag // 查看列出所有打过的标签名</span><br><span class="line">git tag -d 标签名 // 删除对应标签</span><br><span class="line">git tag 标签名字 // 在当前仓库打个标签</span><br><span class="line">git tag foo -m <span class="string">"message"</span> // 在当前提交上，打标签foo 并给message信息注释</span><br><span class="line">git tag 标签名 哈希值 -m <span class="string">"message"</span> // 在某个哈希值上打标签并且写上标签的信息</span><br><span class="line">git tag foo HEAD~4 // 在当前提交之前的第4个版本上 打标签foo</span><br><span class="line">git push origin --tags // 把所有打好的标签推送到远程仓库</span><br><span class="line">git push origin 标签名 // 把指定标签推送到远程仓库</span><br><span class="line">git stash // 把暂存区的内容 暂时放在其他中 使暂存区变空</span><br><span class="line">git stash list // 查看stash了哪些存储</span><br><span class="line">git stash pop // 将stash中的内容恢复到当前目录，将缓存堆栈中的对应stash删除</span><br><span class="line">git stash apply // 将stash中的内容恢复到当前目录，不会将缓存堆栈中的对应stash删除</span><br><span class="line">git stash clear // 删除所有缓存的stash</span><br><span class="line">git pull --tags // 把远程仓库的标签也拉取下来</span><br><span class="line">git push origin :refs/tags/远程标签名 // 删除远程仓库的标签</span><br></pre></td></tr></table></figure>
+<p>#日志管理</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">log</span> --pretty=format:<span class="string">'%h %ad | %s%d [%an]'</span> --graph --date=short</span><br><span class="line">// 获取git <span class="built_in">log</span>里的树形详细信息 包括hasg 日期 提交信息 提交人等</span><br><span class="line">git <span class="built_in">log</span> --oneline //拉出所有提交信息 q是退出</span><br><span class="line">git <span class="built_in">log</span> -5 // 查看前5次的提交记录</span><br><span class="line">git <span class="built_in">log</span> --oneline -5 // 打印出的日志里面只有哈希值和修改的内容备注</span><br><span class="line">git <span class="built_in">log</span> 文件名 // 查看该文件的提交</span><br><span class="line">git <span class="built_in">log</span> --grep // 想过滤看到的内容   过滤日志</span><br><span class="line">git <span class="built_in">log</span> -n // 查看近期提交的n条信息内容</span><br><span class="line">git <span class="built_in">log</span> -p // 查看详细提交记录</span><br><span class="line">git <span class="built_in">log</span> master..experiment  //比较两个版本的区别</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+<p><strong>3、分支管理</strong><br>#查看当前分支</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git branch [-avv]</span><br></pre></td></tr></table></figure>
+<p>#基于当前分支新建分支</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git branch  &lt;branch name&gt;</span><br></pre></td></tr></table></figure>
+<p>#基于提交新建分支</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git branch &lt;branch name&gt; &lt;commit id&gt;</span><br></pre></td></tr></table></figure>
+<p>#把远程分支拉到本地</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git fetch origin dev（dev为远程仓库的分支名）</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+<p>#删除分支</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ git branch -d &lt;branch name&gt;</span><br></pre></td></tr></table></figure>
+<p>#切换分支</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git checkout &lt;branch name&gt;</span><br></pre></td></tr></table></figure>
+<p>#合并分支</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git merge &lt;merge target&gt;</span><br></pre></td></tr></table></figure>
+<p>#解决冲突，如果因冲突导致自动合并失败，此时 status 为mergeing 状态.<br>#需要手动修改后重新提交（commit） </p>
+<p><strong>4、远程仓库管理</strong><br>#查看远程配置 </p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git remote [-v]</span><br></pre></td></tr></table></figure>
+<p>#添加远程地址</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git remote add origin http:xxx.xxx</span><br></pre></td></tr></table></figure>
+<p>#删除远程地址</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git remote remove origin</span><br></pre></td></tr></table></figure>
+<p>#上传新分支至远程</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git push --<span class="built_in">set</span>-upstream origin master</span><br></pre></td></tr></table></figure>
+<p>#将本地分支与远程建立关联</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git branch --track --<span class="built_in">set</span>-upstream-to=origin/<span class="built_in">test</span> <span class="built_in">test</span></span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-]]></content>
+<h1 id="三、git-底层原理"><a href="#三、git-底层原理" class="headerlink" title="三、git 底层原理"></a>三、git 底层原理</h1><ul>
+<li>GIT存储对像</li>
+<li>GIT树对像</li>
+<li>GIT提交对像</li>
+<li>GIT引用</li>
+</ul>
+<p><strong>1、GIT存储对像(hashMap)</strong><br>Git 是一个内容寻址文件系统，其核心部分是一个简单的键值对数据库（key-value data store），你可以向数据库中插入任意内容，它会返回一个用于取回该值的hash 键。</p>
+<p>#git 键值库中插入数据</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">'luban is good man'</span> | git <span class="built_in">hash</span>-object -w --stdin</span><br><span class="line">79362d07cf264f8078b489a47132afbc73f87b9a</span><br></pre></td></tr></table></figure>
+
+<p>#基于键获取指定内容</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git cat-file -p 79362d07cf264f8078b489a47132afbc73f87b9a</span><br></pre></td></tr></table></figure>
+
+<p>Git基于该功能 把每个文件的版本中内容都保存在数据库中，当要进行版本回滚的时候就通过其中一个键将期取回并替换。</p>
+<p>    模拟演示git 版写入与回滚过程<br>#查找所有的git 对像</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">find .git/objects/ -<span class="built_in">type</span> f</span><br></pre></td></tr></table></figure>
+
+<p>#写入版本1</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">'version1'</span> &gt; README.MF; git <span class="built_in">hash</span>-object -w README.MF;</span><br></pre></td></tr></table></figure>
+
+<p>#写入版本2</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">'version2'</span> &gt; README.MF; git <span class="built_in">hash</span>-object -w README.MF;</span><br></pre></td></tr></table></figure>
+
+<p>#写入版本3</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">'version3'</span> &gt; README.MF; git <span class="built_in">hash</span>-object -w README.MF;</span><br></pre></td></tr></table></figure>
+
+<p>#回滚指定版本</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git cat-file -p c11e96db44f7f3bc4c608aa7d7cd9ba4ab25066e &gt; </span><br><span class="line">README.MF</span><br></pre></td></tr></table></figure>
+
+<p>所以我们平常用的 git add 其实就是把修改之后的内容 插入到键值库中。当我们执行 git add README.MF 等同于执行了 git hash-object -w README.MF 把文件写到数据库中。</p>
+<p>我们解决了存储的问题，但其只能存储内容同并没有存储文件名，如果要进行回滚 怎么知道哪个内容对应哪个文件呢？接下要讲的就是树对象，它解决了文件名存储的问题 。</p>
+<p><strong>2、GIT树对像</strong><br>树对像解决了文件名的问题，它的目的将多个文件名组织在一起，其内包含多个文件名称与其对应的Key和其它树对像的用引用，可以理解成操作系统当中的文件夹，一个文件夹包含多个文件和多个其它文件夹。<br><img src="https://img-blog.csdnimg.cn/20200208155735977.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM2NzQ0Njk1,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"><br>每一个分支当中都关联了一个树对像，他存储了当前分支下所有的文件名及对应的 key.<br>通过以下命令即可查看<br>#查看分支树</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git cat-file -p master^&#123;tree&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>3、git提交对象</strong><br>一次提交即为当前版本的一个快照，该快照就是通过提交对像保存，其存储的内容为：一个顶级树对象、上一次提交的对像啥希、提交者用户名及邮箱、提交时间戳、提交评论。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ git cat-file -p b2395925b5f1c12bf8cb9602f05fc8d580311836</span><br><span class="line">tree 002adb8152f7cd49f400a0480ef2d4c09b060c07</span><br><span class="line">parent 8be903f5e1046b851117a21cdc3c80bdcaf97570</span><br><span class="line">author tommy &lt;tommy@tuling.com&gt; 1532959457 +0800</span><br><span class="line">committer tommy &lt;tommy@tuling.com&gt; 1532959457 +0800</span><br></pre></td></tr></table></figure>
+
+<p>通过上面的知识，我们可以推测出从修改一个文件到提交的过程总共生成了三个对像：<br>一个内容对象 ==&gt; 存储了文件内容<br>一个树对像 ==&gt; 存储了文件名及内容对像的key<br>一个提交对像 ==&gt; 存储了树对像的key 及提交评论。 </p>
+<p><strong>4、GIT引用</strong><br>当我们执行 git branch {branchName} 时创建了一个分支，其本质就是在git 基于指定提交创建了一个引用文件，保存在 .git\refs\heads\ 下。</p>
+<p>    演示分支的创建</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git branch dev </span><br><span class="line">cat.git\refs\heads\dev</span><br></pre></td></tr></table></figure>
+
+<p>git 总共 有三种类型的引用：</p>
+<ol>
+<li>分支引用</li>
+<li>远程分支引用</li>
+<li>标签引用</li>
+</ol>
+<p>#查询比较两个版本</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">log</span> master..experiment</span><br></pre></td></tr></table></figure>
+
+<p>#版本提交历史网络</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">log</span> --pretty=format:<span class="string">'%h %s'</span> --graph</span><br></pre></td></tr></table></figure>
+
+<p>#查看分支树</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git cat-file -p master^&#123;tree&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <tags>
+        <tag>git</tag>
+      </tags>
   </entry>
 </search>
