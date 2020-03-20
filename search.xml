@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Hello</title>
+    <url>/2020/03/20/Hello/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
     <title>Git基本概念和底层原理</title>
     <url>/2020/03/20/Git%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E5%92%8C%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/</url>
     <content><![CDATA[<h1 id="GIT和SVN的主要区别"><a href="#GIT和SVN的主要区别" class="headerlink" title="GIT和SVN的主要区别"></a>GIT和SVN的主要区别</h1><ol>
