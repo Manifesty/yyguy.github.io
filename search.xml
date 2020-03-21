@@ -26,7 +26,7 @@
 <li>标签管理</li>
 <li>远程仓库配置</li>
 </ol>
-<p><strong>1、安装git 客户端安装</strong><br>官方客户端： httpsd://git-scm.com/downloads<br>其它客户端：<a href="https://tortoisegit.org/download/" target="_blank" rel="noopener">https://tortoisegit.org/download/</a></p>
+<p><strong>1、安装git 客户端安装</strong><br>官方客户端： httpsd://git-scm.com/downloads<br>其它客户端：<a href="https://tortoisegit.org/download/" target="_blank" rel="external nofollow noopener noreferrer">https://tortoisegit.org/download/</a></p>
 <p><strong>2、认识GIT的基本使用</strong></p>
 <ol>
 <li>git 项目创建与克隆</li>
