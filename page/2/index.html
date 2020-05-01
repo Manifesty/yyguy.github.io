@@ -188,6 +188,401 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2019/03/19/Java%E5%AF%BC%E5%87%BACSV%E6%A0%BC%E5%BC%8F%E6%96%87%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/03/19/Java%E5%AF%BC%E5%87%BACSV%E6%A0%BC%E5%BC%8F%E6%96%87%E4%BB%B6/" class="post-title-link" itemprop="url">Java导出CSV格式文件</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-03-19 18:52:31" itemprop="dateCreated datePublished" datetime="2019-03-19T18:52:31+08:00">2019-03-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:17:33" itemprop="dateModified" datetime="2020-05-01T19:17:33+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Java学习笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+
+<p>导出csv格式文件的本质是导出以逗号为分隔的文本数据</p>
+
+<pre class="has">
+<code>import java.io.BufferedWriter;  
+import java.io.File;  
+import java.io.FileInputStream;  
+import java.io.FileNotFoundException;  
+import java.io.FileOutputStream;  
+import java.io.IOException;  
+import java.io.InputStream;  
+import java.io.OutputStream;  
+import java.io.OutputStreamWriter;  
+import java.net.URLEncoder;  
+import java.util.ArrayList;  
+import java.util.Iterator;  
+import java.util.LinkedHashMap;  
+import java.util.List;  
+import java.util.Map;  
+
+import javax.servlet.http.HttpServletResponse;  
+
+import com.alibaba.druid.util.StringUtils;
+
+
+
+/** 
+ * 文件操作 
+ */  
+public class CSVUtils {  
+
+
+    /**
+    * 功能说明：获取UTF-8编码文本文件开头的BOM签名。
+    * BOM(Byte Order Mark)，是UTF编码方案里用于标识编码的标准标记。例：接收者收到以EF BB BF开头的字节流，就知道是UTF-8编码。
+    * @return UTF-8编码文本文件开头的BOM签名
+    */
+    public static String getBOM() {
+
+         byte b[] = {(byte)0xEF, (byte)0xBB, (byte)0xBF};
+         return new String(b);
+    }
+
+
+  /** 
+   * 生成CVS文件
+   * @param exportData 
+   *       源数据List 
+   * @param map 
+   *       csv文件的列表头map 
+   * @param outPutPath 
+   *       文件路径 
+   * @param fileName 
+   *       文件名称 
+   * @return 
+      */  
+    @SuppressWarnings("rawtypes")  
+    public static File createCSVFile(List exportData, LinkedHashMap map, String outPutPath,  
+                   String fileName) {  
+
+    File csvFile = null;  
+    BufferedWriter csvFileOutputStream = null;  
+    try {  
+      File file = new File(outPutPath);  
+      if (!file.exists()) {  
+        file.mkdirs();  
+      }  
+      //定义文件名格式并创建  
+      csvFile =new File(outPutPath+fileName+".csv");
+      file.createNewFile();  
+      // UTF-8使正确读取分隔符","  
+      //如果生产文件乱码，windows下用gbk，linux用UTF-8
+      csvFileOutputStream = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(  
+        csvFile), "UTF-8"), 1024);  
+
+      //写入前段字节流，防止乱码
+      csvFileOutputStream.write(getBOM());
+      // 写入文件头部
+      for (Iterator propertyIterator = map.entrySet().iterator(); propertyIterator.hasNext();) {  
+        java.util.Map.Entry propertyEntry = (java.util.Map.Entry) propertyIterator.next();  
+        csvFileOutputStream.write((String) propertyEntry.getValue() != null ? (String) propertyEntry.getValue() : "" );  
+        if (propertyIterator.hasNext()) {  
+          csvFileOutputStream.write(",");  
+        }  
+      }  
+      csvFileOutputStream.newLine();  
+      // 写入文件内容  
+      for (Iterator iterator = exportData.iterator(); iterator.hasNext();) {  
+          Object row = (Object) iterator.next();
+        for (Iterator propertyIterator = map.entrySet().iterator(); propertyIterator  
+          .hasNext();) {  
+          java.util.Map.Entry propertyEntry = (java.util.Map.Entry) propertyIterator  
+            .next();  
+          String str=row!=null?((String)((Map)row).get( propertyEntry.getKey())):"";
+
+          if(StringUtils.isEmpty(str)){
+              str="";
+          }else{
+              str=str.replaceAll("\"","\"\"");
+              if(str.indexOf(",")&gt;=0){
+                  str="\""+str+"\"";
+              }
+          }
+          csvFileOutputStream.write(str);  
+          if (propertyIterator.hasNext()) {  
+            csvFileOutputStream.write(",");  
+          }  
+        }  
+        if (iterator.hasNext()) {  
+          csvFileOutputStream.newLine();  
+        }  
+      }  
+      csvFileOutputStream.flush();  
+    } catch (Exception e) {  
+      e.printStackTrace();  
+    } finally {  
+      try {  
+        csvFileOutputStream.close();  
+      } catch (IOException e) {  
+        e.printStackTrace();  
+      }  
+    }  
+    return csvFile;  
+  }  
+
+  /**
+   *     生成并下载csv文件
+   * @param response
+   * @param exportData
+   * @param map
+   * @param outPutPath
+   * @param fileName
+   * @throws IOException
+      */
+    @SuppressWarnings("rawtypes")
+    public static void exportDataFile(HttpServletResponse response,List exportData, LinkedHashMap map, String outPutPath,String fileName) throws IOException{
+      File csvFile = null;  
+        BufferedWriter csvFileOutputStream = null;  
+        try {  
+          File file = new File(outPutPath);  
+          if (!file.exists()) {  
+            file.mkdirs();  
+          }  
+          //定义文件名格式并创建  
+          csvFile =new File(outPutPath+fileName+".csv");
+          if(csvFile.exists()){
+             csvFile.delete(); 
+          }
+          csvFile.createNewFile();  
+          // UTF-8使正确读取分隔符","  
+          //如果生产文件乱码，windows下用gbk，linux用UTF-8
+          csvFileOutputStream = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(csvFile), "UTF-8"), 1024);  
+          //写入前段字节流，防止乱码
+          csvFileOutputStream.write(getBOM());
+          // 写入文件头部  
+          for (Iterator propertyIterator = map.entrySet().iterator(); propertyIterator.hasNext();) {  
+            java.util.Map.Entry propertyEntry = (java.util.Map.Entry) propertyIterator.next();  
+            csvFileOutputStream.write((String) propertyEntry.getValue() != null ? (String) propertyEntry.getValue() : "" );  
+            if (propertyIterator.hasNext()) {  
+              csvFileOutputStream.write(",");  
+            }  
+          }  
+          csvFileOutputStream.newLine();  
+          // 写入文件内容  
+          for (Iterator iterator = exportData.iterator(); iterator.hasNext();) {  
+            Object row = (Object) iterator.next();  
+            for (Iterator propertyIterator = map.entrySet().iterator(); propertyIterator  
+              .hasNext();) {  
+              java.util.Map.Entry propertyEntry = (java.util.Map.Entry) propertyIterator  
+                .next();  
+              String str=row!=null?((String)((Map)row).get( propertyEntry.getKey())):"";
+              if(StringUtils.isEmpty(str)){
+                  str="";
+              }else{
+                  str=str.replaceAll("\"","\"\"");
+                  if(str.indexOf(",")&gt;=0){
+                      str="\""+str+"\"";
+                  }
+              }
+              csvFileOutputStream.write(str);  
+              if (propertyIterator.hasNext()) {  
+                csvFileOutputStream.write(",");  
+              }  
+            }  
+            if (iterator.hasNext()) {  
+              csvFileOutputStream.newLine();  
+            }  
+          }  
+          csvFileOutputStream.flush();  
+        } catch (Exception e) {  
+          e.printStackTrace();  
+        } finally {  
+          try {  
+            csvFileOutputStream.close();  
+          } catch (IOException e) {  
+            e.printStackTrace();  
+          }  
+        }  
+
+
+
+
+        InputStream in = null;  
+        try {  
+          in = new FileInputStream(outPutPath+fileName+".csv");  
+          int len = 0;  
+          byte[] buffer = new byte[1024];  
+
+          OutputStream out = response.getOutputStream(); 
+          response.reset(); 
+
+          response.setContentType("application/csv;charset=UTF-8");  
+          response.setHeader("Content-Disposition","attachment; filename=" + URLEncoder.encode(fileName+".csv", "UTF-8"));  
+          response.setCharacterEncoding("UTF-8"); 
+          while ((len = in.read(buffer)) &gt; 0) {  
+            out.write(new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF });  
+            out.write(buffer, 0, len);  
+          }
+          out.close();
+        } catch (FileNotFoundException e) {  
+        } finally {  
+          if (in != null) {  
+            try {  
+              in.close();  
+            } catch (Exception e) {  
+              throw new RuntimeException(e);  
+            }  
+          }  
+        }
+
+
+  }
+
+  /** 
+   * 删除该目录filePath下的所有文件 
+   * @param filePath 
+   *      文件目录路径 
+      */  
+    public static void deleteFiles(String filePath) {  
+
+    File file = new File(filePath);  
+    if (file.exists()) {  
+      File[] files = file.listFiles();  
+      for (int i = 0; i &lt; files.length; i++) {  
+        if (files[i].isFile()) {  
+          files[i].delete();  
+        }  
+      }  
+    }  
+  }  
+
+  /** 
+   * 删除单个文件 
+   * @param filePath 
+   *     文件目录路径 
+   * @param fileName 
+   *     文件名称 
+      */  
+    public static void deleteFile(String filePath, String fileName) {  
+
+    File file = new File(filePath);  
+    if (file.exists()) {  
+      File[] files = file.listFiles();  
+      for (int i = 0; i &lt; files.length; i++) {  
+        if (files[i].isFile()) {  
+          if (files[i].getName().equals(fileName)) {  
+            files[i].delete();  
+            return;  
+          }  
+        }  
+      }  
+    }  
+  }  
+
+  /** 
+   * 测试数据 
+   * @param args 
+      */  
+    @SuppressWarnings({ "rawtypes", "unchecked" })  
+    public static void main(String[] args) {  
+
+    List exportData = new ArrayList&lt;Map&gt;();  
+    Map row1 = new LinkedHashMap&lt;String, String&gt;();  
+    row1.put("1", "11");  
+    row1.put("2", "12");  
+    row1.put("3", "13");  
+    row1.put("4", "14");  
+    exportData.add(row1);  
+    row1 = new LinkedHashMap&lt;String, String&gt;();  
+    row1.put("1", "21");  
+    row1.put("2", "22");  
+    row1.put("3", "23");  
+    row1.put("4", "24");  
+    exportData.add(row1);  
+    LinkedHashMap map = new LinkedHashMap();  
+
+    //设置列名
+    map.put("1", "第一列名称");  
+    map.put("2", "第二列名称");  
+    map.put("3", "第三列名称");  
+    map.put("4", "第四列名称");  
+    //这个文件上传到路径，可以配置在数据库从数据库读取，这样方便一些！
+    String path = "E:/";  
+
+   //文件名=生产的文件名称+时间戳
+    String fileName = "文件导出";  
+    File file = CSVUtils.createCSVFile(exportData, map, path, fileName);  
+    String fileName2 = file.getName();  
+    System.out.println("文件名称：" + fileName2);  
+  }  
+}</code></pre>
+
+<p><img alt class="has" src="https://images2018.cnblogs.com/blog/1443172/201808/1443172-20180813231232388-1283590677.png"></p>
+
+<p>转自<a href="https://www.cnblogs.com/hanfengyeqiao/p/9471694.html" target="_blank" rel="external nofollow noopener noreferrer">https://www.cnblogs.com/hanfengyeqiao/p/9471694.html</a></p>
+
+<p> </p>
+
+<p>需要注意的是生成的csv其中的数字若过长，csv中查看没有问题，但是用excel打开数字就会变成科学计数法 </p>
+
+<p>解决方法是在生成csv的时候,在数字的前面或后面加上"\t"制表符，再用excel打开问题解决！如 “1234567890\ t”,“\ t1213212312”</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2018/11/22/Redis%E7%AC%94%E8%AE%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -709,7 +1104,7 @@ Master接到命令启动后台的存盘进程，同时收集所有接收到的�
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-count">12</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="folyjzSrNTxM-gzANuN149Z3GWMMc4Go2VluVGIRh48">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yyguy123.github.io","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一、Nginx配置虚拟主机  什么是虚拟主机？         虚拟主机是一种特殊的软硬件技术，它可以将网络上的每一台计算机分成多个虚拟主机，每个虚拟主机可以独立对外提供www服务，这样就可以实现一台主机对外提供多个web服务，每个虚拟主机之间是独立的，互不影响的。        通过nginx可以实现虚拟主机的配置，nginx支持三种类型的虚拟主机配置，1、基于ip的虚拟主机， 2、基于域名">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx的反向代理和负载均衡">
+<meta property="og:url" content="http://yyguy123.github.io/2019/12/08/Nginx%E7%9A%84%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E5%92%8C%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/index.html">
+<meta property="og:site_name" content="yyguy123的个人博客">
+<meta property="og:description" content="一、Nginx配置虚拟主机  什么是虚拟主机？         虚拟主机是一种特殊的软硬件技术，它可以将网络上的每一台计算机分成多个虚拟主机，每个虚拟主机可以独立对外提供www服务，这样就可以实现一台主机对外提供多个web服务，每个虚拟主机之间是独立的，互不影响的。        通过nginx可以实现虚拟主机的配置，nginx支持三种类型的虚拟主机配置，1、基于ip的虚拟主机， 2、基于域名">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-12-08T11:01:57.000Z">
+<meta property="article:modified_time" content="2020-05-01T11:44:24.630Z">
+<meta property="article:author" content="yyguy123">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yyguy123.github.io/2019/12/08/Nginx%E7%9A%84%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E5%92%8C%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Nginx的反向代理和负载均衡 | yyguy123的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">yyguy123的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">若无闲事挂心头，便是人间好时节</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2019/12/08/Nginx%E7%9A%84%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E5%92%8C%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Nginx的反向代理和负载均衡
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-08 19:01:57" itemprop="dateCreated datePublished" datetime="2019-12-08T19:01:57+08:00">2019-12-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:44:24" itemprop="dateModified" datetime="2020-05-01T19:44:24+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <a id="more"></a>
+
+<h2>一、Nginx配置虚拟主机</h2>
+
+<ul><li>什么是虚拟主机？ </li>
+</ul><p>       虚拟主机是一种特殊的软硬件技术，它可以将网络上的每一台计算机分成多个虚拟主机，每个虚拟主机可以独立对外提供www服务，这样就可以实现一台主机对外提供多个web服务，每个虚拟主机之间是独立的，互不影响的。 </p>
+
+<p>     通过nginx可以实现虚拟主机的配置，nginx支持三种类型的虚拟主机配置，1、基于ip的虚拟主机， 2、基于域名的虚拟主机 3、基于端口的虚拟主机。</p>
+
+<h3><strong>1.1  基于ip的虚拟主机配置</strong></h3>
+
+<p>      Linux操作系统允许添加IP别名，IP别名就是在一块物理网卡上绑定多个lP地址。这样就能够在使用单一网卡的同一个服务器上运行多个基于IP的虚拟主机。</p>
+
+<p>一台nginx服务器绑定两个ip：192.168.101.3、192.168.101.103   </p>
+
+<p>访问不同的ip请求不同的html目录，即：</p>
+
+<p style="margin-left:0cm;">访问http://192.168.101.3将访问“html3”目录下的html网页</p>
+
+<p>访问http://192.168.101.103将访问“html103”目录下的html网页</p>
+
+<p><strong>1.1.1 创建html文件夹</strong></p>
+
+<p>将原来nginx的html目录拷贝两个目录 “html3”和“html103”，为了方便测试需要修改每个目录下的index.html内容使之个性化。</p>
+
+<p><strong>1.1.2 绑定多ip：</strong></p>
+
+<p style="margin-left:0cm;">1、将/etc/sysconfig/network-scripts/ifcfg-eth0文件复制一份，命名为ifcfg-eth0:1</p>
+
+<p style="margin-left:0cm;">修改其中内容：</p>
+
+<p style="margin-left:0cm;">DEVICE=eth0:1</p>
+
+<p style="margin-left:0cm;">IPADDR=192.168.25.103</p>
+
+<p style="margin-left:0cm;">其他项不用修改</p>
+
+<p style="margin-left:0cm;">2、重启系统</p>
+
+<p style="margin-left:0cm;"><strong>1.1.3 配置虚拟主机</strong></p>
+
+<p style="margin-left:0cm;">修改/usr/local/nginx/conf/nginx.conf文件，添加两个虚拟主机，如下：</p>
+
+<pre class="has">
+<code class="language-bash">#user  nobody;
+worker_processes  1;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+
+    keepalive_timeout  65;
+    #配置虚拟主机192.168.101.3
+    server {
+    #监听的ip和端口，配置192.168.101.3:80
+        listen       80;
+    #虚拟主机名称这里配置ip地址
+        server_name  192.168.101.3;
+    #所有的请求都以/开始，所有的请求都可以匹配此location
+        location / {
+        #使用root指令指定虚拟主机目录即网页存放目录
+        #比如访问http://ip/test.html将找到/usr/local/html3/test.html
+        #比如访问http://ip/item/test.html将找到/usr/local/html3/item/test.html
+
+            root   /usr/local/nginx/html3;
+        #指定欢迎页面，按从左到右顺序查找
+            index  index.html index.htm;
+        }
+
+    }
+    #配置虚拟主机192.168.101.103
+    server {
+        listen       80;
+        server_name  192.168.101.103;
+
+        location / {
+            root   /usr/local/nginx/html103;
+            index  index.html index.htm;
+        }
+
+    }
+
+}
+</code></pre>
+
+<h3>1.2 基于端口的虚拟主机 </h3>
+
+<p style="margin-left:0cm;">nginx对外提供80和8080两个端口监听服务。</p>
+
+<p style="margin-left:0cm;">请求80端口则请求html80目录下的html</p>
+
+<p style="margin-left:0cm;">请求8080端口则请求html8080目录下的html</p>
+
+<p style="margin-left:0cm;"><strong>1.2.1 创建html目录</strong></p>
+
+<p style="margin-left:0cm;">将原来nginx的html目录拷贝两个目录 “html80”和“html8080”，为了方便测试需要修改每个目录下的index.html内容使之个性化。</p>
+
+<p style="margin-left:0cm;"><strong>1.2.2 配置虚拟主机</strong></p>
+
+<p style="margin-left:0cm;">修改/usr/local/nginx/conf/nginx.conf文件，添加两个虚拟主机，如下：</p>
+
+<pre class="has">
+<code class="language-bash">#user  nobody;
+worker_processes  1;
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+
+    keepalive_timeout  65;
+    #配置虚拟主机
+    server {
+    #监听的ip和端口，配置80
+        listen       80;
+    #虚拟主机名称这里配置ip地址
+        server_name  192.168.101.3;
+    #所有的请求都以/开始，所有的请求都可以匹配此location
+        location / {
+        #使用root指令指定虚拟主机目录即网页存放目录
+        #比如访问http://ip/test.html将找到/usr/local/html3/test.html
+        #比如访问http://ip/item/test.html将找到/usr/local/html3/item/test.html
+
+            root   /usr/local/nginx/html80;
+        #指定欢迎页面，按从左到右顺序查找
+            index  index.html index.htm;
+        }
+
+    }
+    #配置虚拟主机
+    server {
+        listen       8080;
+        server_name  192.168.101.3;
+
+        location / {
+            root   /usr/local/nginx/html8080;
+            index  index.html index.htm;
+        }
+
+    }
+
+}
+</code></pre>
+
+<h3>1.3 基于域名的虚拟主机</h3>
+
+<p style="margin-left:0cm;">两个域名指向同一台nginx服务器，用户访问不同的域名显示不同的网页内容。</p>
+
+<p style="margin-left:0cm;">两个域名是aaa.test.com和bbb.test.com</p>
+
+<p style="margin-left:0cm;">nginx服务器使用虚拟机192.168.101.3</p>
+
+<p style="margin-left:0cm;"><strong>1.3.1 创建html目录</strong></p>
+
+<p style="margin-left:0cm;">在192.168.101.3上创建/usr/local/aaa_html，此目录为aaa.test.com域名访问的目录</p>
+
+<p style="margin-left:0cm;">在192.168.101.3上创建/usr/local/bbb_html，此目录为bbb.test.com域名访问的目录</p>
+
+<p style="margin-left:0cm;">目录中的内容使用nginx自带的html文件，将/usr/local/nginx/html中的内容拷贝分别拷贝到上边两个目录中，并且将aaa_html目录中的index.html内容改为：“Welcome to aaa nginx!”</p>
+
+<p style="margin-left:0cm;">将bbb_html目录中的index.html内容改为“Welcome to bbb nginx!”</p>
+
+<p style="margin-left:0cm;"><strong>1.3.2 配置虚拟主机</strong></p>
+
+<p style="margin-left:0cm;">修改/usr/local/nginx/conf/nginx.conf文件，添加两个虚拟主机，如下： </p>
+
+<pre class="has">
+<code>#配置虚拟主机aaa.test.com 
+server {
+        #监听的ip和端口，配置本机ip和端口
+        listen 192.168.101.3:80;        
+        #虚拟主机名称是aaa.test.com，请求域名aaa.test.com的url将由此server配置解析
+        server_name aaa.test.com;     
+        #所有的请求都以/开始，所有的请求都可以匹配此location
+        location / {
+        #使用root指令指定虚拟主机目录即网页存放目录
+        #比如访问http://ip/test.html将找到/usr/local/aaa_html/test.html
+        #比如访问http://ip/item/test.html将找到/usr/local/aaa_html/item/test.html
+                root /usr/local/aaa_html;    
+                #指定欢迎页面，按从左到右顺序查找
+                index index.html index.htm;    
+        }
+    }
+
+#配置虚拟主机bbb.test.com
+    server {
+        listen 192.168.101.3:80;
+        server_name bbb.test.com;
+        location / {
+                root /usr/local/bbb_html;
+                index index.html index.htm;
+        }
+    }
+
+</code></pre>
+
+<p style="margin-left:0cm;"> </p>
+
+<h2 style="margin-left:0cm;">二 、Nginx反向代理</h2>
+
+<ol><li style="margin-left:0cm;">什么是反向代理？</li>
+</ol><p style="margin-left:0cm;">      通常的代理服务器，只用于代理内部网络对Internet的连接请求，客户机必须指定代理服务器,并将本来要直接发送到Web服务器上的http请求发送到代理服务器中由代理服务器向Internet上的web服务器发起请求，最终达到客户机上网的目的。</p>
+
+<p style="margin-left:0cm;">      而反向代理（Reverse Proxy）方式是指以代理服务器来接受internet上的连接请求，然后将请求转发给内部网络上的服务器，并将从服务器上得到的结果返回给internet上请求连接的客户端，此时代理服务器对外就表现为一个反向代理服务器。</p>
+
+<p style="margin-left:0cm;">两个tomcat服务通过nginx反向代理，本例子使用三台虚拟机进行测试，</p>
+
+<p style="margin-left:0cm;">         nginx服务器：192.168.101.3</p>
+
+<p style="margin-left:0cm;">         tomcat1服务器：192.168.101.5</p>
+
+<p style="margin-left:0cm;">         tomcat2服务器：192.168.101.6</p>
+
+<p style="margin-left:0cm;"><strong>Nginx反向代理配置</strong></p>
+
+<p style="margin-left:0cm;">根据上边的需求在nginx.conf文件中配置反向代理，如下：</p>
+
+<pre class="has">
+<code>#配置一个代理即tomcat1服务器
+upstream tomcat_server1 {
+            server 192.168.101.5:8080;
+        }
+#配置一个代理即tomcat2服务器
+    upstream tomcat_server2 {
+            server 192.168.101.6:8080;
+        }
+
+#配置一个虚拟主机
+    server {
+        listen 80;
+        server_name aaa.test.com;
+        location / {
+                #域名aaa.test.com的请求全部转发到tomcat_server1即tomcat1服务上
+                proxy_pass http://tomcat_server1;
+                #欢迎页面，按照从左到右的顺序查找页面
+                index index.jsp index.html index.htm;
+        }
+
+    }
+
+    server {
+        listen 80;
+        server_name bbb.test.com;
+
+        location / {
+                 #域名bbb.test.com的请求全部转发到tomcat_server2即tomcat2服务上
+                  proxy_pass http://tomcat_server2;
+                  index index.jsp index.html index.htm;
+        }
+    }
+</code></pre>
+
+<p style="margin-left:0cm;">如果在同一个域名下有多台服务器提供服务，此时需要nginx负载均衡。</p>
+
+<h2 style="margin-left:0cm;">三、Nginx负载均衡</h2>
+
+<ol><li>什么是负载均衡？</li>
+</ol><p style="margin-left:0cm;">       负载均衡 建立在现有网络结构之上，它提供了一种廉价有效透明的方法扩展网络设备和服务器的带宽、增加吞吐量、加强网络数据处理能力、提高网络的灵活性和可用性。</p>
+
+<p style="margin-left:0cm;">       负载均衡，英文名称为Load Balance，其意思就是分摊到多个操作单元上进行执行，例如Web服务器、FTP服务器、企业关键应用服务器和其它关键任务服务器等，从而共同完成工作任务。</p>
+
+<p style="margin-left:0cm;">nginx作为负载均衡服务器，用户请求先到达nginx，再由nginx根据负载配置将请求转发至 tomcat服务器。</p>
+
+<p style="margin-left:0cm;">         nginx负载均衡服务器：192.168.101.3</p>
+
+<p style="margin-left:0cm;">         tomcat1服务器：192.168.101.5</p>
+
+<p style="margin-left:0cm;">         tomcat2服务器：192.168.101.6</p>
+
+<p style="margin-left:0cm;"><strong>Nginx负载均衡配置</strong></p>
+
+<p style="margin-left:0cm;">根据上边的需求在nginx.conf文件中配置负载均衡，如下：</p>
+
+<pre class="has">
+<code>upstream tomcat_server_pool{
+        server 192.168.101.5:8080 weight=10;
+        server 192.168.101.6:8080 weight=10;
+        }
+
+    server {
+        listen 80;
+        server_name aaa.test.com;
+        location / {
+                 proxy_pass http://tomcat_server_pool;
+                 index index.jsp index.html index.htm;
+        }
+    }
+</code></pre>
+
+<pre class="has">
+<code>节点说明：
+在http节点里添加:
+
+#定义负载均衡设备的 Ip及设备状态 
+upstream myServer {   
+
+    server 127.0.0.1:9090 down; 
+    server 127.0.0.1:8080 weight=2; 
+    server 127.0.0.1:6060; 
+    server 127.0.0.1:7070 backup; 
+}
+
+在需要使用负载的Server节点下添加
+
+proxy_pass http://myServer;
+
+upstream 每个设备的状态:
+
+down 表示单前的server暂时不参与负载 
+weight  默认为1.weight越大，负载的权重就越大。 
+max_fails ：允许请求失败的次数默认为1.当超过最大次数时，返回proxy_next_upstream 模块定义的错误 
+fail_timeout:max_fails 次失败后，暂停的时间。 
+backup： 其它所有的非backup机器down或者忙的时候，请求backup机器。所以这台机器压力会最轻。
+</code></pre>
+
+<p style="margin-left:0cm;">解决高可用的方案就是添加冗余。</p>
+
+<p style="margin-left:0cm;"> </p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>坚持技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="yyguy123 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="yyguy123 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/05/Java%E9%80%9A%E8%BF%87%E5%BA%8F%E5%88%97%E5%8C%96%E5%AE%9E%E7%8E%B0%E6%B7%B1%E5%BA%A6%E5%A4%8D%E5%88%B6/" rel="prev" title="Java通过序列化实现深度复制">
+      <i class="fa fa-chevron-left"></i> Java通过序列化实现深度复制
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/01/MyBatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%B8%80)%E2%80%94%E2%80%94MyBatis%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E8%A7%A3%E6%9E%90/" rel="next" title="MyBatis源码解析(一)——MyBatis初始化过程解析">
+      MyBatis源码解析(一)——MyBatis初始化过程解析 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text">一、Nginx配置虚拟主机</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#"><span class="nav-number">1.1.</span> <span class="nav-text">1.1  基于ip的虚拟主机配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 基于端口的虚拟主机 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 基于域名的虚拟主机</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text">二 、Nginx反向代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">3.</span> <span class="nav-text">三、Nginx负载均衡</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="yyguy123" src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">yyguy123</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yyguy123" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yyguy123" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yyguy123@gmail.com" title="E-Mail → mailto:yyguy123@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">yyguy123</span>
+</div>
+  
+  <div>
+      <span>版权声明：本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="external nofollow noopener noreferrer">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</span>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '2274aa537532ecf3cabe',
+      clientSecret: '45c6c0de0d52ec8e9523cfaca4ce3c88923f4a3f',
+      repo        : 'yyguy123.github.io',
+      owner       : 'yyguy123',
+      admin       : ['yyguy123'],
+      id          : 'd23191863a5a09d27f70cc190ab4ae0a',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
