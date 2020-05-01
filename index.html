@@ -188,6 +188,718 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2020/05/01/Java8%20Stream/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/01/Java8%20Stream/" class="post-title-link" itemprop="url">Java8 Stream</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-01 19:10:49" itemprop="dateCreated datePublished" datetime="2020-05-01T19:10:49+08:00">2020-05-01</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Lambda表达式基本语法"><a href="#Lambda表达式基本语法" class="headerlink" title="Lambda表达式基本语法"></a>Lambda表达式基本语法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java8_01.Stream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> java.util.Comparator;</span><br><span class="line"><span class="keyword">import</span> java.util.TreeSet;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *   Lambda表达式基本语法：</span></span><br><span class="line"><span class="comment"> *          parameters -&gt; expression</span></span><br><span class="line"><span class="comment"> *  一、 无参  无返回值</span></span><br><span class="line"><span class="comment"> *       () -&gt; System.out.println("Hello Lambda");</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  二、 有参  无返回值</span></span><br><span class="line"><span class="comment"> *       x -&gt; System.out.println(x);</span></span><br><span class="line"><span class="comment"> *       (x,y) -&gt; System.out.println(x +y);</span></span><br><span class="line"><span class="comment"> *  三、 有参  有返回值 Lambda体有多条语句</span></span><br><span class="line"><span class="comment"> *       (x,y) -&gt; &#123;System.out.println(x +y); return x+y;&#125;</span></span><br><span class="line"><span class="comment"> *       若Lambda体只有一条语句可省略&#123;&#125;和return</span></span><br><span class="line"><span class="comment"> *       (x,y) -&gt; x+y</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  Java8 内置四大核心函数式接口</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  Consumer&lt;T&gt;: 消费型接口</span></span><br><span class="line"><span class="comment"> *      void accept(T t);</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  Supplier&lt;T&gt;: 供给型接口</span></span><br><span class="line"><span class="comment"> *      T get();</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  Function&lt;T,R&gt;: 函数型接口</span></span><br><span class="line"><span class="comment"> *      R apply(T t);</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  Predicate&lt;T&gt;: 断言型接口</span></span><br><span class="line"><span class="comment"> *      boolean test(T t);</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  方法引用：若Lambda体中内容有方法已经实现，可以使用方法引用</span></span><br><span class="line"><span class="comment"> *  主要有三种语法格式：</span></span><br><span class="line"><span class="comment"> *      对象::实例方法名</span></span><br><span class="line"><span class="comment"> *      类::静态方法名</span></span><br><span class="line"><span class="comment"> *      类::实例方法名</span></span><br><span class="line"><span class="comment"> *  注意：</span></span><br><span class="line"><span class="comment"> *      ①Lambda体中调用方法的参数列表和返回值类型要与函数式接口中参数列表和返回值类型保持一致</span></span><br><span class="line"><span class="comment"> *      ②若Lambda参数列表中第一参数是方法调用者，第二参数是实例方法的参数，可以使用ClassName::method</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  构造器引用： ClassName::new</span></span><br><span class="line"><span class="comment"> *      需要调用的构造器参数列表与函数式接口中抽象方法参数列表保持一致</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  数组引用：Type[]::new</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestLambda</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Comparator&lt;Integer&gt; com = <span class="keyword">new</span> Comparator&lt;Integer&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(Integer o1, Integer o2)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> Integer.compare(o1,o2);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        TreeSet&lt;Integer&gt; tree =<span class="keyword">new</span> TreeSet&lt;&gt;(com);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Lambda表达式</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span></span>&#123;</span><br><span class="line">        TreeSet&lt;Integer&gt; tree = <span class="keyword">new</span> TreeSet&lt;&gt;((x,y) -&gt; Integer.compare(x,y));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Stream流式操作"><a href="#Stream流式操作" class="headerlink" title="Stream流式操作"></a>Stream流式操作</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java8_01.Stream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">import</span> java.util.stream.Collectors;</span><br><span class="line"><span class="keyword">import</span> java.util.stream.Stream;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Stream的三个步骤</span></span><br><span class="line"><span class="comment"> * 1、创建Stream</span></span><br><span class="line"><span class="comment"> * 2、中间操作</span></span><br><span class="line"><span class="comment"> * 3、终止操作</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StreamDemo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 一、创建Stream</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//1、通过Collection系列集合提供的stream()或parallelStream()</span></span><br><span class="line">        List&lt;String&gt; list=<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        Stream&lt;String&gt; stream = list.stream();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2、通过Arrays中的静态方法stream()获取数组流</span></span><br><span class="line">        User[] users=<span class="keyword">new</span> User[<span class="number">10</span>];</span><br><span class="line">        Stream&lt;User&gt; stream1 = Arrays.stream(users);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//3、通过Stream中的静态方法of()</span></span><br><span class="line">        Stream&lt;String&gt; ss = Stream.of(<span class="string">"aa"</span>, <span class="string">"bb"</span>, <span class="string">"cc"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//4、创建无限流</span></span><br><span class="line">        <span class="comment">//迭代</span></span><br><span class="line">        Stream.iterate(<span class="number">0</span>,x -&gt; x+<span class="number">2</span>).limit(<span class="number">10</span>).forEach(System.out::println);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//生成</span></span><br><span class="line">        Stream.generate(() -&gt; Math.random()).limit(<span class="number">5</span>).forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 二、中间操作</span></span><br><span class="line"><span class="comment">     * 筛选与切片</span></span><br><span class="line"><span class="comment">     * filter--接收Lambda  从流中过滤某些元素</span></span><br><span class="line"><span class="comment">     * limit--截断流，使其元素不超过给定数量</span></span><br><span class="line"><span class="comment">     * skip(n)--跳过元素，返回一个跳过了前n个元素的流，若流中元素不足n个，则返回一个空流</span></span><br><span class="line"><span class="comment">     * distinct--通过流中元素的hashCode和equals去重元素</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * filter</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span>  <span class="title">test2</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        List&lt;User&gt; userList = User.getUserList();</span><br><span class="line">        <span class="comment">//中间操作</span></span><br><span class="line">        <span class="comment">//中间操作不会执行任何操作，只有执行终止操作，中间操作才会被全部执行 “惰性求值”</span></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 内部迭代:迭代操作由StreamAPI完成</span></span><br><span class="line"><span class="comment">         * 这里 “Stream的中间操作” 会输出userList.size()次</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        Stream&lt;User&gt; userStream = userList.stream().filter(e -&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            System.out.println(<span class="string">"Stream的中间操作"</span>);</span><br><span class="line">            <span class="keyword">return</span> e.getAge() &gt; <span class="number">30</span>;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//终止操作  一次性执行全部内容</span></span><br><span class="line">        userStream.forEach(System.out::println);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * limit</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test3</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 这里 “断路” 不一定会输出userList.size()次 找到两条符合条件记录就不会再遍历</span></span><br><span class="line"><span class="comment">         * 短路操作</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        List&lt;User&gt; userList = User.getUserList();</span><br><span class="line">        userList.stream().filter(e -&gt; &#123;</span><br><span class="line">            System.out.println(<span class="string">"短路"</span>);</span><br><span class="line">            <span class="keyword">return</span> e.getAge() &gt; <span class="number">22</span>;</span><br><span class="line">        &#125;).limit(<span class="number">2</span>).forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * skip</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test4</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;User&gt; userList = User.getUserList();</span><br><span class="line">        <span class="comment">//满足filter条件的结果集跳过两个元素后输出</span></span><br><span class="line">        userList.stream().filter(e -&gt; e.getAge() &gt; <span class="number">20</span>).skip(<span class="number">2</span>).forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * distinct</span></span><br><span class="line"><span class="comment">     * 注意：distinct 是通过流中元素的hashCode和equals去重元素，必要时需重写hashCode和equals</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test5</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;User&gt; userList = User.getUserList();</span><br><span class="line">        userList.stream().distinct().forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 映射</span></span><br><span class="line"><span class="comment">     * map--接受Lambda，将元素转换为其他形式或提取信息。</span></span><br><span class="line"><span class="comment">     *      接收一个函数作为参数，该函数会被应用到每个元素上，并将其映射为一个新元素</span></span><br><span class="line"><span class="comment">     * flatMap--接收一个函数作为参数，将流中每个值都换成另一个流，然后把所有流连接成一个流</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test6</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;String&gt; list = Arrays.asList(<span class="string">"aaa"</span>, <span class="string">"bbb"</span>, <span class="string">"ccc"</span>, <span class="string">"ddd"</span>, <span class="string">"eee"</span>);</span><br><span class="line">        list.stream().map((str) -&gt; str.toUpperCase()).forEach(System.out::println);</span><br><span class="line">        System.out.println(<span class="string">"----------------------------"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/*Stream&lt;Stream&lt;Character&gt;&gt; streamStream = list.stream().map(StreamDemo::filterCharacter);</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">        streamStream.forEach(sm -&gt; &#123;sm.forEach(System.out::println);&#125;);*/</span></span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">"----------------------------"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//flatMap</span></span><br><span class="line">        Stream&lt;Character&gt; characterStream = list.stream().flatMap(StreamDemo::filterCharacter);</span><br><span class="line">        characterStream.forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Stream&lt;Character&gt; <span class="title">filterCharacter</span><span class="params">(String str)</span></span>&#123;</span><br><span class="line">        List&lt;Character&gt; list =<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span>(Character ch:str.toCharArray())&#123;</span><br><span class="line">                list.add(ch);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> list.stream();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 排序</span></span><br><span class="line"><span class="comment">     * sorted--自然排序（comparable）</span></span><br><span class="line"><span class="comment">     * sorted（comparator）--定制排序（Comparator）</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sortTest</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;String&gt; list = Arrays.asList(<span class="string">"ccc"</span>, <span class="string">"aaa"</span>, <span class="string">"abc"</span>, <span class="string">"cbd"</span>);</span><br><span class="line">        list.stream().sorted().forEach(System.out::println);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">"-------------------"</span>);</span><br><span class="line"></span><br><span class="line">        List&lt;User&gt; userList = User.getUserList();</span><br><span class="line">        userList.stream().sorted((e1,e2) -&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(e1.getAge()==e2.getAge())&#123;</span><br><span class="line">                <span class="keyword">return</span> e1.getName().compareTo(e2.getName());</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">return</span>  e1.getAge() - e2.getAge();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;).forEach(System.out::println);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 终止操作</span></span><br><span class="line"><span class="comment">     **/</span></span><br><span class="line"></span><br><span class="line">     <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *查找与匹配</span></span><br><span class="line"><span class="comment">     * allMatch--检查是否匹配所有元素</span></span><br><span class="line"><span class="comment">     * anyMatch--检查是否至少匹配一个元素</span></span><br><span class="line"><span class="comment">     * noneMatch--检查是否没有匹配所有元素</span></span><br><span class="line"><span class="comment">     * findFirst--返回第一个元素</span></span><br><span class="line"><span class="comment">     * findAny--返回当前流中任意元素</span></span><br><span class="line"><span class="comment">     * count--返回流中元素总个数</span></span><br><span class="line"><span class="comment">     * max--返回流中最大值</span></span><br><span class="line"><span class="comment">     * min--返回流中最小值</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;User&gt; users = Arrays.asList(</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"001"</span>, <span class="number">38</span>, User.Status.VOCATION),</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"003"</span>, <span class="number">20</span>, User.Status.BUSY),</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"005"</span>, <span class="number">18</span>, User.Status.FREE),</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"004"</span>, <span class="number">35</span>, User.Status.BUSY),</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"002"</span>, <span class="number">27</span>, User.Status.FREE)</span><br><span class="line">        );</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> b1 = users.stream().allMatch(e -&gt; e.getStatus().equals(User.Status.BUSY));</span><br><span class="line">        System.out.println(b1);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> b2 = users.stream().anyMatch(e -&gt; e.getStatus().equals(User.Status.BUSY));</span><br><span class="line">        System.out.println(b2);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> b3 = users.stream().noneMatch(e -&gt; e.getStatus().equals(User.Status.BUSY));</span><br><span class="line">        System.out.println(b3);</span><br><span class="line"></span><br><span class="line">        Optional&lt;User&gt; first = users.stream().sorted((e1, e2) -&gt; Integer.compare(e1.getAge(), e2.getAge()))</span><br><span class="line">                .findFirst();</span><br><span class="line">        System.out.println(first.get());</span><br><span class="line"></span><br><span class="line">        <span class="comment">//parallelStream  并行</span></span><br><span class="line">        Optional&lt;User&gt; any = users.parallelStream().filter(e -&gt; e.getStatus().equals(User.Status.FREE))</span><br><span class="line">                .findAny();</span><br><span class="line">        System.out.println(any.get());</span><br><span class="line"></span><br><span class="line">        System.out.println(users.stream().count());</span><br><span class="line"></span><br><span class="line">        Optional&lt;User&gt; max = users.stream().max((e1, e2) -&gt; Integer.compare(e1.getAge(), e2.getAge()));</span><br><span class="line">        System.out.println(max.get());</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 归约</span></span><br><span class="line"><span class="comment">     * reduce(T,BinaryOperator) / reduce(BinaryOperator)  可将流中元素反复结合起来，得到一个值</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">reduceTest</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;Integer&gt; list = Arrays.asList(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>);</span><br><span class="line">        Integer sum = list.stream().reduce(<span class="number">0</span>, (x, y) -&gt; x + y);</span><br><span class="line">        System.out.println(sum);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 收集</span></span><br><span class="line"><span class="comment">     * collect--将流转换为其他形式，接收一个Collect接口的实现 用于给Stream中元素做汇总的方法</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">collectTest</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;User&gt; users = Arrays.asList(</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"001"</span>, <span class="number">38</span>, User.Status.VOCATION),</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"003"</span>, <span class="number">20</span>, User.Status.BUSY),</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"005"</span>, <span class="number">18</span>, User.Status.FREE),</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"004"</span>, <span class="number">35</span>, User.Status.BUSY),</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"002"</span>, <span class="number">27</span>, User.Status.FREE)</span><br><span class="line">        );</span><br><span class="line">        users.stream().map(User::getName).collect(Collectors.toList()).forEach(System.out::println);</span><br><span class="line">        users.stream().map(User::getName).collect(Collectors.toSet()).forEach(System.out::println);</span><br><span class="line">        users.stream().map(User::getName).collect(Collectors.toCollection(HashSet::<span class="keyword">new</span>)).forEach(System.out::println);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="并行流"><a href="#并行流" class="headerlink" title="并行流"></a>并行流</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java8_01.parallelStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.RecursiveTask;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ForkJoinCaculate</span> <span class="keyword">extends</span> <span class="title">RecursiveTask</span>&lt;<span class="title">Long</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">long</span> start;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">long</span> end;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> THRESHOLD=<span class="number">10000</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ForkJoinCaculate</span><span class="params">(<span class="keyword">long</span> start, <span class="keyword">long</span> end)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.start = start;</span><br><span class="line">        <span class="keyword">this</span>.end = end;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Long <span class="title">compute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> length=end -start;</span><br><span class="line">        <span class="keyword">if</span>(length&lt;=THRESHOLD)&#123;</span><br><span class="line">            <span class="keyword">long</span> sum=<span class="number">0</span>;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">long</span> i=start;i&lt;=end;i++)&#123;</span><br><span class="line">                sum+=i;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> sum;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">long</span> middle = (start + end) /<span class="number">2</span>;</span><br><span class="line">            ForkJoinCaculate left=<span class="keyword">new</span> ForkJoinCaculate(start,middle);</span><br><span class="line">            left.fork();</span><br><span class="line"></span><br><span class="line">            ForkJoinCaculate right=<span class="keyword">new</span> ForkJoinCaculate(middle+<span class="number">1</span>,end);</span><br><span class="line">            right.fork();</span><br><span class="line">            <span class="keyword">return</span> left.join() + right.join();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java8_01.parallelStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.time.Duration;</span><br><span class="line"><span class="keyword">import</span> java.time.Instant;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ForkJoinPool;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ForkJoinTask;</span><br><span class="line"><span class="keyword">import</span> java.util.stream.LongStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestForkJoin</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Instant start = Instant.now();</span><br><span class="line"></span><br><span class="line">        ForkJoinPool pool=<span class="keyword">new</span> ForkJoinPool();</span><br><span class="line">        ForkJoinTask&lt;Long&gt; task=<span class="keyword">new</span> ForkJoinCaculate(<span class="number">0</span>,<span class="number">100000000000L</span>);</span><br><span class="line">        Long sum=pool.invoke(task);</span><br><span class="line">        System.out.println(sum);</span><br><span class="line"></span><br><span class="line">        Instant end = Instant.now();</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">"耗时（ms）："</span>+ Duration.between(start,end).toMillis());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Instant start = Instant.now();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> sum=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">long</span> i=<span class="number">0</span>;i&lt;=<span class="number">100000000000L</span>;i++)&#123;</span><br><span class="line">            sum+=i;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(sum);</span><br><span class="line">        Instant end = Instant.now();</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">"耗时（ms）："</span>+ Duration.between(start,end).toMillis());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Java8并行流</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test3</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Instant start = Instant.now();</span><br><span class="line"></span><br><span class="line">        LongStream.rangeClosed(<span class="number">0</span>,<span class="number">100000000000L</span>)</span><br><span class="line">                .parallel()</span><br><span class="line">                .reduce(<span class="number">0</span>,Long::sum);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//System.out.println(sum);</span></span><br><span class="line">        Instant end = Instant.now();</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">"耗时（ms）："</span>+ Duration.between(start,end).toMillis());</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Java8日期API"><a href="#Java8日期API" class="headerlink" title="Java8日期API"></a>Java8日期API</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java8_01.optional;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> java.text.DateFormat;</span><br><span class="line"><span class="keyword">import</span> java.text.SimpleDateFormat;</span><br><span class="line"><span class="keyword">import</span> java.time.*;</span><br><span class="line"><span class="keyword">import</span> java.time.format.DateTimeFormatter;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestSimpleDateFormat</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">        SimpleDateFormat dateFormat=<span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyyMMdd"</span>);</span><br><span class="line"></span><br><span class="line">        Callable&lt;Date&gt; task=<span class="keyword">new</span> Callable&lt;Date&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> Date <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> dateFormat.parse(<span class="string">"20200425"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        ExecutorService pool = Executors.newFixedThreadPool(<span class="number">10</span>);</span><br><span class="line">        List&lt;Future&gt; results = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</span><br><span class="line">            results.add(pool.submit(task));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(Future&lt;Date&gt; future: results)&#123;</span><br><span class="line">            System.out.println(future.get());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        pool.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line"></span><br><span class="line">       ThreadLocal&lt;DateFormat&gt; df = <span class="keyword">new</span> ThreadLocal&lt;DateFormat&gt;()&#123;</span><br><span class="line">           <span class="function"><span class="keyword">protected</span> DateFormat <span class="title">initialValue</span><span class="params">()</span></span>&#123;</span><br><span class="line">               <span class="keyword">return</span> <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyyMMdd"</span>);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;;</span><br><span class="line"></span><br><span class="line">        Callable&lt;Date&gt; task=<span class="keyword">new</span> Callable&lt;Date&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> Date <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> df.get().parse(<span class="string">"20200425"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        ExecutorService pool = Executors.newFixedThreadPool(<span class="number">10</span>);</span><br><span class="line">        List&lt;Future&gt; results = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</span><br><span class="line">            results.add(pool.submit(task));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(Future&lt;Date&gt; future: results)&#123;</span><br><span class="line">            System.out.println(future.get());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        pool.shutdown();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test3</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">        DateTimeFormatter dtf=DateTimeFormatter.ofPattern(<span class="string">"yyyyMMdd"</span>);</span><br><span class="line"></span><br><span class="line">        Callable&lt;LocalDate&gt; task=<span class="keyword">new</span> Callable&lt;LocalDate&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> LocalDate <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> LocalDate.parse(<span class="string">"20200425"</span>,dtf);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        ExecutorService pool = Executors.newFixedThreadPool(<span class="number">10</span>);</span><br><span class="line">        List&lt;Future&gt; results = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</span><br><span class="line">            results.add(pool.submit(task));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(Future&lt;Date&gt; future: results)&#123;</span><br><span class="line">            System.out.println(future.get());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        pool.shutdown();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test4</span><span class="params">()</span></span>&#123;</span><br><span class="line">        LocalDateTime ldt =LocalDateTime.now();</span><br><span class="line">        System.out.println(ldt);</span><br><span class="line"></span><br><span class="line">        LocalDateTime ldt2 =LocalDateTime.of(<span class="number">2020</span>,<span class="number">04</span>,<span class="number">25</span>,<span class="number">23</span>,<span class="number">00</span>,<span class="number">18</span>);</span><br><span class="line">        System.out.println(ldt2);</span><br><span class="line"></span><br><span class="line">        LocalDateTime ldt3 =ldt2.plusYears(<span class="number">2</span>);</span><br><span class="line">        System.out.println(ldt3);</span><br><span class="line"></span><br><span class="line">        LocalDateTime ldt4 =ldt2.minusMonths(<span class="number">2</span>);</span><br><span class="line">        System.out.println(ldt4);</span><br><span class="line"></span><br><span class="line">        System.out.println(ldt2.getYear());</span><br><span class="line">        System.out.println(ldt2.getMonthValue());</span><br><span class="line">        System.out.println(ldt2.getDayOfMonth());</span><br><span class="line">        System.out.println(ldt2.getMinute());</span><br><span class="line">        System.out.println(ldt2.getSecond());</span><br><span class="line"></span><br><span class="line">        System.out.println(LocalDateTime.parse(<span class="string">"2020-04-25T23:00:18"</span>).</span><br><span class="line">                format(DateTimeFormatter.ofPattern(<span class="string">"yyyyMMdd"</span>)));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test5</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        Instant in1=Instant.now();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span>&#123;</span><br><span class="line">            Thread.sleep(<span class="number">1000</span>);</span><br><span class="line"></span><br><span class="line">        &#125;<span class="keyword">catch</span>(InterruptedException e)&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Instant in2=Instant.now();</span><br><span class="line">        Duration duration =Duration.between(in1,in2);</span><br><span class="line">        System.out.println(duration.toMillis());</span><br><span class="line"></span><br><span class="line">        LocalDate ld1=LocalDate.of(<span class="number">2018</span>,<span class="number">07</span>,<span class="number">01</span>);</span><br><span class="line">        LocalDate ld2=LocalDate.now();</span><br><span class="line"></span><br><span class="line">        Period p=Period.between(ld1,ld2);</span><br><span class="line"></span><br><span class="line">        System.out.println(p);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test6</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Instant instant =Instant.now();</span><br><span class="line">        LocalDateTime ld=LocalDateTime.ofInstant(instant,ZoneId.of(<span class="string">"Asia/Shanghai"</span>));</span><br><span class="line">        System.out.println(ld);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2020/04/07/Spring%E4%BA%8B%E5%8A%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/04/07/Spring%E4%BA%8B%E5%8A%A1/" class="post-title-link" itemprop="url">Spring事务</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-07 22:19:53" itemprop="dateCreated datePublished" datetime="2020-04-07T22:19:53+08:00">2020-04-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:25:39" itemprop="dateModified" datetime="2020-05-01T19:25:39+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring/" itemprop="url" rel="index"><span itemprop="name">Spring</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+
+<h2 style="margin-left:0cm;"> </h2>
+
+<h2 style="margin-left:0cm;"><strong>一、数据库的事物的基本特性</strong></h2>
+
+<div>
+<p style="margin-left:0cm;">事物是区分文件存储系统与Nosql数据库重要特性之一，其存在的意义是为了保证即使在并发情况下也能正确的执行crud操作。怎样才算是正确的呢？这时提出了事物需要保证的四个特性即ACID：</p>
+</div>
+
+<ol><li>A: 原子性(atomicity)
+    <ul><li><span style="color:#a5a5a5;">事物中各项操作，要么全做要么全不做，任何一项操作的失败都会导致整个事物的失败；</span></li>
+    </ul></li>
+    <li>C: 一致性(consistency)
+    <ul><li><span style="color:#a5a5a5;">事物结束后系统状态是一致的；</span></li>
+    </ul></li>
+    <li>I:  隔离性(isolation)
+    <ul><li><span style="color:#a5a5a5;">并发执行的事物彼此无法看到对方的中间状态；</span></li>
+    </ul></li>
+    <li>D: 持久性(durability)
+    <ul><li><span style="color:#a5a5a5;">事物完成后所做的改动都会被持久化，即使发生灾难性的失败。</span></li>
+    </ul></li>
+</ol><p style="margin-left:0cm;">在高并发的情况下，要完全保证其ACID特性是非常困难的，除非把所有的事物串行化执行，但带来的负面的影响将是性能大打折扣。很多时候我们有些业务对事物的要求是不一样的，所以数据库中设计了四种隔离级别，供用户基于业务进行选择。</p>
+
+<table border="1" cellspacing="0" style="margin-left:.5pt;width:412.7pt;"><tbody><tr><td style="width:113.9pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#4f4f4f;">隔离级别</span></strong></p>
+            </td>
+            <td style="width:77.05pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#4f4f4f;">脏读（Dirty Read）</span></strong></p>
+            </td>
+            <td style="width:131.3pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#4f4f4f;">不可重复读（NonRepeatable Read）</span></strong></p>
+            </td>
+            <td style="width:90.45pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#4f4f4f;">幻读（Phantom Read）</span></strong></p>
+            </td>
+        </tr><tr><td style="width:113.9pt;">
+            <p style="margin-left:0cm;"><span style="color:#4f4f4f;">未提交读（Read uncommitted）</span></p>
+            </td>
+            <td style="width:77.05pt;">
+            <p style="margin-left:0cm;"><span style="color:#ff0000;">可能</span></p>
+            </td>
+            <td style="width:131.3pt;">
+            <p style="margin-left:0cm;"><span style="color:#ff0000;">可能</span></p>
+            </td>
+            <td style="width:90.45pt;">
+            <p style="margin-left:0cm;"><span style="color:#ff0000;">可能</span></p>
+            </td>
+        </tr><tr><td style="width:113.9pt;">
+            <p style="margin-left:0cm;"><span style="color:#4f4f4f;">已提交读（Read committed）</span></p>
+            </td>
+            <td style="width:77.05pt;">
+            <p style="margin-left:0cm;"><span style="color:#1c7231;">不可能</span></p>
+            </td>
+            <td style="width:131.3pt;">
+            <p style="margin-left:0cm;"><span style="color:#ff0000;">可能</span></p>
+            </td>
+            <td style="width:90.45pt;">
+            <p style="margin-left:0cm;"><span style="color:#ff0000;">可能</span></p>
+            </td>
+        </tr><tr><td style="width:113.9pt;">
+            <p style="margin-left:0cm;"><span style="color:#4f4f4f;">可重复读（Repeatable read）</span></p>
+            </td>
+            <td style="width:77.05pt;">
+            <p style="margin-left:0cm;"><span style="color:#1c7231;">不可能</span></p>
+            </td>
+            <td style="width:131.3pt;">
+            <p style="margin-left:0cm;"><span style="color:#1c7231;">不可能</span></p>
+            </td>
+            <td style="width:90.45pt;">
+            <p style="margin-left:0cm;"><span style="color:#ff0000;">可能</span></p>
+            </td>
+        </tr><tr><td style="width:113.9pt;">
+            <p style="margin-left:0cm;"><span style="color:#4f4f4f;">可串行化（SERIALIZABLE）</span></p>
+            </td>
+            <td style="width:77.05pt;">
+            <p style="margin-left:0cm;"><span style="color:#1c7231;">不可能</span></p>
+            </td>
+            <td style="width:131.3pt;">
+            <p style="margin-left:0cm;"><span style="color:#1c7231;">不可能</span></p>
+            </td>
+            <td style="width:90.45pt;">
+            <p style="margin-left:0cm;"><span style="color:#1c7231;">不可能</span></p>
+            </td>
+        </tr></tbody></table><p> </p>
+
+<p style="margin-left:0cm;"><strong>脏读 :</strong></p>
+
+<p style="margin-left:0cm;"><span style="color:#a5a5a5;">一个事物读取到另一事物未提交的更新数据</span></p>
+
+<p style="margin-left:0cm;"><strong>不可重复读 : </strong></p>
+
+<p style="margin-left:0cm;"><span style="color:#a5a5a5;">在同一事物中,多次读取同一数据返回的结果有所不同, 换句话说, 后续读取可以读到另一事物已提交的更新数据. 相反, “可重复读”在同一事物中多次读取数据时, 能够保证所读数据一样, 也就是后续读取不能读到另一事物已提交的更新数据。</span></p>
+
+<p style="margin-left:0cm;"><strong>幻读 :</strong></p>
+
+<p style="margin-left:0cm;"><span style="color:#a5a5a5;">在同一事物中,多次读取同一表数据条数返回的结果有所不同,</span></p>
+
+<p style="margin-left:0cm;"> <span style="color:#a5a5a5;">查询表中一条数据如果不存在就插入一条，并发的时候却发现，里面居然有两条相同的数据。这就幻读的问题。</span></p>
+
+<p style="margin-left:0cm;"> </p>
+
+<p style="margin-left:0cm;"><strong>数据库默认隔离级别：</strong></p>
+
+<p style="margin-left:0cm;">Oracle中默认级别是 Read committed</p>
+
+<p style="margin-left:0cm;">mysql 中默认级别 Repeatable read。另外要注意的是mysql 执行一条查询语句默认是一个独立的事物，所以看上去效果跟Read committed一样。</p>
+
+<p style="margin-left:0cm;"># 查看mysql 的默认隔离级别</p>
+
+<p style="margin-left:0cm;">SELECT @@tx_isolation</p>
+
+<p style="margin-left:0cm;"> </p>
+
+<div>
+<h2 style="margin-left:0cm;"><strong>二、Sring 对事物的支持与使用</strong></h2>
+
+<p style="margin-left:0cm;"><strong>1、spring 事物相关API说明</strong></p>
+
+<p style="margin-left:0cm;">spring 事物是在数据库事物的基础上进行封装扩展 其主要特性如下：</p>
+
+<ol><li>
+    <ol><li>支持原有的数据事物的隔离级别</li>
+        <li>加入了事物传播的概念 提供多个事物的和并或隔离的功能</li>
+        <li>提供声明式事物，让业务代码与事物分离，事物变得更易用。</li>
+    </ol></li>
+</ol><p style="margin-left:0cm;">怎么样去使用Spring事物呢？spring 提供了三个接口供使用事物。分别是：</p>
+
+<p style="margin-left:0cm;"> </p>
+
+<ol><li>TransactionDefinition
+    <ul><li><span style="color:#a5a5a5;">事物定义</span></li>
+    </ul></li>
+    <li>PlatformTransactionManager
+    <ul><li><span style="color:#a5a5a5;">事物管理</span></li>
+    </ul></li>
+    <li>TransactionStatus
+    <ul><li><span style="color:#a5a5a5;">事物运行时状态</span></li>
+    </ul></li>
+</ol><p style="margin-left:0cm;"> </p>
+
+<p style="margin-left:0cm;"><strong>接口结构图：</strong></p>
+
+<p style="margin-left:0cm;"><img alt height="241" src="https://img-blog.csdnimg.cn/2020040722121591.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM2NzQ0Njk1,size_16,color_FFFFFF,t_70" width="547"></p>
+
+<p style="margin-left:0cm;"> </p>
+
+<p style="margin-left:0cm;"><strong>API说明：</strong></p>
+
+<pre>
+<code class="language-java">public class SpringTransactionExample {
+    private static String url = "jdbc:mysql://192.168.0.147:3306/test";
+    private static String user = "root";
+    private static String password = "123456";
+
+    public static Connection openConnection() throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.jdbc.Driver");
+        Connection conn = DriverManager.getConnection("jdbc:mysql://192.168.0.147:3306/test", "root", "123456");
+        return conn;
+    }
+
+    public static void main(String[] args) {
+        final DataSource ds = new DriverManagerDataSource(url, user, password);
+        final TransactionTemplate template = new TransactionTemplate();
+        template.setTransactionManager(new DataSourceTransactionManager(ds));
+        template.execute(new TransactionCallback&lt;Object&gt;() {
+            @Override
+            public Object doInTransaction(TransactionStatus status) {
+                Connection conn = DataSourceUtils.getConnection(ds);
+                Object savePoint = null;
+                try {
+                    {
+                        // 插入
+                        PreparedStatement prepare = conn.
+                                prepareStatement("insert INTO account (accountName,user,money) VALUES (?,?,?)");
+                        prepare.setString(1, "111");
+                        prepare.setString(2, "aaaa");
+                        prepare.setInt(3, 10000);
+                        prepare.executeUpdate();
+                    }
+                    // 设置保存点
+                    savePoint = status.createSavepoint();
+                    {
+                        // 插入
+                        PreparedStatement prepare = conn.
+                                prepareStatement("insert INTO account (accountName,user,money) VALUES (?,?,?)");
+                        prepare.setString(1, "222");
+                        prepare.setString(2, "bbb");
+                        prepare.setInt(3, 10000);
+                        prepare.executeUpdate();
+                    }
+                    {
+                        // 更新
+                        PreparedStatement prepare = conn.
+                                prepareStatement("UPDATE account SET money= money+1 where user=?");
+                        prepare.setString(1, "asdflkjaf");
+                        Assert.isTrue(prepare.executeUpdate() &gt; 0, "");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    System.out.println("更新失败");
+                    if (savePoint != null) {
+                        status.rollbackToSavepoint(savePoint);
+                    } else {
+                        status.setRollbackOnly();
+                    }
+                }
+                return null;
+            }
+        });
+    }
+}
+</code></pre>
+
+<p style="margin-left:0cm;"> </p>
+
+<p style="margin-left:0cm;"><strong>2、声明示事物</strong></p>
+
+<p style="margin-left:0cm;">我们前面是通过调用API来实现对事物的控制，这非常的繁琐，与直接操作JDBC事物并没有太多的改善，所以Spring提出了声明示事物，使我们对事物的操作变得非常简单，甚至不需要关心它。</p>
+
+<p style="margin-left:0cm;">配置spring.xml</p>
+
+<pre>
+<code class="language-java">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd"&gt;
+
+    &lt;context:annotation-config/&gt;
+    &lt;context:component-scan base-package="com.test.service.**"&gt;
+    &lt;/context:component-scan&gt;
+
+    &lt;bean class="org.springframework.jdbc.core.JdbcTemplate"&gt;
+        &lt;property name="dataSource" ref="dataSource"/&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- similarly, don't forget the PlatformTransactionManager --&gt;
+    &lt;bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"&gt;
+        &lt;property name="dataSource" ref="dataSource"/&gt;
+    &lt;/bean&gt;
+    &lt;!-- don't forget the DataSource --&gt;
+    &lt;bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"&gt;
+        &lt;constructor-arg name="url" value="jdbc:mysql://192.168.0.147/test"/&gt;
+        &lt;constructor-arg name="username" value="root"/&gt;
+        &lt;constructor-arg name="password" value="123456"/&gt;
+    &lt;/bean&gt;
+    &lt;tx:annotation-driven transaction-manager="txManager"&gt;&lt;/tx:annotation-driven&gt;
+&lt;/beans&gt;
+</code></pre>
+
+<p style="margin-left:0cm;">编写服务类</p>
+
+<pre>
+<code class="language-java">@Transactional
+public void addAccount(String name, int initMenoy) {
+    String accountid = new SimpleDateFormat("yyyyMMddhhmmss").format(new Date());
+    jdbcTemplate.update("insert INTO account (accountName,user,money) VALUES (?,?,?)", accountid, name, initMenoy);
+    // 人为报错
+    int i = 1 / 0;
+}
+</code></pre>
+
+<p style="margin-left:0cm;"><strong>3、事物传播机制</strong></p>
+
+<p style="margin-left:0cm;"> </p>
+
+<table border="1" cellspacing="0" style="margin-left:.5pt;width:412.7pt;"><tbody><tr><td style="width:75pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#ffffff;">类别</span></strong></p>
+            </td>
+            <td style="width:173.5pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#ffffff;">事物传播类型</span></strong></p>
+            </td>
+            <td style="width:164.15pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#ffffff;">说明</span></strong></p>
+            </td>
+        </tr><tr><td rowspan="3" style="width:75pt;">
+            <p style="margin-left:0cm;">支持当前事物</p>
+            </td>
+            <td style="width:173.5pt;">
+            <p style="margin-left:0cm;"><span style="color:#ff0000;">PROPAGATION_REQUIRED</span></p>
+
+<pre><code>    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;（必须的）&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:164.15pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;如果当前没有事物，就新建一个事物，如果已经存在一个事物中，加入到这个事物中。这是最常见的选择。&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:173.5pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;PROPAGATION_SUPPORTS&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;（支持）&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:164.15pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;支持当前事物，如果当前没有事物，就以非事物方式执行。&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:173.5pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;PROPAGATION_MANDATORY&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;（强制）&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:164.15pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;使用当前的事物，如果当前没有事物，就抛出异常。&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;&lt;td rowspan=&quot;3&quot; style=&quot;width:75pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;不支持当前事物&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:173.5pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;PROPAGATION_REQUIRES_NEW&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;隔离)&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:164.15pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;新建事物，如果当前存在事物，把当前事物挂起。&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:173.5pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;PROPAGATION_NOT_SUPPORTED&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;不支持)&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:164.15pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;以非事物方式执行操作，如果当前存在事物，就把当前事物挂起。&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:173.5pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;PROPAGATION_NEVER&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;(强制非事物)&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:164.15pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;以非事物方式执行，如果当前存在事物，则抛出异常。&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:75pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;套事物&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:173.5pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;PROPAGATION_NESTED&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;（嵌套事物）&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:164.15pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;如果当前存在事物，则在嵌套事物内执行。如果当前没有事物，则执行与PROPAGATION_REQUIRED类似的操作。&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;strong&gt;常用事物传播机制：&lt;/strong&gt;&lt;/p&gt;</code></pre><ol><li>PROPAGATION_REQUIRED，
+    <ul><li><span style="color:#a5a5a5;">这个也是默认的传播机制；</span></li>
+    </ul></li>
+    <li>PROPAGATION_NOT_SUPPORTED
+    <ul><li><span style="color:#a5a5a5;">可以用于发送提示消息，站内信、短信、邮件提示等。不属于并且不应当影响主体业务逻辑，即使发送失败也不应该对主体业务逻辑回滚。</span></li>
+    </ul></li>
+    <li>PROPAGATION_REQUIRES_NEW
+    <ul><li><span style="color:#a5a5a5;">总是新启一个事物，这个传播机制适用于不受父方法事物影响的操作，比如某些业务场景下需要记录业务日志，用于异步反查，那么不管主体业务逻辑是否完成，日志都需要记录下来，不能因为主体业务逻辑报错而丢失日志；</span></li>
+    </ul></li>
+</ol><p style="margin-left:0cm;"><strong>用例1:</strong></p>
+
+<p style="margin-left:0cm;">创建用户时初始化一个帐户，表结构和服务类如下。</p>
+
+<table border="1" cellspacing="0" style="margin-left:.5pt;width:387.9pt;"><tbody><tr><td style="width:103.15pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#ffffff;">表结构</span></strong></p>
+            </td>
+            <td style="width:103.15pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#ffffff;">服务类</span></strong></p>
+            </td>
+            <td style="width:181.55pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#ffffff;">功能描述</span></strong></p>
+            </td>
+        </tr><tr><td style="vertical-align:top;width:103.15pt;">
+            <p style="margin-left:0cm;">user</p>
+            </td>
+            <td style="vertical-align:top;width:103.15pt;">
+            <p style="margin-left:0cm;">UserSerivce</p>
+            </td>
+            <td style="vertical-align:top;width:181.55pt;">
+            <p style="margin-left:0cm;">创建用户，并添加帐户</p>
+            </td>
+        </tr><tr><td style="vertical-align:top;width:103.15pt;">
+            <p style="margin-left:0cm;">account</p>
+            </td>
+            <td style="vertical-align:top;width:103.15pt;">
+            <p style="margin-left:0cm;">AccountService</p>
+            </td>
+            <td style="vertical-align:top;width:181.55pt;">
+            <p style="margin-left:0cm;">添加帐户</p>
+            </td>
+        </tr></tbody></table><p style="margin-left:0cm;">UserSerivce.createUser(name) 实现代码</p>
+
+<pre>
+<code class="language-java">@Transactional
+public void createUser(String name) {
+    // 新增用户基本信息
+    jdbcTemplate.update("INSERT INTO `user` (name) VALUES(?)", name);
+    //调用accountService添加帐户
+    accountService.addAccount(name, 10000);
+ ｝
+
+AccountService.addAccount(name,initMoney) 实现代码（方法的最后有一个异常）
+@Transactional(propagation = Propagation.REQUIRED)
+public void addAccount(String name, int initMoney) {
+    String accountid = new SimpleDateFormat("yyyyMMddhhmmss").format(new Date());
+    jdbcTemplate.update("insert INTO account (accountName,user,money) VALUES (?,?,?)", accountid, name, initMenoy);
+    // 出现分母为零的异常
+    int i = 1 / 0;
+}
+</code></pre>
+
+<p style="margin-left:0cm;">实验预测一：</p>
+
+<table border="1" cellspacing="0" style="margin-left:.5pt;width:412.7pt;"><tbody><tr><td style="vertical-align:top;width:54.9pt;">
+            <p style="margin-left:0cm;"> </p>
+            </td>
+            <td style="width:120.6pt;">
+            <p style="margin-left:0cm;">createUser</p>
+            </td>
+            <td style="width:113.9pt;">
+            <p style="margin-left:0cm;">addAccount<span style="color:#ff0000;">(</span><span style="color:#ff0000;">异常)</span></p>
+            </td>
+            <td style="width:123.25pt;">
+            <p style="margin-left:0cm;">预测结果</p>
+            </td>
+        </tr><tr><td style="width:54.9pt;">
+            <p style="margin-left:0cm;">场景一</p>
+            </td>
+            <td style="vertical-align:top;width:120.6pt;">
+            <p style="margin-left:0cm;">无事物</p>
+            </td>
+            <td style="vertical-align:top;width:113.9pt;">
+            <p style="margin-left:0cm;">required</p>
+            </td>
+            <td style="vertical-align:top;width:123.25pt;">
+            <p style="margin-left:0cm;">user （成功） Account（不成功） <span style="color:#1c7231;">正确</span></p>
+            </td>
+        </tr><tr><td style="width:54.9pt;">
+            <p style="margin-left:0cm;">场景二</p>
+            </td>
+            <td style="vertical-align:top;width:120.6pt;">
+            <p style="margin-left:0cm;">required</p>
+            </td>
+            <td style="vertical-align:top;width:113.9pt;">
+            <p style="margin-left:0cm;">无事物</p>
+            </td>
+            <td style="vertical-align:top;width:123.25pt;">
+            <p style="margin-left:0cm;">user （不成功） Account（不成功） <span style="color:#1c7231;">正确</span></p>
+            </td>
+        </tr><tr><td style="width:54.9pt;">
+            <p style="margin-left:0cm;">场景三</p>
+            </td>
+            <td style="vertical-align:top;width:120.6pt;">
+            <p style="margin-left:0cm;">required</p>
+            </td>
+            <td style="vertical-align:top;width:113.9pt;">
+            <p style="margin-left:0cm;">not_supported</p>
+            </td>
+            <td style="vertical-align:top;width:123.25pt;">
+            <p style="margin-left:0cm;">user （不成功） Account（成功）<span style="color:#1c7231;">正确</span></p>
+            </td>
+        </tr><tr><td style="width:54.9pt;">
+            <p style="margin-left:0cm;">场景四</p>
+            </td>
+            <td style="vertical-align:top;width:120.6pt;">
+            <p style="margin-left:0cm;">required</p>
+            </td>
+            <td style="vertical-align:top;width:113.9pt;">
+            <p style="margin-left:0cm;">required_new</p>
+            </td>
+            <td style="vertical-align:top;width:123.25pt;">
+            <p style="margin-left:0cm;">user （不成功） Account（不成功）<span style="color:#1c7231;">正确</span></p>
+            </td>
+        </tr><tr><td style="width:54.9pt;">
+            <p style="margin-left:0cm;">场景五</p>
+            </td>
+            <td style="vertical-align:top;width:120.6pt;">
+            <p style="margin-left:0cm;">required</p>
+
+<pre><code>    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#ff0000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#ff0000;&quot;&gt;异常移至createUser方法未尾)&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt; &lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;vertical-align:top;width:113.9pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;required_new&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;vertical-align:top;width:123.25pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;user （不成功） Account（成功）&lt;span style=&quot;color:#1c7231;&quot;&gt;正确&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:54.9pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;场景六&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;vertical-align:top;width:120.6pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;required&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#ff0000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#ff0000;&quot;&gt;异常移至createUser方法未尾)&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;（&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;addAccount &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;方法称至当前类&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;）&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt; &lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;vertical-align:top;width:113.9pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;required_new&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;vertical-align:top;width:123.25pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;user （不成功） Account（不成功）&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;p style=&quot;margin-left:0cm;&quot;&gt; &lt;/p&gt;</code></pre><div>
+<h2 style="margin-left:0cm;"><strong>三、aop 事物底层实现原理</strong></h2>
+</div>
+
+<p style="margin-left:0cm;"> </p>
+
+<p style="margin-left:0cm;">讲事物原理之前我们先来做一个实验，当场景五的环境改变，把addAccount 方法移至UserService 类下，其它配置和代码不变：</p>
+
+<pre>
+<code class="language-java">@Override
+@Transactional
+public void createUser(String name) {
+    jdbcTemplate.update("INSERT INTO `user` (name) VALUES(?)", name);
+    addAccount(name, 10000);
+    // 人为报错
+    int i = 1 / 0;
+}
+
+@Transactional(propagation = Propagation.REQUIRES_NEW)
+public void addAccount(String name, int initMoney) {
+    String accountid = new SimpleDateFormat("yyyyMMddhhmmss").format(new Date());
+    jdbcTemplate.update("insert INTO account (accountName,user,money) VALUES (?,?,?)", accountid, name, initMoney);
+}
+</code></pre>
+
+<p style="margin-left:0cm;">经过演示我们发现得出的结果与场景五并不 一至，required_new 没有起到其对应的作用。原因在于spring 声明示事物使用动态代理实现，而当调用同一个类的方法时，是会不会走代理逻辑的，自然事物的配置也会失效。</p>
+
+<p style="margin-left:0cm;">通过一个动态代理的实现来模拟这种场景</p>
+
+<pre>
+<code class="language-java">UserSerivce proxyUserSerivce = (UserSerivce) Proxy.newProxyInstance(TestTransaction.class.getClassLoader(),
+        new Class[]{UserSerivce.class}, new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                try {
+                    System.out.println("开启事物:"+method.getName());
+                    return method.invoke(userSerivce, args);
+                } finally {
+                    System.out.println("关闭事物:"+method.getName());
+                }
+            }
+        });
+proxyUserSerivce.createUser("test");
+</code></pre>
+
+<p style="margin-left:0cm;">当我们调用createUser 方法时 仅打印了 createUser  的事物开启、关闭，并没有打印addAccount 方法的事物开启、关闭，由此可见addAccount  的事物配置是失效的。</p>
+
+<p style="margin-left:0cm;">如果业务当中上真有这种场景该如何实现呢？在spring xml中配置 暴露proxy 对象，然后在代码中用AopContext.currentProxy() 就可以获当前代理对象</p>
+
+<p style="margin-left:0cm;">&lt;!-- 配置暴露proxy --&gt;</p>
+
+<p style="margin-left:0cm;">&lt;aop:aspectj-autoproxy expose-proxy="true"/&gt;</p>
+
+<p style="margin-left:0cm;">// 基于代理对象调用创建帐户，事物的配置又生效了</p>
+
+<p style="margin-left:0cm;">((UserSerivce) AopContext.currentProxy()).addAccount(name, 10000);</p>
+
+<p style="margin-left:0cm;"> </p>
+
+<p style="margin-left:0cm;"> </p>
+
+<p style="margin-left:0cm;"> </p>
+</td></tr></tbody></table></td></tr></tbody></table></div>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2020/03/20/Hello/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -449,9 +1161,2271 @@
   
   
 
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2020/03/01/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/01/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E8%AF%A6%E8%A7%A3/" class="post-title-link" itemprop="url">java动态代理详解</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-01 15:06:05" itemprop="dateCreated datePublished" datetime="2020-03-01T15:06:05+08:00">2020-03-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:03:21" itemprop="dateModified" datetime="2020-05-01T19:03:21+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JavaWeb/" itemprop="url" rel="index"><span itemprop="name">JavaWeb</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+
+<p id="main-toc"><strong>目录</strong></p>
+
+<p id="-toc" style="margin-left:80px;"> </p>
+
+<p id="1.%E5%9F%BA%E4%BA%8EJDK%E7%9A%84%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86-toc" style="margin-left:80px;"><a href="#1.%E5%9F%BA%E4%BA%8EJDK%E7%9A%84%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86">1.基于JDK的动态代理</a></p>
+
+<p id="2.%E5%9F%BA%E4%BA%8ECGLIB%E7%9A%84%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86-toc" style="margin-left:80px;"><a href="#2.%E5%9F%BA%E4%BA%8ECGLIB%E7%9A%84%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86">2.基于CGLIB的动态代理</a></p>
+
+<hr id="hr-toc"><p id="%E7%9B%AE%E5%89%8Djava%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%88%86%E4%B8%BA%E4%B8%A4%E7%A7%8D">目前java动态代理的实现分为两种</p>
+
+<p><strong>1.基于JDK的动态代理</strong></p>
+
+<p><strong>2.基于CGILB的动态代理</strong></p>
+
+<p>在业务中使用动态代理，一般是为了给需要实现的方法添加预处理或者添加后续操作，但是不干预实现类的正常业务，把一些基本业务和主要的业务逻辑分离。我们一般所熟知的Spring的AOP原理就是基于动态代理实现的。</p>
+
+<h3 id="1.%E5%9F%BA%E4%BA%8EJDK%E7%9A%84%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86"><strong>1.基于JDK的动态代理</strong></h3>
+
+<p>基于JDK的动态代理就需要知道两个类：1.InvocationHandler（接口）、2.Proxy（类）</p>
+
+<p>还要知道JDK是基于接口的动态代理</p>
+
+<p>下面我们实际用代码来讲解这两个类的实际作用</p>
+
+<p>1.第一步，创建一个接口</p>
+
+<p>public interface Subject {<br>
+    void hello(String param);<br>
+}<br>
+2.第二步，实现接口</p>
+
+<p>public class SubjectImpl implements Subject {<br>
+    @Override<br>
+    public void hello(String param) {<br>
+        System.out.println("hello  " + param);<br>
+    }<br>
+}<br>
+3.第三步，创建SubjectImpl的代理类</p>
+
+<p>public class SubjectProxy implements InvocationHandler {<br>
+    private Subject subject;</p>
+
+<p>    public SubjectProxy(Subject subject) {<br>
+        this.subject = subject;<br>
+    }</p>
+
+<p>    @Override<br>
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {<br>
+        System.out.println("--------------begin-------------");<br>
+        Object invoke = method.invoke(subject, args);<br>
+        System.out.println("--------------end-------------");<br>
+        return invoke;<br>
+    }<br>
+}<br>
+invoke方法的说明：</p>
+
+<p><img alt src="https://img-blog.csdn.net/20180821150523827?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMyNTMyMzIx/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"></p>
+
+<p>4.编写代理类实际的调用，利用Proxy类创建代理之后的Subject类。</p>
+
+<p>public class Main {</p>
+
+<p>    public static void main(String[] args) {<br>
+        Subject subject = new SubjectImpl();<br>
+        InvocationHandler subjectProxy = new SubjectProxy(subject);<br>
+        Subject proxyInstance = (Subject) Proxy.newProxyInstance(subjectProxy.getClass().getClassLoader(), subject.getClass().getInterfaces(), subjectProxy);<br>
+        proxyInstance.hello("world");<br>
+    }</p>
+
+<p>}</p>
+
+<p><img alt src="https://img-blog.csdn.net/20180821150918418?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMyNTMyMzIx/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"><br>
+输出：</p>
+
+<p>--------------begin-------------<br>
+hello  world<br>
+--------------end-------------</p>
+
+<p>看这个结果，实际上在Subject类中只会输出一条hello world，但是在被代理之后，实际调用的方法是SubjectProxy的invoke方法，这样可以在不修改业务类的情况下对业务类增加一些日志等其他操作，甚至可以直接修改有返回值方法的返回值。</p>
+
+<h3 id="2.%E5%9F%BA%E4%BA%8ECGLIB%E7%9A%84%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86"><strong>2.基于CGLIB的动态代理</strong></h3>
+
+<p>本文主要讲的是CGLIB的动态代理，因为基于JDK的动态代理一定要继承一个接口，而绝大部分情况是基于POJO类的动态代理，那么CGLIB就是一个很好的选择，在Hibernate框架中PO的字节码生产工作就是靠CGLIB来完成的。还是先看代码。</p>
+
+<p>1.引入CGLIB的jar包</p>
+
+<p>2.创建代理类</p>
+
+<p>public class CGsubject {<br>
+    public void sayHello(){<br>
+        System.out.println("hello world");<br>
+    }<br>
+}<br>
+如果直接对这个类创建对象，那么调用sayHello方法，控制台就会输出hello world，现在我们还是要对输出添加前置和后置的log输出。来打印输出前和输出后的时间。</p>
+
+<p>3.实现MethodInterceptor接口，对方法进行拦截处理。</p>
+
+<p>public class HelloInterceptor implements MethodInterceptor{<br>
+    @Override<br>
+    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {<br>
+        System.out.println("begin time -----&gt; "+ System.currentTimeMillis());<br>
+        Object o1 = methodProxy.invokeSuper(o, objects);<br>
+        System.out.println("end time -----&gt; "+ System.currentTimeMillis());<br>
+        return o1;<br>
+    }<br>
+}</p>
+
+<p><img alt src="https://img-blog.csdn.net/201808211529299?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMyNTMyMzIx/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"><br>
+4.创建被代理类</p>
+
+<p>public class Main {</p>
+
+<p>    public static void main(String[] args) {<br>
+        Enhancer enhancer = new Enhancer();<br>
+        enhancer.setSuperclass(CGsubject.class);<br>
+        enhancer.setCallback(new HelloInterceptor());<br>
+        CGsubject cGsubject = (CGsubject) enhancer.create();<br>
+        cGsubject.sayHello();<br>
+    }</p>
+
+<p>}<br>
+利用Enhancer来生产被代理类，这样可以拦截方法，对方法进行前置和后置log的添加。</p>
+
+<p>输出：</p>
+
+<p>begin time -----&gt; 1534836443741<br>
+hello world<br>
+end time -----&gt; 1534836443786<br>
+ </p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2020/03/01/MyBatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%BA%8C)%E2%80%94%E2%80%94%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E5%AE%9E%E7%8E%B0%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/01/MyBatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%BA%8C)%E2%80%94%E2%80%94%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E5%AE%9E%E7%8E%B0%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8/" class="post-title-link" itemprop="url">MyBatis源码解析(二)——动态代理实现函数调用</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-01 15:04:38" itemprop="dateCreated datePublished" datetime="2020-03-01T15:04:38+08:00">2020-03-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:03:21" itemprop="dateModified" datetime="2020-05-01T19:03:21+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mybatis/" itemprop="url" rel="index"><span itemprop="name">Mybatis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+
+<p>如果我们要使用MyBatis进行数据库操作的话，大致要做两件事情：</p>
+
+<ol><li>定义DAO接口<br>
+    在DAO接口中定义需要进行的数据库操作。</li>
+    <li>创建映射文件<br>
+    当有了DAO接口后，还需要为该接口创建映射文件。映射文件中定义了一系列SQL语句，这些SQL语句和DAO接口一一对应。</li>
+</ol><p>MyBatis在初始化的时候会将映射文件与DAO接口一一对应，并根据映射文件的内容为每个函数创建相应的数据库操作能力。而我们作为MyBatis使用者，只需将DAO接口注入给Service层使用即可。<br>
+那么MyBatis是如何根据映射文件为每个DAO接口创建具体实现的？答案是——动态代理。<br>
+下面进入正题。</p>
+
+<hr><p>首先来回顾一项MyBatis在初始化过程中所做的事情。<br>
+MyBatis在初始化过程中，首先会读取我们的配置文件流程，并使用<code>XMLConfigBuilder</code>来解析配置文件。<code>XMLConfigBuilder</code>会依次解析配置文件中的各个子节点，如：<code>&lt;settings&gt;</code>、<code>&lt;typeAliases&gt;</code>、<code>&lt;mappers&gt;</code>等。这些子节点在解析完成后都会被注册进<code>configuration</code>对象。然后<code>configuration</code>对象将作为参数，创建<code>SqlSessionFactory</code>对象。至此，初始化过程完毕！<br>
+下面我们重点分析<code>&lt;mapper&gt;</code>节点解析的过程。</p>
+
+<p>PS：MyBatis详细的初始化过程请移步至：<a href="https://www.jianshu.com/p/7bc6d3b7fb45" target="_blank" rel="external nofollow noopener noreferrer">MyBatis源码解析(一)——MyBatis初始化过程解析</a></p>
+
+<hr><h1>&lt;mapper&gt;节点解析过程</h1>
+
+<p> </p>
+
+<pre>
+<code>XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
+mapperParser.parse();
+</code></pre>
+
+<p>由上述代码可知，解析mapper节点的解析是由<code>XMLMapperBuilder</code>类的<code>parse()</code>函数来完成的，下面我们就详细看一下<code>parse()</code>函数。</p>
+
+<p> </p>
+
+<pre>
+<code>  public void parse() {
+    // 若当前Mapper.xml尚未加载，则加载
+    if (!configuration.isResourceLoaded(resource)) {
+      // 解析&lt;mapper&gt;节点
+      configurationElement(parser.evalNode("/mapper"));
+      // 将当前Mapper.xml标注为『已加载』（下回就不用再加载了）
+      configuration.addLoadedResource(resource);
+      // 【关键】将Mapper Class添加至Configuration中
+      bindMapperForNamespace();
+    }
+
+    parsePendingResultMaps();
+    parsePendingCacheRefs();
+    parsePendingStatements();
+  }
+</code></pre>
+
+<p>这个函数主要做了两件事：</p>
+
+<ol><li>解析<code>&lt;mapper&gt;</code>节点，并将解析结果注册进<code>configuration</code>中；</li>
+    <li>将当前映射文件所对应的DAO接口的Class对象注册进<code>configuration</code>中<br>
+    这一步极为关键！是为了给DAO接口创建代理对象，下文会详细介绍。</li>
+</ol><p>下面再进入<code>bindMapperForNamespace()</code>函数，看一看它做了什么：</p>
+
+<p> </p>
+
+<pre>
+<code>  private void bindMapperForNamespace() {
+    // 获取当前映射文件对应的DAO接口的全限定名
+    String namespace = builderAssistant.getCurrentNamespace();
+    if (namespace != null) {
+      // 将全限定名解析成Class对象
+      Class&lt;?&gt; boundType = null;
+      try {
+        boundType = Resources.classForName(namespace);
+      } catch (ClassNotFoundException e) {
+      }
+      if (boundType != null) {
+        if (!configuration.hasMapper(boundType)) {
+          // 将当前Mapper.xml标注为『已加载』（下回就不用再加载了）
+          configuration.addLoadedResource("namespace:" + namespace);
+          // 将DAO接口的Class对象注册进configuration中
+          configuration.addMapper(boundType);
+        }
+      }
+    }
+  }
+</code></pre>
+
+<p>这个函数主要做了两件事：</p>
+
+<ol><li>将<code>&lt;mapper&gt;</code>节点上定义的<code>namespace</code>属性（即：当前映射文件所对应的DAO接口的权限定名）解析成Class对象</li>
+    <li>将该Class对象存储在<code>configuration</code>对象的<code>MapperRegistry</code>容器中。</li>
+</ol><p>可以看一下<code>MapperRegistry</code>：</p>
+
+<p> </p>
+
+<pre>
+<code>public class MapperRegistry {
+  private final Configuration config;
+  private final Map&lt;Class&lt;?&gt;, MapperProxyFactory&lt;?&gt;&gt; knownMappers = new HashMap&lt;Class&lt;?&gt;, MapperProxyFactory&lt;?&gt;&gt;();
+}
+</code></pre>
+
+<p><code>MapperRegistry</code>有且仅有两个属性：<code>Configuration</code>和<code>knownMappers</code>。<br>
+其中，<code>knownMappers</code>的类型为<code>Map&lt;Class&lt;?&gt;, MapperProxyFactory&lt;?&gt;&gt;</code>，由此可见，它是一个Map，key为DAO接口的Class对象，而Value为该DAO接口代理对象的工厂。<br>
+那么，这个代理对象工厂是何许人也？它又是如何产生的呢？我们先来看一下<code>MapperRegistry</code>的<code>addMapper()</code>函数。</p>
+
+<p> </p>
+
+<pre>
+<code>  public &lt;T&gt; void addMapper(Class&lt;T&gt; type) {
+    if (type.isInterface()) {
+      if (hasMapper(type)) {
+        throw new BindingException("Type " + type + " is already known to the MapperRegistry.");
+      }
+      boolean loadCompleted = false;
+      try {
+        // 创建MapperProxyFactory对象，并put进knownMappers中
+        knownMappers.put(type, new MapperProxyFactory&lt;T&gt;(type));
+        MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type);
+        parser.parse();
+        loadCompleted = true;
+      } finally {
+        if (!loadCompleted) {
+          knownMappers.remove(type);
+        }
+      }
+    }
+  }
+</code></pre>
+
+<p>从这个函数可知，<code>MapperProxyFactory</code>是在这里创建，并put进<code>knownMappers</code>中的。<br>
+下面我们就来看一下<code>MapperProxyFactory</code>这个类究竟有些啥：</p>
+
+<p> </p>
+
+<pre>
+<code>public class MapperProxyFactory&lt;T&gt; {
+
+  private final Class&lt;T&gt; mapperInterface;
+  private final Map&lt;Method, MapperMethod&gt; methodCache = new ConcurrentHashMap&lt;Method, MapperMethod&gt;();
+
+  public MapperProxyFactory(Class&lt;T&gt; mapperInterface) {
+    this.mapperInterface = mapperInterface;
+  }
+
+  public Class&lt;T&gt; getMapperInterface() {
+    return mapperInterface;
+  }
+
+  public Map&lt;Method, MapperMethod&gt; getMethodCache() {
+    return methodCache;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected T newInstance(MapperProxy&lt;T&gt; mapperProxy) {
+    return (T) Proxy.newProxyInstance(mapperInterface.getClassLoader(), new Class[] { mapperInterface }, mapperProxy);
+  }
+
+  public T newInstance(SqlSession sqlSession) {
+    final MapperProxy&lt;T&gt; mapperProxy = new MapperProxy&lt;T&gt;(sqlSession, mapperInterface, methodCache);
+    return newInstance(mapperProxy);
+  }
+}
+</code></pre>
+
+<p>这个类有三个重要成员：</p>
+
+<ol><li>mapperInterface属性<br>
+    这个属性就是DAO接口的Class对象，当创建<code>MapperProxyFactory</code>对象的时候需要传入</li>
+    <li>methodCache属性<br>
+    这个属性用于存储当前DAO接口中所有的方法。</li>
+    <li>newInstance函数<br>
+    这个函数用于创建DAO接口的代理对象，它需要传入一个MapperProxy对象作为参数。而MapperProxy类实现了InvocationHandler接口，由此可知它是动态代理中的处理类，所有对目标函数的调用请求都会先被这个处理类截获，所以可以在这个处理类中添加目标函数调用前、调用后的逻辑。</li>
+</ol><hr><h1>DAO函数调用过程</h1>
+
+<p>当MyBatis初始化完毕后，<code>configuration</code>对象中存储了所有DAO接口的Class对象和相应的<code>MapperProxyFactory</code>对象（用于创建DAO接口的代理对象）。接下来，就到了使用DAO接口中函数的阶段了。</p>
+
+<p> </p>
+
+<pre>
+<code>SqlSession sqlSession = sqlSessionFactory.openSession();
+try {
+    ProductMapper productMapper = sqlSession.getMapper(ProductMapper.class);
+    List&lt;Product&gt; productList = productMapper.selectProductList();
+    for (Product product : productList) {
+        System.out.printf(product.toString());
+    }
+} finally {
+    sqlSession.close();
+}
+</code></pre>
+
+<p>我们首先需要从<code>sqlSessionFactory</code>对象中创建一个<code>SqlSession</code>对象，然后调用<code>sqlSession.getMapper(ProductMapper.class)</code>来获取代理对象。</p>
+
+<p><code>sqlSessionFactory.openSession()</code>创建<code>SqlSession</code>对象</p>
+
+<pre>
+<code class="language-java">public SqlSession openSession() {
+        return this.openSessionFromDataSource(this.configuration.getDefaultExecutorType(), (TransactionIsolationLevel)null, false);
+    }</code></pre>
+
+<p>会调用 openSessionFromDataSource 方法，其中执行器为初始化Configuration时默认的 SimpleExecutor，接下来看openSessionFromDataSource方法</p>
+
+<pre>
+<code class="language-java">private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
+        Transaction tx = null;
+
+        DefaultSqlSession var8;
+        try {
+            Environment environment = this.configuration.getEnvironment();
+            TransactionFactory transactionFactory = this.getTransactionFactoryFromEnvironment(environment);
+            tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
+            Executor executor = this.configuration.newExecutor(tx, execType);
+            var8 = new DefaultSqlSession(this.configuration, executor, autoCommit);
+        } catch (Exception var12) {
+            this.closeTransaction(tx);
+            throw ExceptionFactory.wrapException("Error opening session.  Cause: " + var12, var12);
+        } finally {
+            ErrorContext.instance().reset();
+        }
+
+        return var8;
+    }</code></pre>
+
+<p>会返回一个 DefaultSqlSession 对象，看一下其中的this.configuration.newExecutor(tx, execType);方法</p>
+
+<pre>
+<code class="language-java">public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
+        executorType = executorType == null ? this.defaultExecutorType : executorType;
+        executorType = executorType == null ? ExecutorType.SIMPLE : executorType;
+        Object executor;
+        if (ExecutorType.BATCH == executorType) {
+            executor = new BatchExecutor(this, transaction);
+        } else if (ExecutorType.REUSE == executorType) {
+            executor = new ReuseExecutor(this, transaction);
+        } else {
+            executor = new SimpleExecutor(this, transaction);
+        }
+
+        //缓存
+        if (this.cacheEnabled) {
+            executor = new CachingExecutor((Executor)executor);
+        }
+        //责任链模式拦截器 
+        Executor executor = (Executor)this.interceptorChain.pluginAll(executor);
+        return executor;
+    }</code></pre>
+
+<p>开启缓存这里SimpleExecutor就会被CachingExecutor替换</p>
+
+<p><br>
+我们再来看一下<code>sqlSession.getMapper()</code>是如何创建代理对象的？</p>
+
+<p> </p>
+
+<pre>
+<code>  public &lt;T&gt; T getMapper(Class&lt;T&gt; type) {
+    return configuration.&lt;T&gt;getMapper(type, this);
+  }
+</code></pre>
+
+<p><code>sqlSession.getMapper()</code>调用了<code>configuration.getMapper()</code>，那我们再看一下<code>configuration.getMapper()</code>：</p>
+
+<p> </p>
+
+<pre>
+<code>  public &lt;T&gt; T getMapper(Class&lt;T&gt; type, SqlSession sqlSession) {
+    return mapperRegistry.getMapper(type, sqlSession);
+  }
+</code></pre>
+
+<p><code>configuration.getMapper()</code>又调用了<code>mapperRegistry.getMapper()</code>，那好，我们再深入看一下<code>mapperRegistry.getMapper()</code>：</p>
+
+<p> </p>
+
+<pre>
+<code>  public &lt;T&gt; T getMapper(Class&lt;T&gt; type, SqlSession sqlSession) {
+    final MapperProxyFactory&lt;T&gt; mapperProxyFactory = (MapperProxyFactory&lt;T&gt;) knownMappers.get(type);
+    if (mapperProxyFactory == null) {
+      throw new BindingException("Type " + type + " is not known to the MapperRegistry.");
+    }
+    try {
+      return mapperProxyFactory.newInstance(sqlSession);
+    } catch (Exception e) {
+      throw new BindingException("Error getting mapper instance. Cause: " + e, e);
+    }
+  }
+</code></pre>
+
+<p>看到这里我们就恍然大悟了，原来它根据上游传递进来DAO接口的Class对象，从<code>configuration</code>中取出了该DAO接口对应的代理对象生成工厂：<code>MapperProxyFactory</code>；<br>
+在有了这个工厂后，再通过<code>newInstance</code>函数创建该DAO接口的代理对象，并返回给上游。</p>
+
+<p>OK，此时我们已经获取了代理对象，接下来就可以使用这个代理对象调用相应的函数了。</p>
+
+<p> </p>
+
+<pre>
+<code>SqlSession sqlSession = sqlSessionFactory.openSession();
+try {
+    ProductMapper productMapper = sqlSession.getMapper(ProductMapper.class);
+    List&lt;Product&gt; productList = productMapper.selectProductList();
+    for (Product product : productList) {
+        System.out.printf(product.toString());
+    }
+} finally {
+    sqlSession.close();
+}
+</code></pre>
+
+<p>以上述代码为例，当我们获取到<code>ProductMapper</code>的代理对象后，我们调用了它的<code>selectProductList()</code>函数。<br>
+下面我们就来分析下代理函数调用过程。</p>
+
+<hr><p>当调用了代理对象的某一个代理函数后，这个调用请求首先会被发送给代理对象处理类<code>MapperProxy</code>的<code>invoke()</code>函数：</p>
+
+<p> </p>
+
+<pre>
+<code>  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    try {
+      if (Object.class.equals(method.getDeclaringClass())) {
+        return method.invoke(this, args);
+      } else if (isDefaultMethod(method)) {
+        return invokeDefaultMethod(proxy, method, args);
+      }
+    } catch (Throwable t) {
+      throw ExceptionUtil.unwrapThrowable(t);
+    }
+    // 【核心代理在这里】
+    final MapperMethod mapperMethod = cachedMapperMethod(method);
+    return mapperMethod.execute(sqlSession, args);
+  }
+</code></pre>
+
+<p>先来解释下invoke函数的几个参数：</p>
+
+<ol><li><code>Object proxy</code>：代理对象</li>
+    <li><code>Method method</code>：当前正在被调用的代理对象的函数对象</li>
+    <li><code>Object[] args</code>：调用函数的所有入参</li>
+</ol><p>然后，直接看invoke函数最核心的两行代码：</p>
+
+<ol><li><code>cachedMapperMethod(method)</code>：从当前代理对象处理类<code>MapperProxy</code>的<code>methodCache</code>属性中获取method方法的详细信息（即：<code>MapperMethod</code>对象）。如果<code>methodCache</code>中没有就创建并加进去。</li>
+    <li>有了<code>MapperMethod</code>对象后执行它的<code>execute()</code>方法，该方法就会调用JDBC执行相应的SQL语句，并将结果返回给上游调用者。至此，代理对象函数的调用过程结束！</li>
+</ol><p>MapperMethod的execute方法</p>
+
+<pre>
+<code class="language-java">public Object execute(SqlSession sqlSession, Object[] args) {
+        Object result;
+        Object param;
+        switch(this.command.getType()) {
+        case INSERT:
+            param = this.method.convertArgsToSqlCommandParam(args);
+            result = this.rowCountResult(sqlSession.insert(this.command.getName(), param));
+            break;
+        case UPDATE:
+            param = this.method.convertArgsToSqlCommandParam(args);
+            result = this.rowCountResult(sqlSession.update(this.command.getName(), param));
+            break;
+        case DELETE:
+            param = this.method.convertArgsToSqlCommandParam(args);
+            result = this.rowCountResult(sqlSession.delete(this.command.getName(), param));
+            break;
+        case SELECT:
+            if (this.method.returnsVoid() &amp;&amp; this.method.hasResultHandler()) {
+                this.executeWithResultHandler(sqlSession, args);
+                result = null;
+            } else if (this.method.returnsMany()) {
+                result = this.executeForMany(sqlSession, args);
+            } else if (this.method.returnsMap()) {
+                result = this.executeForMap(sqlSession, args);
+            } else if (this.method.returnsCursor()) {
+                result = this.executeForCursor(sqlSession, args);
+            } else {
+                param = this.method.convertArgsToSqlCommandParam(args);
+                result = sqlSession.selectOne(this.command.getName(), param);
+                if (this.method.returnsOptional() &amp;&amp; (result == null || !this.method.getReturnType().equals(result.getClass()))) {
+                    result = Optional.ofNullable(result);
+                }
+            }
+            break;
+        case FLUSH:
+            result = sqlSession.flushStatements();
+            break;
+        default:
+            throw new BindingException("Unknown execution method for: " + this.command.getName());
+        }
+
+        if (result == null &amp;&amp; this.method.getReturnType().isPrimitive() &amp;&amp; !this.method.returnsVoid()) {
+            throw new BindingException("Mapper method '" + this.command.getName() + " attempted to return null from a method with a primitive return type (" + this.method.getReturnType() + ").");
+        } else {
+            return result;
+        }
+    }</code></pre>
+
+<p>可以看出是sqlsession通过xml中的sql id和参数在做CRUD操作，再看 result = this.executeForMany(sqlSession, args);方法</p>
+
+<pre>
+<code class="language-java">private &lt;E&gt; Object executeForMany(SqlSession sqlSession, Object[] args) {
+        Object param = this.method.convertArgsToSqlCommandParam(args);
+        List result;
+        if (this.method.hasRowBounds()) {
+            RowBounds rowBounds = this.method.extractRowBounds(args);
+            result = sqlSession.selectList(this.command.getName(), param, rowBounds);
+        } else {
+            result = sqlSession.selectList(this.command.getName(), param);
+        }
+
+        if (!this.method.getReturnType().isAssignableFrom(result.getClass())) {
+            return this.method.getReturnType().isArray() ? this.convertToArray(result) : this.convertToDeclaredCollection(sqlSession.getConfiguration(), result);
+        } else {
+            return result;
+        }
+    }</code></pre>
+
+<p>进入 sqlSession.selectList(this.command.getName(), param, rowBounds);方法</p>
+
+<pre>
+<code class="language-java">public &lt;E&gt; List&lt;E&gt; selectList(String statement, Object parameter, RowBounds rowBounds) {
+        List var5;
+        try {
+            MappedStatement ms = this.configuration.getMappedStatement(statement);
+            var5 = this.executor.query(ms, this.wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
+        } catch (Exception var9) {
+            throw ExceptionFactory.wrapException("Error querying database.  Cause: " + var9, var9);
+        } finally {
+            ErrorContext.instance().reset();
+        }
+
+        return var5;
+    }</code></pre>
+
+<p>继续看 this.executor.query 方法</p>
+
+<pre>
+<code class="language-java">public &lt;E&gt; List&lt;E&gt; query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
+        BoundSql boundSql = ms.getBoundSql(parameterObject);
+        CacheKey key = this.createCacheKey(ms, parameterObject, rowBounds, boundSql);
+        return this.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+    }</code></pre>
+
+<p>这里的cacheKey是通过 id +sql+limit+offsetxxx 等等参数确定一个缓存的key</p>
+
+<p>接着看query方法：</p>
+
+<pre>
+<code class="language-java">public &lt;E&gt; List&lt;E&gt; query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
+        // 获取二级缓存
+        Cache cache = ms.getCache();
+        if (cache != null) {
+            // 根据ms来决定是否刷新缓存
+            this.flushCacheIfRequired(ms);
+            if (ms.isUseCache() &amp;&amp; resultHandler == null) {
+                this.ensureNoOutParams(ms, boundSql);
+                List&lt;E&gt; list = (List)this.tcm.getObject(cache, key);
+                if (list == null) {
+                    list = this.delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+                    // 放入二级缓存
+                    this.tcm.putObject(cache, key, list);
+                }
+
+                return list;
+            }
+        }
+
+        return this.delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+    }</code></pre>
+
+<p>有缓存就从缓存中取，无缓存就调用初始化CachingExecutor时传入的SimpleExecutor的query方法，继续看 this.delegate.query 方法：</p>
+
+<pre>
+<code class="language-java">public &lt;E&gt; List&lt;E&gt; query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
+        ErrorContext.instance().resource(ms.getResource()).activity("executing a query").object(ms.getId());
+        if (this.closed) {
+            throw new ExecutorException("Executor was closed.");
+        } else {
+            // 上一个查询执行完成 并且 &lt;select&gt;标签增加了flushCache="true" 刷新一级缓存
+            if (this.queryStack == 0 &amp;&amp; ms.isFlushCacheRequired()) {
+                this.clearLocalCache();
+            }
+
+            List list;
+            try {
+                ++this.queryStack;
+                // 对于指定了resultHandler的查询，不走缓存。否则从缓存中查询。
+                list = resultHandler == null ? (List)this.localCache.getObject(key) : null;
+                if (list != null) {
+                    // 如果存在缓存参数值，取出来覆盖当前参数值，只针对Callable
+                    this.handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
+                } else {
+                    // 缓存中没有，从数据库中查询放入缓存
+                    list = this.queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
+                }
+            } finally {
+                --this.queryStack;
+            }
+
+            if (this.queryStack == 0) {
+                Iterator var8 = this.deferredLoads.iterator();
+
+                while(var8.hasNext()) {
+                    BaseExecutor.DeferredLoad deferredLoad = (BaseExecutor.DeferredLoad)var8.next();
+                    deferredLoad.load();
+                }
+
+                this.deferredLoads.clear();
+                // 如果cacheScope配置了statement，查询完后清除缓存
+                if (this.configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) {
+                    this.clearLocalCache();
+                }
+            }
+
+            return list;
+        }
+    }</code></pre>
+
+<p>再看 queryFromDatabase 方法：</p>
+
+<pre>
+<code class="language-java">private &lt;E&gt; List&lt;E&gt; queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
+        // 放入一个初始值
+        this.localCache.putObject(key, ExecutionPlaceholder.EXECUTION_PLACEHOLDER);
+
+        List list;
+        try {
+            list = this.doQuery(ms, parameter, rowBounds, resultHandler, boundSql);
+        } finally {
+            this.localCache.removeObject(key);
+        }
+        // 放入一级缓存
+        this.localCache.putObject(key, list);
+        if (ms.getStatementType() == StatementType.CALLABLE) {
+            this.localOutputParameterCache.putObject(key, parameter);
+        }
+
+        return list;
+    }</code></pre>
+
+<p>可以看到上面的查询方法先是看&lt;select&gt;有没有flushCache=”true”，有就刷新一级缓存，没有的话先去从一级缓存取数据，如果一级缓存里没有结果，调用<code>queryFromDatabase</code>方法，从数据库查询结果并返回。</p>
+
+<p>一级缓存的范围有 <code>SESSION</code> 和 <code>STATEMENT</code> 两种，默认是 <code>SESSION</code> ，如果我们不需要使用一级缓存，那么我们可以把一级缓存的范围指定为STATEMENT，这样每次执行完一个Mapper语句后都会将一级缓存清除。如果需要更改一级缓存的范围，请在Mybatis的配置文件中，在&lt;settings&gt;下通过localCacheScope指定。</p>
+
+<p>至此，一次完整的Mybatis执行过程到此结束。</p>
+
+<p> </p>
+
+<p>需要注意的是与spring整合之后，mybatis的一级缓存就失效了</p>
+
+<p>1.mybatis的一级缓存生效的范围是sqlsession，是为了在sqlsession没有关闭时，业务需要重复查询相同数据使用的。一旦sqlsession关闭，则由这个sqlsession缓存的数据将会被清空。</p>
+
+<p>2.spring对mybatis的sqlsession的使用是由template控制的，sqlSessionTemplate又被spring当作resource放在当前线程的上下文里（threadlocal),spring通过mybatis调用数据库的过程如下：</p>
+
+<blockquote>
+<ol><li>我们需要访问数据</li>
+    <li>spring检查到了这种需求，于是去申请一个mybatis的sqlsession（资源池），并将申请到的sqlsession与当前线程绑定，放入threadlocal里面</li>
+    <li>sqlSessionTemplate从threadlocal获取到sqlsession，去执行查询</li>
+    <li>查询结束，清空threadlocal中与当前线程绑定的sqlsession，释放资源</li>
+    <li>我们又需要访问数据</li>
+    <li>返回到步骤2</li>
+</ol><p>通过以上步骤后发现，同一线程里面两次查询同一数据所使用的sqlsession是不相同的，所以，给人的印象就是结合spring后，mybatis的一级缓存失效了。</p>
+</blockquote>
+
+<p>对于spring开启事务时，getSqlSession方法里面维护了个SqlSessionHolder，关联了事务与session，如果存在则直接取出，否则则新建个session，所以在有事务的里，每个session都是同一个，故能用上缓存了。</p>
+
+<p> </p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2020/03/01/MyBatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%B8%80)%E2%80%94%E2%80%94MyBatis%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E8%A7%A3%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/01/MyBatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%B8%80)%E2%80%94%E2%80%94MyBatis%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E8%A7%A3%E6%9E%90/" class="post-title-link" itemprop="url">MyBatis源码解析(一)——MyBatis初始化过程解析</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-01 15:03:52" itemprop="dateCreated datePublished" datetime="2020-03-01T15:03:52+08:00">2020-03-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:03:21" itemprop="dateModified" datetime="2020-05-01T19:03:21+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mybatis/" itemprop="url" rel="index"><span itemprop="name">Mybatis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+
+<h1>1. 准备工作</h1>
+
+<p>为了看清楚MyBatis的整个初始化过程，先创建一个简单的Java项目，目录结构如下图所示：</p>
+
+<p> </p>
+
+<p><img alt src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTk0NjA0LTk0Y2EzOTk4YmVlMGFiYjcucG5nP2ltYWdlTW9ncjIvYXV0by1vcmllbnQvc3RyaXB8aW1hZ2VWaWV3Mi8yL3cvMjk0L2Zvcm1hdC93ZWJw?x-oss-process=image/format,png"></p>
+
+<h2>1.1 Product 产品实体类</h2>
+
+<p> </p>
+
+<pre>
+<code>public class Product {
+    private long id;
+    private String productName;
+    private String productContent;
+    private String price;
+    private int sort;
+    private int falseSales;
+    private long category_id;
+    private byte type;
+    private byte state;
+    // PS：省略setter、getter函数
+}
+</code></pre>
+
+<h2>1.2 ProductMapper 产品持久化接口</h2>
+
+<p> </p>
+
+<pre>
+<code>public interface ProductMapper {
+    /**
+     * 查询所有的产品
+     * @return
+     */
+    List&lt;Product&gt; selectProductList();
+}
+</code></pre>
+
+<h2>1.3 ProductMapper.xml 产品映射文件</h2>
+
+<p> </p>
+
+<pre>
+<code>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" &gt;
+
+&lt;mapper namespace="team.njupt.mapper.ProductMapper"&gt;
+    &lt;select id="selectProductList" resultType="team.njupt.entity.Product"&gt;
+        select * from product
+    &lt;/select&gt;
+&lt;/mapper&gt;
+</code></pre>
+
+<h2>1.4 db.properties 数据库配置文件</h2>
+
+<p> </p>
+
+<pre>
+<code>driver=com.mysql.jdbc.Driver
+url=jdbc:mysql://127.0.0.1:3306/waimai?useUnicode=true&amp;characterEncoding=utf8
+username=root
+password=xxxxxx
+</code></pre>
+
+<h2>1.5 mybatis.xml MyBatis的配置文件</h2>
+
+<p> </p>
+
+<pre>
+<code>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd"&gt;
+&lt;configuration&gt;
+    &lt;properties resource="db.properties"&gt;
+        &lt;!--&lt;property name="username" value="dev_user"/&gt;--&gt;
+        &lt;!--&lt;property name="password" value="F2Fa3!33TYyg"/&gt;--&gt;
+    &lt;/properties&gt;
+
+    &lt;environments default="development"&gt;
+        &lt;environment id="development"&gt;
+            &lt;transactionManager type="JDBC"/&gt;
+            &lt;dataSource type="POOLED"&gt;
+                &lt;property name="driver" value="${driver}"/&gt;
+                &lt;property name="url" value="${url}"/&gt;
+                &lt;property name="username" value="${username}"/&gt;
+                &lt;property name="password" value="${password}"/&gt;
+            &lt;/dataSource&gt;
+        &lt;/environment&gt;
+    &lt;/environments&gt;
+    &lt;mappers&gt;
+        &lt;mapper resource="team/njupt/mapper/ProductMapper.xml"/&gt;
+    &lt;/mappers&gt;
+&lt;/configuration&gt;
+</code></pre>
+
+<h2>1.6 Main 主函数</h2>
+
+<p> </p>
+
+<pre>
+<code>public class Main {
+    public static void main(String[] args) throws IOException {
+
+        String resource = "mybatis.xml";
+        InputStream inputStream = Resources.getResourceAsStream(resource);
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            ProductMapper productMapper = sqlSession.getMapper(ProductMapper.class);
+            List&lt;Product&gt; productList = productMapper.selectProductList();
+            for (Product product : productList) {
+                System.out.printf(product.toString());
+            }
+        } finally {
+            sqlSession.close();
+        }
+    }
+}
+</code></pre>
+
+<hr><h1>2. MyBatis初始化过程</h1>
+
+<h2>2.1 获取配置文件</h2>
+
+<p>当系统初始化时，首先会读取配置文件，并将其解析成InputStream</p>
+
+<p> </p>
+
+<pre>
+<code>String resource = "mybatis.xml";
+InputStream inputStream = Resources.getResourceAsStream(resource);
+</code></pre>
+
+<h2>2.2 创建SqlSessionFactoryBuilder对象</h2>
+
+<p>从<code>SqlSessionFactoryBuilder</code>的名字中可以看出，<code>SqlSessionFactoryBuilder</code>是用来创建<code>SqlSessionFactory</code>对象的。<br>
+来看一下SqlSessionFactoryBuilder源码：</p>
+
+<p><img alt src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTk0NjA0LWIwZjNlOTk1YWM1NmYyMGEucG5nP2ltYWdlTW9ncjIvYXV0by1vcmllbnQvc3RyaXB8aW1hZ2VWaWV3Mi8yL3cvMzQ5L2Zvcm1hdC93ZWJw?x-oss-process=image/format,png"></p>
+
+<p><br>
+SqlSessionFactoryBuilder中只有一些重载的build函数，这些build函数的入参都是MyBatis配置文件的输入流，返回值都是SqlSessionFactory；由此可见，SqlSessionFactoryBuilder的作用很纯粹，就是用来通过配置文件创建SqlSessionFactory对象的。</p>
+
+<p> </p>
+
+<h2>2.3 SqlSessionFactory创建过程</h2>
+
+<p>下面具体来看一下，build函数是如何创建SqlSessionFactory对象的。</p>
+
+<p> </p>
+
+<pre>
+<code>public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
+  try {
+    XMLConfigBuilder parser = new XMLConfigBuilder(inputStream, environment, properties);
+    return build(parser.parse());
+  } catch (Exception e) {
+    throw ExceptionFactory.wrapException("Error building SqlSession.", e);
+  } finally {
+    ErrorContext.instance().reset();
+    try {
+      inputStream.close();
+    } catch (IOException e) {
+      // Intentionally ignore. Prefer previous error.
+    }
+  }
+}
+</code></pre>
+
+<p>2.3.1 构造XMLConfigBuilder对象</p>
+
+<p>build函数首先会构造一个<code>XMLConfigBuilder</code>对象，从名字上大致可以猜到，该对象是用来解析XML配置文件的。下面来看一下<code>XMLConfigBuilder</code>的体系结构。</p>
+
+<p><img alt src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTk0NjA0LTM5OThmOTcyYTZhNGUyNTEucG5nP2ltYWdlTW9ncjIvYXV0by1vcmllbnQvc3RyaXB8aW1hZ2VWaWV3Mi8yL3cvNzQ4L2Zvcm1hdC93ZWJw?x-oss-process=image/format,png"></p>
+
+<p> </p>
+
+<ul><li>
+    <p><code>XMLxxxBuilder</code>是用来解析XML配置文件的，不同类型<code>XMLxxxBuilder</code>用来解析MyBatis配置文件的不同部位。比如：<code>XMLConfigBuilder</code>用来解析MyBatis的配置文件，<code>XMLMapperBuilder</code>用来解析MyBatis中的映射文件（如上文提到的<code>ProductMapper.xml</code>），<code>XMLStatementBuilder</code>用来解析映射文件中的SQL语句。</p>
+    </li>
+    <li>
+    <p>这些<code>XMLxxxBuilder</code>都有一个共同的父类——<code>BaseBuilder</code>。这个父类维护了一个全局的<code>Configuration</code>对象，MyBatis的配置文件解析后就以<code>Configuration</code>对象的形式存储。</p>
+    </li>
+    <li>
+    <p>当创建<code>XMLConfigBuilder</code>对象时，就会初始化<code>Configuration</code>对象，并且在初始化<code>Configuration</code>对象的时候，一些别名会被注册到<code>Configuration</code>的<code>typeAliasRegistry</code>容器中。</p>
+
+<pre><code>&lt;pre&gt;</code></pre><p><code>private XMLConfigBuilder(XPathParser parser, String environment, Properties props) {<br>super(new Configuration());<br>ErrorContext.instance().resource("SQL Mapper Configuration");<br>this.configuration.setVariables(props);<br>this.parsed = false;<br>this.environment = environment;<br>this.parser = parser;<br>}<br></code></p>
+<pre><code>&lt;pre&gt;</code></pre><p><code>public Configuration() {<br>typeAliasRegistry.registerAlias("JDBC", JdbcTransactionFactory.class);<br>typeAliasRegistry.registerAlias("MANAGED", ManagedTransactionFactory.class);</code></p>
+<p>typeAliasRegistry.registerAlias("JNDI", JndiDataSourceFactory.class);<br>typeAliasRegistry.registerAlias("POOLED", PooledDataSourceFactory.class);<br>typeAliasRegistry.registerAlias("UNPOOLED", UnpooledDataSourceFactory.class);</p>
+<p>typeAliasRegistry.registerAlias("PERPETUAL", PerpetualCache.class);<br>typeAliasRegistry.registerAlias("FIFO", FifoCache.class);<br>typeAliasRegistry.registerAlias("LRU", LruCache.class);<br>typeAliasRegistry.registerAlias("SOFT", SoftCache.class);<br>typeAliasRegistry.registerAlias("WEAK", WeakCache.class);<br>……<br>}<br><br>    </p></li><p></p>
+</ul><h3>2.3.2 解析配置文件</h3>
+
+<p>当有了<code>XMLConfigBuilder</code>对象之后，接下来就可以用它来解析配置文件了。</p>
+
+<p> </p>
+
+<pre>
+<code>  private void parseConfiguration(XNode root) {
+  try {
+    // 解析&lt;properties&gt;节点
+    propertiesElement(root.evalNode("properties"));
+    // 解析&lt;settings&gt;节点
+    Properties settings = settingsAsProperties(root.evalNode("settings"));
+    loadCustomVfs(settings);
+    // 解析&lt;typeAliases&gt;节点
+    typeAliasesElement(root.evalNode("typeAliases"));
+    // 解析&lt;plugins&gt;节点
+    pluginElement(root.evalNode("plugins"));
+    // 解析&lt;objectFactory&gt;节点
+    objectFactoryElement(root.evalNode("objectFactory"));
+    objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
+    // 解析&lt;reflectorFactory&gt;节点
+    reflectorFactoryElement(root.evalNode("reflectorFactory"));
+    settingsElement(settings);
+    // 解析&lt;environments&gt;节点
+    environmentsElement(root.evalNode("environments"));
+    databaseIdProviderElement(root.evalNode("databaseIdProvider"));
+    typeHandlerElement(root.evalNode("typeHandlers"));
+    // 解析&lt;mappers&gt;节点
+    mapperElement(root.evalNode("mappers"));
+  } catch (Exception e) {
+    throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
+  }
+}
+</code></pre>
+
+<p>从上述代码中可以看到，<code>XMLConfigBuilder</code>会依次解析配置文件中的<code>&lt;properties&gt;</code>、<code>&lt; settings &gt;</code>、<code>&lt; environments&gt;</code>、<code>&lt; typeAliases &gt;</code>、<code>&lt; plugins &gt;</code>、<code>&lt; mappers &gt;</code>等属性。下面介绍下几个重要属性的解析过程。</p>
+
+<p>2.3.2.1 &lt;properties&gt;节点的解析过程</p>
+
+<ul><li>
+    <p>&lt;properties&gt;节点的定义如下：</p>
+
+<pre><code>&lt;pre&gt;</code></pre><p><code class="language-java">&lt;properties resource="org/mybatis/example/config.properties"&gt;<br>  &lt;property name="username" value="dev_user"/&gt;<br>  &lt;property name="password" value="F2Fa3!33TYyg"/&gt;<br>&lt;/properties&gt;<br></code><br>    </p></li><p></p>
+</ul><p> </p>
+
+<ul><li>
+    <p>&lt;properties&gt;节点的解析过程：</p>
+
+<pre><code>&lt;pre&gt;</code></pre><p><code>/**</code></p>
+<ul>
+<li><p>@Param context &lt;properties&gt;节点</p>
+</li>
+<li><p>/<br>private void propertiesElement(XNode context) throws Exception {<br>if (context != null) {<br> // 获取&lt;properties&gt;节点的所有子节点<br> Properties defaults = context.getChildrenAsProperties();<br> // 获取&lt;properties&gt;节点上的resource属性<br> String resource = context.getStringAttribute("resource");<br> // 获取&lt;properties&gt;节点上的url属性<br> String url = context.getStringAttribute("url");<br> // resource和url不能同时存在<br> if (resource != null &amp;&amp; url != null) {<br>   throw new BuilderException("The properties element cannot specify both a URL and a resource based property file reference.  Please specify one or the other.");<br> }<br> if (resource != null) {<br>   // 获取resource属性值对应的properties文件中的键值对，并添加至defaults容器中<br>   defaults.putAll(Resources.getResourceAsProperties(resource));<br> } else if (url != null) {<br>   // 获取url属性值对应的properties文件中的键值对，并添加至defaults容器中<br>   defaults.putAll(Resources.getUrlAsProperties(url));<br> }<br> // 获取configuration中原本的属性，并添加至defaults容器中<br> Properties vars = configuration.getVariables();<br> if (vars != null) {<br>   defaults.putAll(vars);<br> }<br> parser.setVariables(defaults);<br> // 将defaults容器添加至configuration中<br> configuration.setVariables(defaults);<br>}<br>}<br></p>
+ <p>如果属性在不只一个地方进行了配置，那么 MyBatis 将按照下面的顺序来加载：</p>
+ </li>
+ <li>在 properties 元素体内指定的属性首先被读取。</li>
+ <li>然后根据 properties 元素中的 resource 属性读取类路径下属性文件或根据 url 属性指定的路径读取属性文件，并覆盖已读取的同名属性。</li>
+</ul><p>因此，通过方法参数传递的属性具有最高优先级，resource/url 属性中指定的配置文件次之，最低优先级的是 properties 属性中指定的属性。</p>
+
+</li>
+</ul>
+<ul><li>最终，携带所有属性的<code>Properties</code>对象会被存储在<code>Configuration</code>对象中。</li>
+</ul><p>2.3.2.2 &lt;settings&gt;节点的解析过程</p>
+
+<ul><li>&lt;settings&gt;节点的定义如下：
+    <pre>
+<code>&lt;settings&gt;
+  &lt;setting name="cacheEnabled" value="true"/&gt;
+  &lt;setting name="lazyLoadingEnabled" value="true"/&gt;
+  &lt;setting name="multipleResultSetsEnabled" value="true"/&gt;
+&lt;/settings&gt;
+</code></pre>
+    </li>
+    <li>&lt;settings&gt;节点的解析过程：<br><code>&lt;settings&gt;</code>属性的解析过程和 <code>&lt;properties&gt;</code>属性的解析过程极为类似，这里不再赘述。最终，所有的setting属性都被存储在<code>Configuration</code>对象中。</li>
+</ul><p>2.3.2.3 &lt;typeAliases&gt;属性的解析过程</p>
+
+<p><code>&lt;typeAliases&gt;</code>属性的定义方式有如下两种：</p>
+
+<ul><li>方式1：
+    <pre>
+<code>&lt;typeAliases&gt;
+  &lt;typeAlias alias="Author" type="domain.blog.Author"/&gt;
+  &lt;typeAlias alias="Blog" type="domain.blog.Blog"/&gt;
+&lt;/typeAliases&gt;
+</code></pre>
+    </li>
+    <li>方式2：
+    <pre>
+<code>&lt;typeAliases&gt;
+  &lt;package name="domain.blog"/&gt;
+&lt;/typeAliases&gt;
+</code></pre>
+    采用这种方式时，MyBatis会为指定包下的所有类起一个别名，该别名为首字母小写的类名。</li>
+</ul><p><code>&lt;typeAliases&gt;</code>节点的解析过程如下：</p>
+
+<p> </p>
+
+<pre>
+<code>  private void typeAliasesElement(XNode parent) {
+  if (parent != null) {
+    // 遍历&lt;typeAliases&gt;下的所有子节点
+    for (XNode child : parent.getChildren()) {
+      // 若当前结点为&lt;package&gt;
+      if ("package".equals(child.getName())) {
+        // 获取&lt;package&gt;上的name属性（包名）
+        String typeAliasPackage = child.getStringAttribute("name");
+        // 为该包下的所有类起个别名，并注册进configuration的typeAliasRegistry中          
+        configuration.getTypeAliasRegistry().registerAliases(typeAliasPackage);
+      } 
+      // 如果当前结点为&lt; typeAlias &gt;
+      else {
+        // 获取alias和type属性
+        String alias = child.getStringAttribute("alias");
+        String type = child.getStringAttribute("type");
+        // 注册进configuration的typeAliasRegistry中
+        try {
+          Class&lt;?&gt; clazz = Resources.classForName(type);
+          if (alias == null) {
+            typeAliasRegistry.registerAlias(clazz);
+          } else {
+            typeAliasRegistry.registerAlias(alias, clazz);
+          }
+        } catch (ClassNotFoundException e) {
+          throw new BuilderException("Error registering typeAlias for '" + alias + "'. Cause: " + e, e);
+        }
+      }
+    }
+  }
+}
+</code></pre>
+
+<ul><li>如果<code>&lt;typeAliases&gt;</code>节点下定义了<code>&lt;package&gt;</code>节点，那么MyBatis会给该包下的所有类起一个别名（以类名首字母小写作为别名）</li>
+    <li>如果<code>&lt;typeAliases&gt;</code>节点下定义了<code>&lt;typeAlias&gt;</code>节点，那么MyBatis就会给指定的类起指定的别名。</li>
+    <li>这些别名都会被存入<code>configuration</code>的<code>typeAliasRegistry</code>容器中。</li>
+</ul><p>2.3.2.4 &lt;mappers&gt;节点的解析过程</p>
+
+<p><code>&lt;mappers&gt;</code>节点的定义方式有如下四种：</p>
+
+<ul><li>方式1：</li>
+</ul><p> </p>
+
+<pre>
+<code>&lt;mappers&gt;
+  &lt;package name="org.mybatis.builder"/&gt;
+&lt;/mappers&gt;
+</code></pre>
+
+<ul><li>方式2：</li>
+</ul><p> </p>
+
+<pre>
+<code>&lt;mappers&gt;
+  &lt;mapper resource="org/mybatis/builder/AuthorMapper.xml"/&gt;
+&lt;/mappers&gt;
+</code></pre>
+
+<ul><li>方式3：</li>
+</ul><p> </p>
+
+<pre>
+<code>&lt;mappers&gt;
+  &lt;mapper url="file:///var/mappers/AuthorMapper.xml"/&gt;
+&lt;/mappers&gt;
+</code></pre>
+
+<ul><li>方式4：</li>
+</ul><p> </p>
+
+<pre>
+<code>&lt;mappers&gt;
+  &lt;mapper class="org.mybatis.builder.AuthorMapper"/&gt;
+&lt;/mappers&gt;
+</code></pre>
+
+<p><code>&lt;mappers&gt;</code>节点的解析过程如下：</p>
+
+<p> </p>
+
+<pre>
+<code>  private void mapperElement(XNode parent) throws Exception {
+  if (parent != null) {
+    // 遍历&lt;mappers&gt;下所有子节点
+    for (XNode child : parent.getChildren()) {
+      // 如果当前节点为&lt;package&gt;
+      if ("package".equals(child.getName())) {
+        // 获取&lt;package&gt;的name属性（该属性值为mapper class所在的包名）
+        String mapperPackage = child.getStringAttribute("name");
+        // 将该包下的所有Mapper Class注册到configuration的mapperRegistry容器中
+        configuration.addMappers(mapperPackage);
+      } 
+      // 如果当前节点为&lt;mapper&gt;
+      else {
+        // 依次获取resource、url、class属性
+        String resource = child.getStringAttribute("resource");
+        String url = child.getStringAttribute("url");
+        String mapperClass = child.getStringAttribute("class");
+        // 解析resource属性（Mapper.xml文件的路径）
+        if (resource != null &amp;&amp; url == null &amp;&amp; mapperClass == null) {
+          ErrorContext.instance().resource(resource);
+          // 将Mapper.xml文件解析成输入流
+          InputStream inputStream = Resources.getResourceAsStream(resource);
+          // 使用XMLMapperBuilder解析Mapper.xml，并将Mapper Class注册进configuration对象的mapperRegistry容器中
+          XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
+          mapperParser.parse();
+        } 
+        // 解析url属性（Mapper.xml文件的路径）
+        else if (resource == null &amp;&amp; url != null &amp;&amp; mapperClass == null) {
+          ErrorContext.instance().resource(url);
+          InputStream inputStream = Resources.getUrlAsStream(url);
+          XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, url, configuration.getSqlFragments());
+          mapperParser.parse();
+        } 
+        // 解析class属性（Mapper Class的全限定名）
+        else if (resource == null &amp;&amp; url == null &amp;&amp; mapperClass != null) {
+          // 将Mapper Class的权限定名转化成Class对象
+          Class&lt;?&gt; mapperInterface = Resources.classForName(mapperClass);
+          // 注册进configuration对象的mapperRegistry容器中
+          configuration.addMapper(mapperInterface);
+        } else {
+          throw new BuilderException("A mapper element may only specify a url, resource or class, but not more than one.");
+        }
+      }
+    }
+  }
+}
+</code></pre>
+
+<ul><li>MyBatis会遍历<code>&lt;mappers&gt;</code>下所有的子节点，如果当前遍历到的节点是<code>&lt;package&gt;</code>，则MyBatis会将该包下的所有Mapper Class注册到<code>configuration</code>的<code>mapperRegistry</code>容器中。</li>
+    <li>如果当前节点为<code>&lt;mapper&gt;</code>，则会依次获取resource、url、class属性，解析映射文件，并将映射文件对应的Mapper Class注册到<code>configuration</code>的<code>mapperRegistry</code>容器中。</li>
+</ul><p>其中，<code>&lt;mapper&gt;</code>节点的解析过程如下：</p>
+
+<p> </p>
+
+<pre>
+<code>XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
+mapperParser.parse();
+</code></pre>
+
+<ul><li>
+    <p>在解析前，首先需要创建<code>XMLMapperBuilder</code>，创建过程如下：</p>
+
+<pre><code>&lt;pre&gt;</code></pre><p><code>private XMLMapperBuilder(XPathParser parser, Configuration configuration, String resource, Map&lt;String, XNode&gt; sqlFragments) {<br>  // 将configuration赋给BaseBuilder<br>  super(configuration);<br>  // 创建MapperBuilderAssistant对象（该对象为MapperBuilder的协助者）<br>  this.builderAssistant = new  MapperBuilderAssistant(configuration, resource);<br>  this.parser = parser;<br>  this.sqlFragments = sqlFragments;<br>  this.resource = resource;<br>}<br></code></p>
+<pre><code>&lt;ul&gt;&lt;li&gt;首先会初始化父类&lt;code&gt;BaseBuilder&lt;/code&gt;，并将&lt;code&gt;configuration&lt;/code&gt;赋给BaseBuilder；&lt;/li&gt;
+    &lt;li&gt;然后创建&lt;code&gt;MapperBuilderAssistant&lt;/code&gt;对象，该对象为&lt;code&gt;XMLMapperBuilder&lt;/code&gt;的协助者，用来协助&lt;code&gt;XMLMapperBuilder&lt;/code&gt;完成一些解析映射文件的动作。&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;当有了&lt;code&gt;XMLMapperBuilder&lt;/code&gt;后，便可进入解析&lt;code&gt;&amp;lt;mapper&amp;gt;&lt;/code&gt;的过程：&lt;/p&gt;
+
+&lt;pre&gt;</code></pre><p><code>public void parse() {<br>  // 若当前的Mapper.xml尚未被解析，则开始解析<br>  // PS：若&lt;mappers&gt;节点下有相同的&lt;mapper&gt;节点，那么就无需再次解析了<br>  if (!configuration.isResourceLoaded(resource)) {<br>    // 解析&lt;mapper&gt;节点<br>    configurationElement(parser.evalNode("/mapper"));<br>    // 将该Mapper.xml添加至configuration的LoadedResource容器中，下回无需再解析<br>    configuration.addLoadedResource(resource);<br>    // 将该Mapper.xml对应的Mapper Class注册进configuration的mapperRegistry容器中<br>    bindMapperForNamespace();<br>  }</code></p>
+<p>  parsePendingResultMaps();<br>  parsePendingCacheRefs();<br>  parsePendingStatements();<br>}<br><br>    </p></li><br>    <li><br>    <p><code>configurationElement</code>函数</p><p></p>
+<pre><code>&lt;pre&gt;</code></pre><p><code>private void configurationElement(XNode context) {<br>try {<br>  // 获取&lt;mapper&gt;节点上的namespace属性，该属性必须存在，表示当前映射文件对应的Mapper Class是谁<br>  String namespace = context.getStringAttribute("namespace");<br>  if (namespace == null || namespace.equals("")) {<br>    throw new BuilderException("Mapper's namespace cannot be empty");<br>  }<br>  // 将namespace属性值赋给builderAssistant<br>  builderAssistant.setCurrentNamespace(namespace);<br>  // 解析&lt;cache-ref&gt;节点<br>  cacheRefElement(context.evalNode("cache-ref"));<br>  // 解析&lt;cache&gt;节点<br>  cacheElement(context.evalNode("cache"));<br>  // 解析&lt;parameterMap&gt;节点<br>  parameterMapElement(context.evalNodes("/mapper/parameterMap"));<br>  // 解析&lt;resultMap&gt;节点<br>  resultMapElements(context.evalNodes("/mapper/resultMap"));<br>  // 解析&lt;sql&gt;节点<br>  sqlElement(context.evalNodes("/mapper/sql"));<br>  // 解析sql语句<br>  buildStatementFromContext(context.evalNodes("select|insert|update|delete"));<br>} catch (Exception e) {<br>  throw new BuilderException("Error parsing Mapper XML. Cause: " + e, e);<br>}<br>}<br></code><br>    </p></li><br>    <li><br>    <p><code>resultMapElements</code>函数<br><br>    该函数用于解析映射文件中所有的<code>&lt;resultMap&gt;</code>节点，这些节点会被解析成<code>ResultMap</code>对象，存储在<code>Configuration</code>对象的<code>resultMaps</code>容器中。</p><p></p>
+<pre><code>&lt;ul&gt;&lt;li&gt;&lt;code&gt;&amp;lt;resultMap&amp;gt;&lt;/code&gt;节点定义如下：&lt;/li&gt;
+&lt;/ul&gt;&lt;pre&gt;</code></pre><p><code> &lt;resultMap id="userResultMap" type="User"&gt;<br>  &lt;constructor&gt;<br>     &lt;idArg column="id" javaType="int"/&gt;<br>     &lt;arg column="username" javaType="String"/&gt;<br>  &lt;/constructor&gt;<br>  &lt;result property="username" column="user_name"/&gt;<br>  &lt;result property="password" column="hashed_password"/&gt;<br>&lt;/resultMap&gt;<br></code></p>
+<pre><code>&lt;ul&gt;&lt;li&gt;&lt;code&gt;&amp;lt;resultMap&amp;gt;&lt;/code&gt;节点的解析过程：&lt;/li&gt;
+&lt;/ul&gt;&lt;pre&gt;</code></pre><p><code>private ResultMap resultMapElement(XNode resultMapNode, List&lt;ResultMapping&gt; additionalResultMappings) throws Exception {<br>  ErrorContext.instance().activity("processing " + resultMapNode.getValueBasedIdentifier());<br>  // 获取&lt;ResultMap&gt;上的id属性<br>  String id = resultMapNode.getStringAttribute("id",<br>    resultMapNode.getValueBasedIdentifier());<br>  // 获取&lt;ResultMap&gt;上的type属性（即resultMap的返回值类型）<br>  String type = resultMapNode.getStringAttribute("type",<br>    resultMapNode.getStringAttribute("ofType",<br>        resultMapNode.getStringAttribute("resultType",<br>            resultMapNode.getStringAttribute("javaType"))));<br>  // 获取extends属性<br>  String extend = resultMapNode.getStringAttribute("extends");<br>  // 获取autoMapping属性<br>  Boolean autoMapping = resultMapNode.getBooleanAttribute("autoMapping");<br>  // 将resultMap的返回值类型转换成Class对象<br>  Class&lt;?&gt; typeClass = resolveClass(type);<br>  Discriminator discriminator = null;<br>  // resultMappings用于存储&lt;resultMap&gt;下所有的子节点<br>  List&lt;ResultMapping&gt; resultMappings = new ArrayList&lt;ResultMapping&gt;();<br>  resultMappings.addAll(additionalResultMappings);<br>  // 获取并遍历&lt;resultMap&gt;下所有的子节点<br>  List&lt;XNode&gt; resultChildren = resultMapNode.getChildren();<br>  for (XNode resultChild : resultChildren) {<br>    // 若当前节点为&lt;constructor&gt;，则将它的子节点们添加到resultMappings中去<br>    if ("constructor".equals(resultChild.getName())) {<br>      processConstructorElement(resultChild, typeClass, resultMappings);<br>    }<br>    // 若当前节点为&lt;discriminator&gt;，则进行条件判断，并将命中的子节点添加到resultMappings中去<br>    else if ("discriminator".equals(resultChild.getName())) {<br>      discriminator = processDiscriminatorElement(resultChild, typeClass, resultMappings);<br>    }<br>    // 若当前节点为&lt;result&gt;、&lt;association&gt;、&lt;collection&gt;，则将其添加到resultMappings中去<br>    else {<br>      // PS:flags仅用于区分当前节点是否是&lt;id&gt;或&lt;idArg&gt;，因为这两个节点的属性名为name，而其他节点的属性名为property<br>      List&lt;ResultFlag&gt; flags = new ArrayList&lt;ResultFlag&gt;();<br>      if ("id".equals(resultChild.getName())) {<br>        flags.add(ResultFlag.ID);<br>      }<br>      resultMappings.add(buildResultMappingFromContext(resultChild, typeClass, flags));<br>    }<br>  }<br>  // ResultMapResolver的作用是生成ResultMap对象，并将其加入到Configuration对象的resultMaps容器中（具体过程见下）<br>  ResultMapResolver resultMapResolver = new ResultMapResolver(builderAssistant, id, typeClass, extend, discriminator, resultMappings, autoMapping);<br>  try {<br>    return resultMapResolver.resolve();<br>  } catch (IncompleteElementException  e) {<br>    configuration.addIncompleteResultMap(resultMapResolver);<br>    throw e;<br>  }<br>}<br></code></p>
+<pre><code>&lt;p&gt;&lt;code&gt;ResultMapResolver&lt;/code&gt;这个类很纯粹，有且仅有一个函数&lt;code&gt;resolve&lt;/code&gt;，用于构造&lt;code&gt;ResultMap&lt;/code&gt;对象，并将其存入Configuration对象的resultMaps容器中；而这个过程是借助于&lt;code&gt;MapperBuilderAssistant.addResultMap&lt;/code&gt;完成的。&lt;/p&gt;
+
+&lt;pre&gt;</code></pre><p><code>public ResultMap resolve() {<br>  return assistant.addResultMap(this.id, this.type, this.extend,  this.discriminator, this.resultMappings, this.autoMapping);<br>}<br></code><br>    </p></li><br>    <li><br>    <p><code>sqlElement</code>函数<br><br>    该函数用于解析映射文件中所有的<code>&lt;sql&gt;</code>节点，并将这些节点存储在当前映射文件所对应的XMLMapperBuilder对象的sqlFragments容器中，供解析sql语句时使用。</p><p></p>
+<pre><code>&lt;pre&gt;</code></pre><p><code>&lt;sql id="userColumns"&gt; ${alias}.id,${alias}.username,${alias}.password &lt;/sql&gt;<br></code><br>    </p></li><p></p>
+</ul><ul><li><code>buildStatementFromContext</code>函数<br>
+    该函数会将映射文件中的sql语句解析成<code>MappedStatement</code>对象，并存在<code>configuration</code>的<code>mappedStatements</code>。</li>
+</ul><h3>2.3.3 创建SqlSessionFactory对象</h3>
+
+<p> </p>
+
+<pre>
+<code>public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
+  try {
+    XMLConfigBuilder parser = new XMLConfigBuilder(inputStream, environment, properties);
+    return build(parser.parse());
+  } catch (Exception e) {
+    throw ExceptionFactory.wrapException("Error building SqlSession.", e);
+  } finally {
+    ErrorContext.instance().reset();
+    try {
+      inputStream.close();
+    } catch (IOException e) {
+      // Intentionally ignore. Prefer previous error.
+    }
+  }
+}
+</code></pre>
+
+<p>回过头来再看一下<code>SqlSessionFactory</code>的<code>build</code>函数，刚才说了半天，介绍了<code>XMLConfigBuilder</code>解析映射文件的过程，解析完成之后<code>parser.parse()</code>函数会返回一个包含了映射文件解析结果的<code>configuration</code>对象，紧接着，这个对象将作为参数传递给另一个build函数，如下：</p>
+
+<p> </p>
+
+<pre>
+<code>  public SqlSessionFactory build(Configuration config) {
+    return new DefaultSqlSessionFactory(config);
+  }
+</code></pre>
+
+<p>这个函数将<code>configuration</code>作为参数，创建了<code>DefaultSqlSessionFactory</code>对象。<br><code>DefaultSqlSessionFactory</code>是接口<code>SqlSessionFactory</code>的一个实现类，<code>SqlSessionFactory</code>的体系结构如下图所示：</p>
+
+<p><img alt src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTk0NjA0LWRhMmRiZDhmMWYyYWM4NDQucG5nP2ltYWdlTW9ncjIvYXV0by1vcmllbnQvc3RyaXB8aW1hZ2VWaWV3Mi8yL3cvNDM2L2Zvcm1hdC93ZWJw?x-oss-process=image/format,png"></p>
+
+<p> </p>
+
+<p>此时，<code>SqlSessionFactory</code>创建完毕！</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2019/11/05/Java%E9%80%9A%E8%BF%87%E5%BA%8F%E5%88%97%E5%8C%96%E5%AE%9E%E7%8E%B0%E6%B7%B1%E5%BA%A6%E5%A4%8D%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/11/05/Java%E9%80%9A%E8%BF%87%E5%BA%8F%E5%88%97%E5%8C%96%E5%AE%9E%E7%8E%B0%E6%B7%B1%E5%BA%A6%E5%A4%8D%E5%88%B6/" class="post-title-link" itemprop="url">Java通过序列化实现深度复制</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-05 23:29:04" itemprop="dateCreated datePublished" datetime="2019-11-05T23:29:04+08:00">2019-11-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:03:21" itemprop="dateModified" datetime="2020-05-01T19:03:21+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Java学习笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+
+<pre class="has">
+<code class="language-java">package beanCopy;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+public class SerializeTest {
+
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+
+        Son son=new Son("qwer", "15");
+        List sons=new ArrayList&lt;Son&gt;();
+        sons.add(son);
+        Person p1=new Person("zs", "30",sons);
+
+        ByteArrayOutputStream bos=new ByteArrayOutputStream();
+        ObjectOutputStream oos=new ObjectOutputStream(bos);
+
+        oos.writeObject(p1);
+
+        ByteArrayInputStream bis=new ByteArrayInputStream(bos.toByteArray());
+        ObjectInputStream ois=new ObjectInputStream(bis);
+
+        Person p2=(Person) ois.readObject();
+
+        System.out.println(p1);
+        System.out.println(p2);
+
+
+    }
+
+}
+
+
+class Person implements Serializable{
+
+    private String name;
+
+    private String age;
+
+    private List&lt;Son&gt; sons;
+
+
+    /*@Override
+    public String toString() {
+        return "Person [name=" + name + ", age=" + age + ", sons=" + sons + "]";
+    }*/
+
+
+
+    public Person(String name, String age, List&lt;Son&gt; sons) {
+        super();
+        this.name = name;
+        this.age = age;
+        this.sons = sons;
+    }
+
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+
+
+}
+
+
+class Son implements Serializable{
+    private String name;
+
+    private String age;
+
+
+
+    /*@Override
+    public String toString() {
+        return "Son [name=" + name + ", age=" + age + "]";
+    }*/
+
+    public Son(String name, String age) {
+        super();
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+
+}</code></pre>
+
+<p>输出</p>
+
+<p><img alt class="has" height="74" src="https://img-blog.csdnimg.cn/20191105233038132.png" width="378"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2019/06/11/%EF%BC%88Linux%EF%BC%89%E8%BF%9C%E7%A8%8B%E6%8C%82%E8%BD%BD%E7%BD%91%E7%BB%9C%E7%A3%81%E7%9B%98%E8%AF%A6%E8%A7%A3---nfs%E5%85%B1%E4%BA%AB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/06/11/%EF%BC%88Linux%EF%BC%89%E8%BF%9C%E7%A8%8B%E6%8C%82%E8%BD%BD%E7%BD%91%E7%BB%9C%E7%A3%81%E7%9B%98%E8%AF%A6%E8%A7%A3---nfs%E5%85%B1%E4%BA%AB/" class="post-title-link" itemprop="url">（Linux）远程挂载网络磁盘详解---nfs共享</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-06-11 13:28:04" itemprop="dateCreated datePublished" datetime="2019-06-11T13:28:04+08:00">2019-06-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:15:31" itemprop="dateModified" datetime="2020-05-01T19:15:31+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+
+<h1><strong>前言</strong></h1>
+
+<hr><p>在Linux或Windows乃至其他的系统，我们经常会需要进行磁盘的挂载。通常从挂载的方式的上分为本地挂载和远程挂载。Linux的本地挂载就不介绍了，这篇文章介绍的是远程挂载网络磁盘。</p>
+
+<hr><h1> </h1>
+
+<h1><strong>远程挂载网络磁盘</strong></h1>
+
+<hr><p>实际上，这个操作与使用nfs共享一个文件的方法是相同的。思路是服务端将一块磁盘空间本地挂载到一个目录，然后通过网络使用nfs将这个目录进行共享，客户端最后将服务端共享的目录挂载到自己本地的一个目录，这样就使客户端拥有了一块网络磁盘。</p>
+
+<p>优点是:服务端的同一块磁盘可以挂载到不同的客户端，实现文件的共享；可以扩充客户端的存储空间。<br>
+缺点是：依赖网络，当网络联通失败，客户端挂载的网络磁盘会无法使用。</p>
+
+<p>做网络挂载，服务端与客户端网络要联通，最好是在同一局域网内，还要注意防火墙的设置。<br>
+ </p>
+
+<hr><h2><strong>NFS简介</strong></h2>
+
+<ul><li>
+    <p>Sun公司于1984年发布。</p>
+    </li>
+    <li>
+    <p>NFS 是一种可分散式的网络文件系统。</p>
+    </li>
+    <li>
+    <p>可以通过网络使不同的机器、不同的操作系统，能够分享资料，使客户端能通过网络访问并分享文件到位于服务端的磁盘中。</p>
+    </li>
+    <li>NFS在文件传送或信息传送过程中依赖于RPC协议。RPC负责负责信息的传输。</li>
+</ul><hr><h2> </h2>
+
+<h2><strong>服务端操作</strong></h2>
+
+<hr><p>【1】安装NFS程序</p>
+
+<p>yum -y install nfs*</p>
+
+<p>rpcbind,在centos6以前自带的yum源中为portmap。<br>
+使用yum安装nfs时会下载依赖，因此只要下载nfs即可，无需再下载rpcbind.</p>
+
+<p>【2】查看是否安装了nfs与rpcbind</p>
+
+<p>rpm -qa |grep nfs<br>
+rpm -qa |grep rpcbind<br><img alt="è¿éåå¾çæè¿°" class="has" src="https://img-blog.csdn.net/20180915190249681?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"></p>
+
+<p>【3】创建共享的目录并共享</p>
+
+<p>如要共享的目录已存在请跳过创建</p>
+
+<p>&lt;1&gt;mkdir /mnt/nfs01</p>
+
+<p>&lt;2&gt;vim /etc/exports<br>
+/mnt/nfs01 10.10.10.0/24 (rw,no_root_squash,no_all_squash,sync)<br>
+ </p>
+
+<pre class="has">
+<code class="language-bash">
+配置
+
+
+/mnt/nfs01      10.10.10.0/24    (rw,no_root_squash,no_all_squash,sync)
+
+要共享的目录     要分享给的客户端   客户端对此共享目录的权限
+
+----------
+
+
+客户端指定
+
+
+192.168.1.125           指定特定的的IP可以共享nfs目录
+
+*                       指定所有网段及ip都可以共享nfs目录
+
+192.168.1.0/24          指定子网中的所有主机都可以共享nfs目录
+
+2018fs.wxyonghe.com     指定域名的主机可以共享nfs目录
+
+----------
+
+
+权限
+
+
+rw                      可读可写     
+
+ro                      只读(还与文件系统的rwx有关)
+
+sync　　                 数据同步写入到内存与硬盘中
+
+async                   数据先暂存于内存当中，不会直接写入硬盘
+
+wdelay                  当有写操作，就会检查是否有相关的写操作，并在一起执行(默认设置)
+
+no_wdelay               当有写操作就立即执行，通常要与sync配合使用
+
+root_squash             当客户端登陆NFS的身份为root用户时，将客户端的root用户及所属组都映射为匿名用户或用户组（默认设置） 
+
+no_root_squash　　       使客户端可以使用root身份及权限来操作共享的目录
+
+all_squash              无论客户端登陆NFS的身份为何，都将映射为匿名用户
+
+no_all_squash           无论客户端登陆NFS的身份为何，都将映射为root用户（默认设置）
+
+anonuid                 将远程访问的所有用户都映射为匿名用户，并指定该用户为本地用户
+
+anongid                 将远程访问的所有用户组都映射为匿名用户组账户，并指定该匿名用户组账户为本地用户组账户
+
+secure                  使客户端只能从小于1024的tcp/ip端口连接服务端(默认设置)
+
+insecure                允许客户端从大于1024的tcp/ip端口连接服务端
+
+subtree                 当共享的目录是一个子目录，服务端会检查其父目录的权限(默认设置)
+
+no_subtree              当共享的目录是一个子目录，服务端不检查其父目录的权限
+</code></pre>
+
+<p>【4】启动nfs,rpcbind,并设为开机自启</p>
+
+<p>(centos7)<br>
+systemctl start nfs<br>
+systemctl start rpcbind<br>
+systemctl enable nfs<br>
+systemclt enable rpcbind</p>
+
+<p>(centos6)<br>
+service nfs start<br>
+service rpcbind start</p>
+
+<p>【5】查看是否共享成功</p>
+
+<p>showmount -e localhost<br><img alt="è¿éåå¾çæè¿°" class="has" src="https://img-blog.csdn.net/2018091520415162?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"></p>
+
+<p>可看到共享的目录及客户端，即为成功</p>
+
+<hr><p> </p>
+
+<h2><strong>客户端操作</strong></h2>
+
+<hr><p>【1】安装NFS程序</p>
+
+<p>yum -y install nfs*</p>
+
+<p>【2】启动nfs</p>
+
+<p>(centos7)<br>
+systemctl start nfs<br>
+systemctl start rpcbind<br>
+systemctl enable nfs<br>
+systemctl enable rpcbind</p>
+
+<p>(centos6)<br>
+service nfs start<br>
+service rpcbind start<br>
+chkconfig nfs on<br>
+chkconfig rpcbind on</p>
+
+<p>【3】创建挂载目录</p>
+
+<p>mkdir /data/nfsone</p>
+
+<p>【4】查看是否共享成功</p>
+
+<p>showmount -e nfs服务端IP</p>
+
+<p>showmount -e 10.10.20.212<br><img alt="è¿éåå¾çæè¿°" class="has" src="https://img-blog.csdn.net/20180915205422918?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"></p>
+
+<p>【5】网络挂载</p>
+
+<p>mount -t nfs -o nolock 服务端IP:共享目录绝对路径 本地挂载目录<br>
+mount -t nfs -o nolock 10.10.20.212:/mnt/nfs01 /data/nfsone</p>
+
+<p>centos7的nfs默认使用的是nfs4,所以mount -t 无需指定nfs4也可以</p>
+
+<p>【6】查看是否成功</p>
+
+<p>df -Th<br><img alt="è¿éåå¾çæè¿°" class="has" src="https://img-blog.csdn.net/20180915211531532?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"></p>
+
+<p>【7】卸载网络磁盘</p>
+
+<p>与卸载本地挂载相同</p>
+
+<p>umount /data/nfsone<br>
+或<br>
+umount 10.10.20.212:/mnt/nfs01</p>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2019/03/19/Java%E5%AF%BC%E5%87%BACSV%E6%A0%BC%E5%BC%8F%E6%96%87%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/03/19/Java%E5%AF%BC%E5%87%BACSV%E6%A0%BC%E5%BC%8F%E6%96%87%E4%BB%B6/" class="post-title-link" itemprop="url">Java导出CSV格式文件</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-03-19 18:52:31" itemprop="dateCreated datePublished" datetime="2019-03-19T18:52:31+08:00">2019-03-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:17:33" itemprop="dateModified" datetime="2020-05-01T19:17:33+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Java学习笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+
+<p>导出csv格式文件的本质是导出以逗号为分隔的文本数据</p>
+
+<pre class="has">
+<code>import java.io.BufferedWriter;  
+import java.io.File;  
+import java.io.FileInputStream;  
+import java.io.FileNotFoundException;  
+import java.io.FileOutputStream;  
+import java.io.IOException;  
+import java.io.InputStream;  
+import java.io.OutputStream;  
+import java.io.OutputStreamWriter;  
+import java.net.URLEncoder;  
+import java.util.ArrayList;  
+import java.util.Iterator;  
+import java.util.LinkedHashMap;  
+import java.util.List;  
+import java.util.Map;  
+
+import javax.servlet.http.HttpServletResponse;  
+
+import com.alibaba.druid.util.StringUtils;
+
+
+
+/** 
+ * 文件操作 
+ */  
+public class CSVUtils {  
+
+
+    /**
+    * 功能说明：获取UTF-8编码文本文件开头的BOM签名。
+    * BOM(Byte Order Mark)，是UTF编码方案里用于标识编码的标准标记。例：接收者收到以EF BB BF开头的字节流，就知道是UTF-8编码。
+    * @return UTF-8编码文本文件开头的BOM签名
+    */
+    public static String getBOM() {
+
+         byte b[] = {(byte)0xEF, (byte)0xBB, (byte)0xBF};
+         return new String(b);
+    }
+
+
+  /** 
+   * 生成CVS文件
+   * @param exportData 
+   *       源数据List 
+   * @param map 
+   *       csv文件的列表头map 
+   * @param outPutPath 
+   *       文件路径 
+   * @param fileName 
+   *       文件名称 
+   * @return 
+      */  
+    @SuppressWarnings("rawtypes")  
+    public static File createCSVFile(List exportData, LinkedHashMap map, String outPutPath,  
+                   String fileName) {  
+
+    File csvFile = null;  
+    BufferedWriter csvFileOutputStream = null;  
+    try {  
+      File file = new File(outPutPath);  
+      if (!file.exists()) {  
+        file.mkdirs();  
+      }  
+      //定义文件名格式并创建  
+      csvFile =new File(outPutPath+fileName+".csv");
+      file.createNewFile();  
+      // UTF-8使正确读取分隔符","  
+      //如果生产文件乱码，windows下用gbk，linux用UTF-8
+      csvFileOutputStream = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(  
+        csvFile), "UTF-8"), 1024);  
+
+      //写入前段字节流，防止乱码
+      csvFileOutputStream.write(getBOM());
+      // 写入文件头部
+      for (Iterator propertyIterator = map.entrySet().iterator(); propertyIterator.hasNext();) {  
+        java.util.Map.Entry propertyEntry = (java.util.Map.Entry) propertyIterator.next();  
+        csvFileOutputStream.write((String) propertyEntry.getValue() != null ? (String) propertyEntry.getValue() : "" );  
+        if (propertyIterator.hasNext()) {  
+          csvFileOutputStream.write(",");  
+        }  
+      }  
+      csvFileOutputStream.newLine();  
+      // 写入文件内容  
+      for (Iterator iterator = exportData.iterator(); iterator.hasNext();) {  
+          Object row = (Object) iterator.next();
+        for (Iterator propertyIterator = map.entrySet().iterator(); propertyIterator  
+          .hasNext();) {  
+          java.util.Map.Entry propertyEntry = (java.util.Map.Entry) propertyIterator  
+            .next();  
+          String str=row!=null?((String)((Map)row).get( propertyEntry.getKey())):"";
+
+          if(StringUtils.isEmpty(str)){
+              str="";
+          }else{
+              str=str.replaceAll("\"","\"\"");
+              if(str.indexOf(",")&gt;=0){
+                  str="\""+str+"\"";
+              }
+          }
+          csvFileOutputStream.write(str);  
+          if (propertyIterator.hasNext()) {  
+            csvFileOutputStream.write(",");  
+          }  
+        }  
+        if (iterator.hasNext()) {  
+          csvFileOutputStream.newLine();  
+        }  
+      }  
+      csvFileOutputStream.flush();  
+    } catch (Exception e) {  
+      e.printStackTrace();  
+    } finally {  
+      try {  
+        csvFileOutputStream.close();  
+      } catch (IOException e) {  
+        e.printStackTrace();  
+      }  
+    }  
+    return csvFile;  
+  }  
+
+  /**
+   *     生成并下载csv文件
+   * @param response
+   * @param exportData
+   * @param map
+   * @param outPutPath
+   * @param fileName
+   * @throws IOException
+      */
+    @SuppressWarnings("rawtypes")
+    public static void exportDataFile(HttpServletResponse response,List exportData, LinkedHashMap map, String outPutPath,String fileName) throws IOException{
+      File csvFile = null;  
+        BufferedWriter csvFileOutputStream = null;  
+        try {  
+          File file = new File(outPutPath);  
+          if (!file.exists()) {  
+            file.mkdirs();  
+          }  
+          //定义文件名格式并创建  
+          csvFile =new File(outPutPath+fileName+".csv");
+          if(csvFile.exists()){
+             csvFile.delete(); 
+          }
+          csvFile.createNewFile();  
+          // UTF-8使正确读取分隔符","  
+          //如果生产文件乱码，windows下用gbk，linux用UTF-8
+          csvFileOutputStream = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(csvFile), "UTF-8"), 1024);  
+          //写入前段字节流，防止乱码
+          csvFileOutputStream.write(getBOM());
+          // 写入文件头部  
+          for (Iterator propertyIterator = map.entrySet().iterator(); propertyIterator.hasNext();) {  
+            java.util.Map.Entry propertyEntry = (java.util.Map.Entry) propertyIterator.next();  
+            csvFileOutputStream.write((String) propertyEntry.getValue() != null ? (String) propertyEntry.getValue() : "" );  
+            if (propertyIterator.hasNext()) {  
+              csvFileOutputStream.write(",");  
+            }  
+          }  
+          csvFileOutputStream.newLine();  
+          // 写入文件内容  
+          for (Iterator iterator = exportData.iterator(); iterator.hasNext();) {  
+            Object row = (Object) iterator.next();  
+            for (Iterator propertyIterator = map.entrySet().iterator(); propertyIterator  
+              .hasNext();) {  
+              java.util.Map.Entry propertyEntry = (java.util.Map.Entry) propertyIterator  
+                .next();  
+              String str=row!=null?((String)((Map)row).get( propertyEntry.getKey())):"";
+              if(StringUtils.isEmpty(str)){
+                  str="";
+              }else{
+                  str=str.replaceAll("\"","\"\"");
+                  if(str.indexOf(",")&gt;=0){
+                      str="\""+str+"\"";
+                  }
+              }
+              csvFileOutputStream.write(str);  
+              if (propertyIterator.hasNext()) {  
+                csvFileOutputStream.write(",");  
+              }  
+            }  
+            if (iterator.hasNext()) {  
+              csvFileOutputStream.newLine();  
+            }  
+          }  
+          csvFileOutputStream.flush();  
+        } catch (Exception e) {  
+          e.printStackTrace();  
+        } finally {  
+          try {  
+            csvFileOutputStream.close();  
+          } catch (IOException e) {  
+            e.printStackTrace();  
+          }  
+        }  
+
+
+
+
+        InputStream in = null;  
+        try {  
+          in = new FileInputStream(outPutPath+fileName+".csv");  
+          int len = 0;  
+          byte[] buffer = new byte[1024];  
+
+          OutputStream out = response.getOutputStream(); 
+          response.reset(); 
+
+          response.setContentType("application/csv;charset=UTF-8");  
+          response.setHeader("Content-Disposition","attachment; filename=" + URLEncoder.encode(fileName+".csv", "UTF-8"));  
+          response.setCharacterEncoding("UTF-8"); 
+          while ((len = in.read(buffer)) &gt; 0) {  
+            out.write(new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF });  
+            out.write(buffer, 0, len);  
+          }
+          out.close();
+        } catch (FileNotFoundException e) {  
+        } finally {  
+          if (in != null) {  
+            try {  
+              in.close();  
+            } catch (Exception e) {  
+              throw new RuntimeException(e);  
+            }  
+          }  
+        }
+
+
+  }
+
+  /** 
+   * 删除该目录filePath下的所有文件 
+   * @param filePath 
+   *      文件目录路径 
+      */  
+    public static void deleteFiles(String filePath) {  
+
+    File file = new File(filePath);  
+    if (file.exists()) {  
+      File[] files = file.listFiles();  
+      for (int i = 0; i &lt; files.length; i++) {  
+        if (files[i].isFile()) {  
+          files[i].delete();  
+        }  
+      }  
+    }  
+  }  
+
+  /** 
+   * 删除单个文件 
+   * @param filePath 
+   *     文件目录路径 
+   * @param fileName 
+   *     文件名称 
+      */  
+    public static void deleteFile(String filePath, String fileName) {  
+
+    File file = new File(filePath);  
+    if (file.exists()) {  
+      File[] files = file.listFiles();  
+      for (int i = 0; i &lt; files.length; i++) {  
+        if (files[i].isFile()) {  
+          if (files[i].getName().equals(fileName)) {  
+            files[i].delete();  
+            return;  
+          }  
+        }  
+      }  
+    }  
+  }  
+
+  /** 
+   * 测试数据 
+   * @param args 
+      */  
+    @SuppressWarnings({ "rawtypes", "unchecked" })  
+    public static void main(String[] args) {  
+
+    List exportData = new ArrayList&lt;Map&gt;();  
+    Map row1 = new LinkedHashMap&lt;String, String&gt;();  
+    row1.put("1", "11");  
+    row1.put("2", "12");  
+    row1.put("3", "13");  
+    row1.put("4", "14");  
+    exportData.add(row1);  
+    row1 = new LinkedHashMap&lt;String, String&gt;();  
+    row1.put("1", "21");  
+    row1.put("2", "22");  
+    row1.put("3", "23");  
+    row1.put("4", "24");  
+    exportData.add(row1);  
+    LinkedHashMap map = new LinkedHashMap();  
+
+    //设置列名
+    map.put("1", "第一列名称");  
+    map.put("2", "第二列名称");  
+    map.put("3", "第三列名称");  
+    map.put("4", "第四列名称");  
+    //这个文件上传到路径，可以配置在数据库从数据库读取，这样方便一些！
+    String path = "E:/";  
+
+   //文件名=生产的文件名称+时间戳
+    String fileName = "文件导出";  
+    File file = CSVUtils.createCSVFile(exportData, map, path, fileName);  
+    String fileName2 = file.getName();  
+    System.out.println("文件名称：" + fileName2);  
+  }  
+}</code></pre>
+
+<p><img alt class="has" src="https://images2018.cnblogs.com/blog/1443172/201808/1443172-20180813231232388-1283590677.png"></p>
+
+<p>转自<a href="https://www.cnblogs.com/hanfengyeqiao/p/9471694.html" target="_blank" rel="external nofollow noopener noreferrer">https://www.cnblogs.com/hanfengyeqiao/p/9471694.html</a></p>
+
+<p> </p>
+
+<p>需要注意的是生成的csv其中的数字若过长，csv中查看没有问题，但是用excel打开数字就会变成科学计数法 </p>
+
+<p>解决方法是在生成csv的时候,在数字的前面或后面加上"\t"制表符，再用excel打开问题解决！如 “1234567890\ t”,“\ t1213212312”</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
   </div>
 
   
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+  </nav>
 
 
 
@@ -517,14 +3491,18 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-count">11</span>
           <span class="site-state-item-name">日志</span>
         </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">2</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

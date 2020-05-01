@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="folyjzSrNTxM-gzANuN149Z3GWMMc4Go2VluVGIRh48">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yyguy123.github.io","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta property="og:type" content="website">
+<meta property="og:title" content="yyguy123的个人博客">
+<meta property="og:url" content="http://yyguy123.github.io/page/2/index.html">
+<meta property="og:site_name" content="yyguy123的个人博客">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="yyguy123">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yyguy123.github.io/page/2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : true,
+    isPost : false,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>yyguy123的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">yyguy123的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">若无闲事挂心头，便是人间好时节</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2018/11/22/Redis%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2018/11/22/Redis%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">Redis笔记</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-11-22 19:11:36" itemprop="dateCreated datePublished" datetime="2018-11-22T19:11:36+08:00">2018-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:03:21" itemprop="dateModified" datetime="2020-05-01T19:03:21+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+
+<h2>在分布式数据库中CAP原理CAP+BASE:</h2>
+
+<p>传统的ACID分别是什么：A（Atomicity）原子性  C(Consistency)一致性  I（Isolation）隔离性  D（Durability）持久性<br>
+CAP:  C（Consistency）强一致性   A（Availability）可用性    P（Partition tolerance）分区容错性<br>
+CAP理论的核心是：一个分布式系统不可能同时很好的满足一致性，可用性和分区容错性这三个要求；<br>
+CA-单点集群，满足一致性，可用性的系统，通常在可扩展性上不太强大（RDBMS）<br>
+CP-满足一致性，分区容错性的系统，通常性能不是特别高(MongoDB，HBase,redis)<br>
+AP-满足可用性，分区容错性的系统，通常可能对一致性要求低一些,大多数网站架构的选择(CouchDB CASSANDRA)<br>
+BASE:基本可用（basically available）<br>
+软状态 （soft state）<br>
+最终一致性（eventually consistent）<br>
+它的思想是通过让系统轻松对某一时刻数据一致性的要求来换取系统整体伸缩性和性能上改观。为什么这么说呢，缘由就在于大型系统旺旺由于地域分布和级高性能的要求，不可能采用分布式失误来完成这些指标，要想获得这些指标，我们必须采用另外一种方式来完成，这里BASE就是来解决这个问题的办法<br>
+ </p>
+
+<p><strong>分布式和集群介绍</strong>：</p>
+
+<p>分布式：不同的多态服务器上面部署不同的服务器块，他们之间通过Rpc/Rmi之间通信和调用，对外提供服务和组内协作<br>
+集群：不同的多台服务器上面部署相同的服务模块，通过分布式调度软件进行统一的调度，对外提供服务和访问</p>
+
+<p> </p>
+
+<h3>Redis介绍</h3>
+
+<p>Redis：Remote Dictionary Server（远程字典服务器），是完全开源免费的，用C语言编写的，遵守BSD协议。是一个高性能的（key/value）分布式内存数据库，基于内存运行并支持持久化的NoSQL数据库，也被人们称为数据结构服务器。</p>
+
+<p>Redis及其他key/value缓存产品有以下三个特点：</p>
+
+<p>       1.Redis支持数据的持久化，可以将内存中的数据保存在磁盘中，重启的时候可以再次加载进行使用；</p>
+
+<p>       2.Redis不仅仅支持简单的key-value类型的数据，同时还支持list、set、zset、hash等数据结构的存储。</p>
+
+<p>       3.Redis支持数据的备份，及master-slave模式的数据备份。</p>
+
+<p>功能：</p>
+
+<p>      内存存储和持久化：redis支持异步将内存中的数据写到硬盘上，同时不影响继续服务</p>
+
+<p>      取最新N个数据的操作：如：将最新10条评论的ID放入Redis的list集合中</p>
+
+<p>      模拟类似于HttpSession这种需要设定过期时间的功能</p>
+
+<p>      发布、订阅消息系统</p>
+
+<p>       定时器、计数器</p>
+
+<p><strong>基础命令</strong></p>
+
+<p>Key：</p>
+
+<p>       keys * ：列出当前库所有key</p>
+
+<p>       exists key的名字：判断某个key是否存在</p>
+
+<p>       move key db ：当前库没有，被移除</p>
+
+<p>       exire key 秒钟 ：为给定key设置过期时间</p>
+
+<p>       ttl key：查看还有多少秒过期，-1永不过期，-2表示已过期即移除内存</p>
+
+<p>       type key：查看key的类型</p>
+
+<p> </p>
+
+<p>String：</p>
+
+<p>          set/get：set  k1  qwer, get  k1     set k2  123</p>
+
+<p>          del:del  k1</p>
+
+<p>          append: append k1 123      (qwer123)</p>
+
+<p>          incr、decr、incrby、decrby  ： incrby  k2  2  一定要是数字才能加减</p>
+
+<p>          getrange、setrange ： getrange k1 0 -1 (qwer)   getrange 0 2 (qwe)    setrange k1 0 xx （xxer）</p>
+
+<p>          setex：设置过期时间  setex k3 10 v3</p>
+
+<p>          setnx：不存在就set成功  存在就返回0  不会覆盖之前的  setnx  k1  zxcvv  返回0</p>
+
+<p>          mset、mget、msetnx：mset k1 v1 k2 v2 k3 v3    mget k1 k2 k3     msetnx有一个存在就会set失败</p>
+
+<p>List：</p>
+
+<p>        rpush  mylist  1 2 3 4 5      rpush  list   123</p>
+
+<p>        lpush、rpush、lrange   ：l先进后出 r先进先出</p>
+
+<p>        lpop、rpop：出栈  同上   </p>
+
+<p>        lindex：按下标获取元素   lindex  mylist  1   （2）</p>
+
+<p>        llen：长度</p>
+
+<p>        lrem key  n  val ：删除n个val</p>
+
+<p>        ltrim  key  start  end  截取指定范围的值赋给key</p>
+
+<p>        rpoplpush   源列表  目的列表   rpoplpush  mylist  list   （5123）</p>
+
+<p>        lset  key  index   value    覆盖列表中下标位置的值</p>
+
+<p>        linsert  key  before/after  val1  val2  在val1前/后插入val2</p>
+
+<p>Set：</p>
+
+<p>      sadd、smembers、sismember    sadd set1 1 1 2 2 3 3 （1 2 3） 、  smembers  set1（1 2 3） </p>
+
+<p>      scard：获取集合元素个数</p>
+
+<p>      srem  key  val  ：删除集合中某个元素</p>
+
+<p>      srandmember  key  n  随机列出n个元素</p>
+
+<p>      spop  key：随机出栈</p>
+
+<p>      smove  k1  k2   在k1中的某个值 ：将k1中某个值移除赋给k2</p>
+
+<p>      sdiff  k1   k2  ：在k1中不在k2中的元素</p>
+
+<p>      sinter  k1  k2  ：k1  k2  的交集</p>
+
+<p>      sunion k1  k2 ：并集</p>
+
+<p><strong>Hash</strong>：kv模式不变  v为键值对</p>
+
+<p>            hset  user name  zs  、  hget  user  name</p>
+
+<p>            hmset   customer  id 1  name  zz  age  20  、hmget  customer  id  name  age</p>
+
+<p>            hgetall   customer   (id 1 name zz age 20)</p>
+
+<p>            hdel  user  name</p>
+
+<p>            hlen  长度</p>
+
+<p>            hexists  key  在key中某个值的key  ：  hexists  customer  id</p>
+
+<p>            hkeys、hvals ：hkeys  customer  （id name age）</p>
+
+<p>            hincrby、hincrbyfloat</p>
+
+<p>            hsetnx</p>
+
+<p>Zset（sorted set）：</p>
+
+<p>            zadd  zset01  60 v1  70  v2  80  v3  、zrange  zset01   0  -1 (withscores) （v1  v2  v3）</p>
+
+<p>            zrangebyscore  key  score1   score2  （limit  index1  index2 ）：  “（score”表示不包含 </p>
+
+<p>            zrem  key   val   删除</p>
+
+<p>            zcard  key  统计</p>
+
+<p>            zcount  key  val1  val2   统计分数段中的个数</p>
+
+<p>            zrank   key  val   返回val的下标</p>
+
+<p>            zscore  key  val  返回val对应的score</p>
+
+<p>            zrevrank  key  val   逆序获得下标</p>
+
+<p>            zrevrange  key  0  -1   逆序获得 （v3  v2  v1）</p>
+
+<p>            zrevrangebyscore  key  score1   score2   结束分数到开始分数</p>
+
+<p>           </p>
+
+<p><strong>Maxmemory-policy</strong></p>
+
+<p>     1.volatile-lru：使用LRU算法移除key，只对设置了过期时间的key</p>
+
+<p>     2.allkeys-lru：使用LRU算法移除key</p>
+
+<p>     3.volatile-random：在过期集合中移除随机的key，只对设置了过期时间的key</p>
+
+<p>     4.allkeys-random：移除随机的key</p>
+
+<p>     5.volatile-ttl：移除那些TTL值最小的key，即那些最近要过期的key</p>
+
+<p>     6.noeviction：不进行移除，针对写操作，只是返回错误信息</p>
+
+<p>       </p>
+
+<h3><strong>Redis的持久化机制</strong></h3>
+
+<p><strong>RDB</strong></p>
+
+<p>          RDB持久化是把当前进程数据生成快照保存到硬盘的过程，触发RDB持久化过程分为手动触发和自动触发。</p>
+
+<p>手动触发分别对应save和bgsave命令。</p>
+
+<p>save：阻塞当前redis服务器，直到RDB过程完成为止。对于内存较大的实例会产生长时间的阻塞，线上环境不建议使用。</p>
+
+<p>bgsave：redis进程执行fork操作创建子进程，RDB持久化过程由子进程负责，完成后自动结束，阻塞只发生在fork阶段，时间很短。所以一般使用bgsave。</p>
+
+<p>自动触发机制场景：</p>
+
+<p>     1 ) 使用save相关配置，如‘save m n’表示m秒之内数据集存在n次修改时，自动触发bgsave。<br>
+     2）如果从节点执行全量复制操作，主节点自动执行bgsave生成RDB文件并发送给从节点。<br>
+     3）执行debug reload命令重新加载Redis时，也会自动触发save操作。<br>
+     4）默认情况下执行shutdown命令时，如果没有开启AOF持久化功能则自动执行bgsave。</p>
+
+<p>RDB优点：RDB是一个紧凑压缩的二进制文件，代表Redis在某一个时间点上的数据快照。非常适合用于备份，全量复制等场景。<br>
+                  Redis加载RDB恢复数据远远快于AOF方式。</p>
+
+<p>      缺点：RDB方式数据没办法做到实时持久化/秒级持久化。因为bgsave每次运行都要执行fork操作创建子进程，属于重量级操  作，频繁执行成本过高。<br>
+RDB文件使用特定二进制格式保存，Redis版本演进过程中有多个格式的RDB版本，存在老版本Redis服务无法兼容新版RDB格式的问题。</p>
+
+<p><strong>AOF</strong></p>
+
+<p>      AOF(append only file)持久化：以独立日志的方式记录每次写命令，重启时再重新执行AOF文件中命令达到恢复数据的目的。AOF的主要作用是解决了数据持久化的实时性，目前已经是Redis持久化的主流方式。</p>
+
+<p>     开启AOF功能需要设置配置：appendonly yes,默认不开启。AOF文件通过appendfilename 配置设置，默认文件名是appendonly.aof。保存路径同RDB持久化方式一致。通过dir配置指定。AOF的工作流程操作：命令写入（append）、文件同步（sync）、文件重写（rewrite）、重启加载（load）。</p>
+
+<p>    流程如下：<br>
+         1） 所有的写入命令会追加到aof_buf（缓冲区）中。<br>
+         2） AOF缓冲区根据对应的策略向硬盘做同步操作。<br>
+         3） 随着AOF文件越来越大，需要定期对AOF文件进行重写，达到压缩的目的。<br>
+         4） 当Redis服务重启时，可以加载AOF文件进行数据恢复。</p>
+
+<p>   AOF为什么把命令追加到aof_buf中？</p>
+
+<p>       Redis使用单线程响应命令，如果每次写AOF文件命令都直接追加到硬盘，那么性能完全取决于当前硬盘负载。先写入缓冲区aof_buf中，还有另一个好处，Redis可以提供多种缓冲区同步硬盘的策略，在性能和安全性方面做出平衡。</p>
+
+<p> </p>
+
+<p>Redis提供了多种AOF缓冲区同步文件策略，由参数appendfsync控制</p>
+
+<p>     write操作在写入系统缓冲区后直接返回。同步硬盘操作依赖于系统调度机制，列如：缓冲区页空间写满或达到特定时间周期。同步文件之前，如果此时系统故障宕机，缓冲区内数据将丢失。<br>
+      fsync针对单个文件操作（比如AOF文件），做强制硬盘同步，fsync将阻塞知道写入硬盘完成后返回，保证了数据持久化。</p>
+
+<p>       默认配置为everysec，做到兼顾性能和数据安全性，理论上只有在系统突然宕机的情况下丢失1s的数据。</p>
+
+<p> </p>
+
+<p>随着命令不断写入AOF，文件会越来越大，为了解决这个问题，Redis引入了AOF重写机制压缩文件体积。AOF文件重写是把Redis进程内的数据转化为写命令同步到新AOF文件的过程。<br>
+重写后的AOF文件为什么可以变小？有如下原因：<br>
+1） 进程内已经超时的数据不再写文件。<br>
+2）旧的AOF文件含有无效命令，如del key1、 hdel key2、srem keys、set a 111、set a 222等。重写使用进程内数据直接生成，这样新的AOF文件只保留最终数据的写入命令。<br>
+3) 多条写命令可以合并为一个，如lpush list a、lpush list b、 lpush list c 可以转化为：lpush list a b c。为了防止但挑明了过大造成客户端缓冲区溢出，对于list、set、hash、zset等类型曹组，以64个元素为界拆分为多条。 <br>
+AOF重写降低了文件占用空间，除此之外，另一个目的是：更小的AOF文件可以更快地被Redis加载。<br>
+AOF重写过程可以手动触发和自动触发：</p>
+
+<p>手动触发：直接调用bgrewriteaof命令</p>
+
+<p>自动触发：更具auto-aof-rewrite-min-size和auto-aof-rewrite-percentage参数确定自动触发时机</p>
+
+<p>AOF和RDB文件都可以用于服务器重启时的数据恢复。<br>
+1） AOF持久化开启且存在AOF文件时，优先加载AOF文件<br>
+2） AOF关闭或者AOF文件不存在时，加载RDB文件<br>
+3） 加载AOF/RDB文件完成后，Redis启动成功。<br>
+4） AOF/RDB文件存在错误时，Redis启动失败并打印错误信息</p>
+
+<p><strong>Redis的事务</strong></p>
+
+<p><strong>    </strong>  可以一次执行多个命令，本质是一组命令的集合，一个事务中的所有命令都会被序列化，按顺序的串行化执行而不会被其他命令插入，不许加塞。</p>
+
+<p>multi：开启事务</p>
+
+<p>exec：执行</p>
+
+<p>discard：放弃事务</p>
+
+<p>watch：监视一个或多个key，如果在事务执行之前这个key被其他命令所改动，那么事务将被打断。</p>
+
+<p>unwatch：取消watch命令对所有key的监控</p>
+
+<p>redis的事务是部分支持，比如出现set  key这样严重错误的语句时，会直接报error，但还是可以继续往队列里添加命令，只是执行的时候所有命令都不会成功执行；但是出现incr key（其中key所对应的value不为数字时），不会报错，执行时只有这条命令不能成功执行。</p>
+
+<p>watch监控：</p>
+
+<p>悲观锁：每次拿数据都认为别人会修改，所以每次拿数据都会上锁。</p>
+
+<p>乐观锁：每次拿数据的时候认为别人不会修改，所以不会上锁，就是在更新的时候会判断在此期间别人有没有修改数据，可以使用版本号等机制。乐观锁适用于多读的应用类型，这样可以提高吞吐量。</p>
+
+<p>乐观锁策略：提交版本必须大于当前记录版本才能更新。</p>
+
+<p>一旦执行exec之前的监控锁都会被取消。</p>
+
+<p>watch命令类似于乐观锁，事务提交时，如果key的值被别的客户端改变，整个事务队列都不会被执行，通过watch命令在事务执行之前监控了多个keys，倘若在watch之后有任何key的值发生了变化，exec执行的事务都将被放弃。</p>
+
+<p><strong>Redis的发布订阅</strong></p>
+
+<p>subscribe：订阅</p>
+
+<p>publish：发布</p>
+
+<p>mset  k1 v1 k2 v2 k3 v3</p>
+
+<p>subscribe k1 k2 k3</p>
+
+<p>publish k1 qwer</p>
+
+<h3><strong>Redis主从复制</strong></h3>
+
+<p>1.配从（库）不配主（库）</p>
+
+<p>2.从库配置：slaveof  主库ip  主库端口     每次与master断开连接后，都需要重新连接，除非配置进redis.conf文件</p>
+
+<p>3.修改配置文件细节操作</p>
+
+<p>      拷贝多个redis.conf文件、开启daemonize   yes、pid文件名、指定端口、log文件名字、dump.rdb文件名</p>
+
+<p>4.常用</p>
+
+<p>一主二仆</p>
+
+<p>一个master，两个slave，slave只要一连接就会把master所有数据（包括未连接时的数据）都记录下来。</p>
+
+<p>读写分离：只有master可以读写操作，slave只能读不能写。</p>
+
+<p>master挂掉后，slave保留了之前的数据，角色仍是slave，master重新连接后可继续正常工作。</p>
+
+<p>slave挂掉后，重新连接后角色为master，也就没有了之前的数据，需要重新连接，除非配置进redis.conf。</p>
+
+<p> </p>
+
+<p>薪火相传</p>
+
+<p>上一个slave可以是下一个slave的master，slave同样可以接收其他slaves的连接和同步请求，那么该slave作为了链条中下一个的master，可以有效减轻master的压力。中途变更转向：会清楚之前的数据，重新建立拷贝最新的。</p>
+
+<p> </p>
+
+<p>反客为主</p>
+
+<p>slaveof no one 使当前数据库停止与其他数据库的同步，角色转为master，会保留之前的数据。</p>
+
+<p> </p>
+
+<p>复制原理</p>
+
+<p>slave启动成功连接到master会发送一个sync命令<br>
+Master接到命令启动后台的存盘进程，同时收集所有接收到的用于修改数据集的命令，在后台进程执行完成之后，master将传动整个数据文件到slave，以完成一次完全同步操作。<br>
+全量复制：slave服务在接收到数据库文件数据后，将其存盘并加载到内存中。<br>
+增量复制：master继续将新的所有收集到的修改命令依次传给slave，完成同步<br>
+但是只要是重新连接master，依次完全同步（全量复制）将被自动执行。</p>
+
+<p> </p>
+
+<p><strong>哨兵模式</strong>（反客为主自动版）<br>
+反客为主不够智能，需手动将slave转为master并手动将其他slave连接过来，哨兵模式解决了这些问题。</p>
+
+<p>在redis安装目录下新建sentinel.conf文件，添加内容：sentinel  monitor  redis-6379（自己起的数据库名）  127.0.0.1  6379  1。</p>
+
+<p>1表示得票大于一的当master。</p>
+
+<p>运行redis-sentinel   ./redis/sentinel.conf命令    </p>
+
+<p>哨兵会监控6379端口的master，如果这个master挂了，会自动在剩下的slave选出一个转为master并将其他slave连接到新的master，如果挂掉的master重新连接回来，哨兵会将其转为slave连接到新的master。</p>
+
+<p>一组sentinel可以同时监控多个master</p>
+
+<p> </p>
+
+<p>复制的缺点</p>
+
+<p>由于所有的写操作都是现在master上操作，然后同步更新到slave上，所以从master同步到slave上有一定的延迟，当系统繁忙的时候，延迟问题会更加严重，slave机器数量的增加也会使这个问题更加严重。</p>
+
+<p> </p>
+
+<p>Java连接redis</p>
+
+<p>１.修改redis.conf配置文件，将绑定的ip地址端口号给注释</p>
+
+<p>２.由于Linux上的redis处于安全保护模式，这就让你无法从虚拟机外部去轻松建立连接，这里就有两种解决方法，一种是在redis.conf中设置保护模式为no</p>
+
+<p>3.另外一种方式是加上安全认证，即redis默认是没有密码的可以直接登录，修改requirepass添加密码。用jedis的auth方法输入密码。</p>
+
+<p>  Connect  time  out ：systemctl stop firewalld.service    </p>
+
+<p> </p>
+
+<p>   单台机器伪分布式集群：<a href="https://blog.csdn.net/baidu_38558076/article/details/90707045" target="_blank" rel="external nofollow noopener noreferrer">https://blog.csdn.net/baidu_38558076/article/details/90707045</a></p>
+
+<p>    多机部署redis5.0集群：<a href="https://www.cnblogs.com/Dev0ps/p/10206604.html" target="_blank" rel="external nofollow noopener noreferrer">https://www.cnblogs.com/Dev0ps/p/10206604.html</a></p>
+
+<p> </p>
+
+<p> </p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+  </div>
+
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+  </nav>
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="yyguy123" src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">yyguy123</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yyguy123" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yyguy123" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yyguy123@gmail.com" title="E-Mail → mailto:yyguy123@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">yyguy123</span>
+</div>
+  
+  <div>
+      <span>版权声明：本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="external nofollow noopener noreferrer">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</span>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+</body>
+</html>

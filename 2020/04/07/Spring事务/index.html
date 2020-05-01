@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="folyjzSrNTxM-gzANuN149Z3GWMMc4Go2VluVGIRh48">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yyguy123.github.io","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一、数据库的事物的基本特性   事物是区分文件存储系统与Nosql数据库重要特性之一，其存在的意义是为了保证即使在并发情况下也能正确的执行crud操作。怎样才算是正确的呢？这时提出了事物需要保证的四个特性即ACID：   A: 原子性(atomicity)     事物中各项操作，要么全做要么全不做，任何一项操作的失败都会导致整个事物的失败；          C: 一致性(consis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring事务">
+<meta property="og:url" content="http://yyguy123.github.io/2020/04/07/Spring%E4%BA%8B%E5%8A%A1/index.html">
+<meta property="og:site_name" content="yyguy123的个人博客">
+<meta property="og:description" content="一、数据库的事物的基本特性   事物是区分文件存储系统与Nosql数据库重要特性之一，其存在的意义是为了保证即使在并发情况下也能正确的执行crud操作。怎样才算是正确的呢？这时提出了事物需要保证的四个特性即ACID：   A: 原子性(atomicity)     事物中各项操作，要么全做要么全不做，任何一项操作的失败都会导致整个事物的失败；          C: 一致性(consis">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020040722121591.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM2NzQ0Njk1,size_16,color_FFFFFF,t_70">
+<meta property="article:published_time" content="2020-04-07T14:19:53.000Z">
+<meta property="article:modified_time" content="2020-05-01T11:25:39.900Z">
+<meta property="article:author" content="yyguy123">
+<meta property="article:tag" content="spring">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/2020040722121591.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM2NzQ0Njk1,size_16,color_FFFFFF,t_70">
+
+<link rel="canonical" href="http://yyguy123.github.io/2020/04/07/Spring%E4%BA%8B%E5%8A%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Spring事务 | yyguy123的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">yyguy123的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">若无闲事挂心头，便是人间好时节</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2020/04/07/Spring%E4%BA%8B%E5%8A%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring事务
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-07 22:19:53" itemprop="dateCreated datePublished" datetime="2020-04-07T22:19:53+08:00">2020-04-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:25:39" itemprop="dateModified" datetime="2020-05-01T19:25:39+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring/" itemprop="url" rel="index"><span itemprop="name">Spring</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <a id="more"></a>
+
+<h2 style="margin-left:0cm;"> </h2>
+
+<h2 style="margin-left:0cm;"><strong>一、数据库的事物的基本特性</strong></h2>
+
+<div>
+<p style="margin-left:0cm;">事物是区分文件存储系统与Nosql数据库重要特性之一，其存在的意义是为了保证即使在并发情况下也能正确的执行crud操作。怎样才算是正确的呢？这时提出了事物需要保证的四个特性即ACID：</p>
+</div>
+
+<ol><li>A: 原子性(atomicity)
+    <ul><li><span style="color:#a5a5a5;">事物中各项操作，要么全做要么全不做，任何一项操作的失败都会导致整个事物的失败；</span></li>
+    </ul></li>
+    <li>C: 一致性(consistency)
+    <ul><li><span style="color:#a5a5a5;">事物结束后系统状态是一致的；</span></li>
+    </ul></li>
+    <li>I:  隔离性(isolation)
+    <ul><li><span style="color:#a5a5a5;">并发执行的事物彼此无法看到对方的中间状态；</span></li>
+    </ul></li>
+    <li>D: 持久性(durability)
+    <ul><li><span style="color:#a5a5a5;">事物完成后所做的改动都会被持久化，即使发生灾难性的失败。</span></li>
+    </ul></li>
+</ol><p style="margin-left:0cm;">在高并发的情况下，要完全保证其ACID特性是非常困难的，除非把所有的事物串行化执行，但带来的负面的影响将是性能大打折扣。很多时候我们有些业务对事物的要求是不一样的，所以数据库中设计了四种隔离级别，供用户基于业务进行选择。</p>
+
+<table border="1" cellspacing="0" style="margin-left:.5pt;width:412.7pt;"><tbody><tr><td style="width:113.9pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#4f4f4f;">隔离级别</span></strong></p>
+            </td>
+            <td style="width:77.05pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#4f4f4f;">脏读（Dirty Read）</span></strong></p>
+            </td>
+            <td style="width:131.3pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#4f4f4f;">不可重复读（NonRepeatable Read）</span></strong></p>
+            </td>
+            <td style="width:90.45pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#4f4f4f;">幻读（Phantom Read）</span></strong></p>
+            </td>
+        </tr><tr><td style="width:113.9pt;">
+            <p style="margin-left:0cm;"><span style="color:#4f4f4f;">未提交读（Read uncommitted）</span></p>
+            </td>
+            <td style="width:77.05pt;">
+            <p style="margin-left:0cm;"><span style="color:#ff0000;">可能</span></p>
+            </td>
+            <td style="width:131.3pt;">
+            <p style="margin-left:0cm;"><span style="color:#ff0000;">可能</span></p>
+            </td>
+            <td style="width:90.45pt;">
+            <p style="margin-left:0cm;"><span style="color:#ff0000;">可能</span></p>
+            </td>
+        </tr><tr><td style="width:113.9pt;">
+            <p style="margin-left:0cm;"><span style="color:#4f4f4f;">已提交读（Read committed）</span></p>
+            </td>
+            <td style="width:77.05pt;">
+            <p style="margin-left:0cm;"><span style="color:#1c7231;">不可能</span></p>
+            </td>
+            <td style="width:131.3pt;">
+            <p style="margin-left:0cm;"><span style="color:#ff0000;">可能</span></p>
+            </td>
+            <td style="width:90.45pt;">
+            <p style="margin-left:0cm;"><span style="color:#ff0000;">可能</span></p>
+            </td>
+        </tr><tr><td style="width:113.9pt;">
+            <p style="margin-left:0cm;"><span style="color:#4f4f4f;">可重复读（Repeatable read）</span></p>
+            </td>
+            <td style="width:77.05pt;">
+            <p style="margin-left:0cm;"><span style="color:#1c7231;">不可能</span></p>
+            </td>
+            <td style="width:131.3pt;">
+            <p style="margin-left:0cm;"><span style="color:#1c7231;">不可能</span></p>
+            </td>
+            <td style="width:90.45pt;">
+            <p style="margin-left:0cm;"><span style="color:#ff0000;">可能</span></p>
+            </td>
+        </tr><tr><td style="width:113.9pt;">
+            <p style="margin-left:0cm;"><span style="color:#4f4f4f;">可串行化（SERIALIZABLE）</span></p>
+            </td>
+            <td style="width:77.05pt;">
+            <p style="margin-left:0cm;"><span style="color:#1c7231;">不可能</span></p>
+            </td>
+            <td style="width:131.3pt;">
+            <p style="margin-left:0cm;"><span style="color:#1c7231;">不可能</span></p>
+            </td>
+            <td style="width:90.45pt;">
+            <p style="margin-left:0cm;"><span style="color:#1c7231;">不可能</span></p>
+            </td>
+        </tr></tbody></table><p> </p>
+
+<p style="margin-left:0cm;"><strong>脏读 :</strong></p>
+
+<p style="margin-left:0cm;"><span style="color:#a5a5a5;">一个事物读取到另一事物未提交的更新数据</span></p>
+
+<p style="margin-left:0cm;"><strong>不可重复读 : </strong></p>
+
+<p style="margin-left:0cm;"><span style="color:#a5a5a5;">在同一事物中,多次读取同一数据返回的结果有所不同, 换句话说, 后续读取可以读到另一事物已提交的更新数据. 相反, “可重复读”在同一事物中多次读取数据时, 能够保证所读数据一样, 也就是后续读取不能读到另一事物已提交的更新数据。</span></p>
+
+<p style="margin-left:0cm;"><strong>幻读 :</strong></p>
+
+<p style="margin-left:0cm;"><span style="color:#a5a5a5;">在同一事物中,多次读取同一表数据条数返回的结果有所不同,</span></p>
+
+<p style="margin-left:0cm;"> <span style="color:#a5a5a5;">查询表中一条数据如果不存在就插入一条，并发的时候却发现，里面居然有两条相同的数据。这就幻读的问题。</span></p>
+
+<p style="margin-left:0cm;"> </p>
+
+<p style="margin-left:0cm;"><strong>数据库默认隔离级别：</strong></p>
+
+<p style="margin-left:0cm;">Oracle中默认级别是 Read committed</p>
+
+<p style="margin-left:0cm;">mysql 中默认级别 Repeatable read。另外要注意的是mysql 执行一条查询语句默认是一个独立的事物，所以看上去效果跟Read committed一样。</p>
+
+<p style="margin-left:0cm;"># 查看mysql 的默认隔离级别</p>
+
+<p style="margin-left:0cm;">SELECT @@tx_isolation</p>
+
+<p style="margin-left:0cm;"> </p>
+
+<div>
+<h2 style="margin-left:0cm;"><strong>二、Sring 对事物的支持与使用</strong></h2>
+
+<p style="margin-left:0cm;"><strong>1、spring 事物相关API说明</strong></p>
+
+<p style="margin-left:0cm;">spring 事物是在数据库事物的基础上进行封装扩展 其主要特性如下：</p>
+
+<ol><li>
+    <ol><li>支持原有的数据事物的隔离级别</li>
+        <li>加入了事物传播的概念 提供多个事物的和并或隔离的功能</li>
+        <li>提供声明式事物，让业务代码与事物分离，事物变得更易用。</li>
+    </ol></li>
+</ol><p style="margin-left:0cm;">怎么样去使用Spring事物呢？spring 提供了三个接口供使用事物。分别是：</p>
+
+<p style="margin-left:0cm;"> </p>
+
+<ol><li>TransactionDefinition
+    <ul><li><span style="color:#a5a5a5;">事物定义</span></li>
+    </ul></li>
+    <li>PlatformTransactionManager
+    <ul><li><span style="color:#a5a5a5;">事物管理</span></li>
+    </ul></li>
+    <li>TransactionStatus
+    <ul><li><span style="color:#a5a5a5;">事物运行时状态</span></li>
+    </ul></li>
+</ol><p style="margin-left:0cm;"> </p>
+
+<p style="margin-left:0cm;"><strong>接口结构图：</strong></p>
+
+<p style="margin-left:0cm;"><img alt height="241" src="https://img-blog.csdnimg.cn/2020040722121591.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM2NzQ0Njk1,size_16,color_FFFFFF,t_70" width="547"></p>
+
+<p style="margin-left:0cm;"> </p>
+
+<p style="margin-left:0cm;"><strong>API说明：</strong></p>
+
+<pre>
+<code class="language-java">public class SpringTransactionExample {
+    private static String url = "jdbc:mysql://192.168.0.147:3306/test";
+    private static String user = "root";
+    private static String password = "123456";
+
+    public static Connection openConnection() throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.jdbc.Driver");
+        Connection conn = DriverManager.getConnection("jdbc:mysql://192.168.0.147:3306/test", "root", "123456");
+        return conn;
+    }
+
+    public static void main(String[] args) {
+        final DataSource ds = new DriverManagerDataSource(url, user, password);
+        final TransactionTemplate template = new TransactionTemplate();
+        template.setTransactionManager(new DataSourceTransactionManager(ds));
+        template.execute(new TransactionCallback&lt;Object&gt;() {
+            @Override
+            public Object doInTransaction(TransactionStatus status) {
+                Connection conn = DataSourceUtils.getConnection(ds);
+                Object savePoint = null;
+                try {
+                    {
+                        // 插入
+                        PreparedStatement prepare = conn.
+                                prepareStatement("insert INTO account (accountName,user,money) VALUES (?,?,?)");
+                        prepare.setString(1, "111");
+                        prepare.setString(2, "aaaa");
+                        prepare.setInt(3, 10000);
+                        prepare.executeUpdate();
+                    }
+                    // 设置保存点
+                    savePoint = status.createSavepoint();
+                    {
+                        // 插入
+                        PreparedStatement prepare = conn.
+                                prepareStatement("insert INTO account (accountName,user,money) VALUES (?,?,?)");
+                        prepare.setString(1, "222");
+                        prepare.setString(2, "bbb");
+                        prepare.setInt(3, 10000);
+                        prepare.executeUpdate();
+                    }
+                    {
+                        // 更新
+                        PreparedStatement prepare = conn.
+                                prepareStatement("UPDATE account SET money= money+1 where user=?");
+                        prepare.setString(1, "asdflkjaf");
+                        Assert.isTrue(prepare.executeUpdate() &gt; 0, "");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    System.out.println("更新失败");
+                    if (savePoint != null) {
+                        status.rollbackToSavepoint(savePoint);
+                    } else {
+                        status.setRollbackOnly();
+                    }
+                }
+                return null;
+            }
+        });
+    }
+}
+</code></pre>
+
+<p style="margin-left:0cm;"> </p>
+
+<p style="margin-left:0cm;"><strong>2、声明示事物</strong></p>
+
+<p style="margin-left:0cm;">我们前面是通过调用API来实现对事物的控制，这非常的繁琐，与直接操作JDBC事物并没有太多的改善，所以Spring提出了声明示事物，使我们对事物的操作变得非常简单，甚至不需要关心它。</p>
+
+<p style="margin-left:0cm;">配置spring.xml</p>
+
+<pre>
+<code class="language-java">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd"&gt;
+
+    &lt;context:annotation-config/&gt;
+    &lt;context:component-scan base-package="com.test.service.**"&gt;
+    &lt;/context:component-scan&gt;
+
+    &lt;bean class="org.springframework.jdbc.core.JdbcTemplate"&gt;
+        &lt;property name="dataSource" ref="dataSource"/&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- similarly, don't forget the PlatformTransactionManager --&gt;
+    &lt;bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"&gt;
+        &lt;property name="dataSource" ref="dataSource"/&gt;
+    &lt;/bean&gt;
+    &lt;!-- don't forget the DataSource --&gt;
+    &lt;bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"&gt;
+        &lt;constructor-arg name="url" value="jdbc:mysql://192.168.0.147/test"/&gt;
+        &lt;constructor-arg name="username" value="root"/&gt;
+        &lt;constructor-arg name="password" value="123456"/&gt;
+    &lt;/bean&gt;
+    &lt;tx:annotation-driven transaction-manager="txManager"&gt;&lt;/tx:annotation-driven&gt;
+&lt;/beans&gt;
+</code></pre>
+
+<p style="margin-left:0cm;">编写服务类</p>
+
+<pre>
+<code class="language-java">@Transactional
+public void addAccount(String name, int initMenoy) {
+    String accountid = new SimpleDateFormat("yyyyMMddhhmmss").format(new Date());
+    jdbcTemplate.update("insert INTO account (accountName,user,money) VALUES (?,?,?)", accountid, name, initMenoy);
+    // 人为报错
+    int i = 1 / 0;
+}
+</code></pre>
+
+<p style="margin-left:0cm;"><strong>3、事物传播机制</strong></p>
+
+<p style="margin-left:0cm;"> </p>
+
+<table border="1" cellspacing="0" style="margin-left:.5pt;width:412.7pt;"><tbody><tr><td style="width:75pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#ffffff;">类别</span></strong></p>
+            </td>
+            <td style="width:173.5pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#ffffff;">事物传播类型</span></strong></p>
+            </td>
+            <td style="width:164.15pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#ffffff;">说明</span></strong></p>
+            </td>
+        </tr><tr><td rowspan="3" style="width:75pt;">
+            <p style="margin-left:0cm;">支持当前事物</p>
+            </td>
+            <td style="width:173.5pt;">
+            <p style="margin-left:0cm;"><span style="color:#ff0000;">PROPAGATION_REQUIRED</span></p>
+
+<pre><code>    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;（必须的）&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:164.15pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;如果当前没有事物，就新建一个事物，如果已经存在一个事物中，加入到这个事物中。这是最常见的选择。&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:173.5pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;PROPAGATION_SUPPORTS&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;（支持）&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:164.15pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;支持当前事物，如果当前没有事物，就以非事物方式执行。&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:173.5pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;PROPAGATION_MANDATORY&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;（强制）&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:164.15pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;使用当前的事物，如果当前没有事物，就抛出异常。&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;&lt;td rowspan=&quot;3&quot; style=&quot;width:75pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;不支持当前事物&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:173.5pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;PROPAGATION_REQUIRES_NEW&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;隔离)&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:164.15pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;新建事物，如果当前存在事物，把当前事物挂起。&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:173.5pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;PROPAGATION_NOT_SUPPORTED&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;不支持)&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:164.15pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;以非事物方式执行操作，如果当前存在事物，就把当前事物挂起。&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:173.5pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;PROPAGATION_NEVER&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;(强制非事物)&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:164.15pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;以非事物方式执行，如果当前存在事物，则抛出异常。&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:75pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;套事物&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:173.5pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;PROPAGATION_NESTED&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;（嵌套事物）&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;width:164.15pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;如果当前存在事物，则在嵌套事物内执行。如果当前没有事物，则执行与PROPAGATION_REQUIRED类似的操作。&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;strong&gt;常用事物传播机制：&lt;/strong&gt;&lt;/p&gt;</code></pre><ol><li>PROPAGATION_REQUIRED，
+    <ul><li><span style="color:#a5a5a5;">这个也是默认的传播机制；</span></li>
+    </ul></li>
+    <li>PROPAGATION_NOT_SUPPORTED
+    <ul><li><span style="color:#a5a5a5;">可以用于发送提示消息，站内信、短信、邮件提示等。不属于并且不应当影响主体业务逻辑，即使发送失败也不应该对主体业务逻辑回滚。</span></li>
+    </ul></li>
+    <li>PROPAGATION_REQUIRES_NEW
+    <ul><li><span style="color:#a5a5a5;">总是新启一个事物，这个传播机制适用于不受父方法事物影响的操作，比如某些业务场景下需要记录业务日志，用于异步反查，那么不管主体业务逻辑是否完成，日志都需要记录下来，不能因为主体业务逻辑报错而丢失日志；</span></li>
+    </ul></li>
+</ol><p style="margin-left:0cm;"><strong>用例1:</strong></p>
+
+<p style="margin-left:0cm;">创建用户时初始化一个帐户，表结构和服务类如下。</p>
+
+<table border="1" cellspacing="0" style="margin-left:.5pt;width:387.9pt;"><tbody><tr><td style="width:103.15pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#ffffff;">表结构</span></strong></p>
+            </td>
+            <td style="width:103.15pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#ffffff;">服务类</span></strong></p>
+            </td>
+            <td style="width:181.55pt;">
+            <p style="margin-left:0cm;"><strong><span style="color:#ffffff;">功能描述</span></strong></p>
+            </td>
+        </tr><tr><td style="vertical-align:top;width:103.15pt;">
+            <p style="margin-left:0cm;">user</p>
+            </td>
+            <td style="vertical-align:top;width:103.15pt;">
+            <p style="margin-left:0cm;">UserSerivce</p>
+            </td>
+            <td style="vertical-align:top;width:181.55pt;">
+            <p style="margin-left:0cm;">创建用户，并添加帐户</p>
+            </td>
+        </tr><tr><td style="vertical-align:top;width:103.15pt;">
+            <p style="margin-left:0cm;">account</p>
+            </td>
+            <td style="vertical-align:top;width:103.15pt;">
+            <p style="margin-left:0cm;">AccountService</p>
+            </td>
+            <td style="vertical-align:top;width:181.55pt;">
+            <p style="margin-left:0cm;">添加帐户</p>
+            </td>
+        </tr></tbody></table><p style="margin-left:0cm;">UserSerivce.createUser(name) 实现代码</p>
+
+<pre>
+<code class="language-java">@Transactional
+public void createUser(String name) {
+    // 新增用户基本信息
+    jdbcTemplate.update("INSERT INTO `user` (name) VALUES(?)", name);
+    //调用accountService添加帐户
+    accountService.addAccount(name, 10000);
+ ｝
+
+AccountService.addAccount(name,initMoney) 实现代码（方法的最后有一个异常）
+@Transactional(propagation = Propagation.REQUIRED)
+public void addAccount(String name, int initMoney) {
+    String accountid = new SimpleDateFormat("yyyyMMddhhmmss").format(new Date());
+    jdbcTemplate.update("insert INTO account (accountName,user,money) VALUES (?,?,?)", accountid, name, initMenoy);
+    // 出现分母为零的异常
+    int i = 1 / 0;
+}
+</code></pre>
+
+<p style="margin-left:0cm;">实验预测一：</p>
+
+<table border="1" cellspacing="0" style="margin-left:.5pt;width:412.7pt;"><tbody><tr><td style="vertical-align:top;width:54.9pt;">
+            <p style="margin-left:0cm;"> </p>
+            </td>
+            <td style="width:120.6pt;">
+            <p style="margin-left:0cm;">createUser</p>
+            </td>
+            <td style="width:113.9pt;">
+            <p style="margin-left:0cm;">addAccount<span style="color:#ff0000;">(</span><span style="color:#ff0000;">异常)</span></p>
+            </td>
+            <td style="width:123.25pt;">
+            <p style="margin-left:0cm;">预测结果</p>
+            </td>
+        </tr><tr><td style="width:54.9pt;">
+            <p style="margin-left:0cm;">场景一</p>
+            </td>
+            <td style="vertical-align:top;width:120.6pt;">
+            <p style="margin-left:0cm;">无事物</p>
+            </td>
+            <td style="vertical-align:top;width:113.9pt;">
+            <p style="margin-left:0cm;">required</p>
+            </td>
+            <td style="vertical-align:top;width:123.25pt;">
+            <p style="margin-left:0cm;">user （成功） Account（不成功） <span style="color:#1c7231;">正确</span></p>
+            </td>
+        </tr><tr><td style="width:54.9pt;">
+            <p style="margin-left:0cm;">场景二</p>
+            </td>
+            <td style="vertical-align:top;width:120.6pt;">
+            <p style="margin-left:0cm;">required</p>
+            </td>
+            <td style="vertical-align:top;width:113.9pt;">
+            <p style="margin-left:0cm;">无事物</p>
+            </td>
+            <td style="vertical-align:top;width:123.25pt;">
+            <p style="margin-left:0cm;">user （不成功） Account（不成功） <span style="color:#1c7231;">正确</span></p>
+            </td>
+        </tr><tr><td style="width:54.9pt;">
+            <p style="margin-left:0cm;">场景三</p>
+            </td>
+            <td style="vertical-align:top;width:120.6pt;">
+            <p style="margin-left:0cm;">required</p>
+            </td>
+            <td style="vertical-align:top;width:113.9pt;">
+            <p style="margin-left:0cm;">not_supported</p>
+            </td>
+            <td style="vertical-align:top;width:123.25pt;">
+            <p style="margin-left:0cm;">user （不成功） Account（成功）<span style="color:#1c7231;">正确</span></p>
+            </td>
+        </tr><tr><td style="width:54.9pt;">
+            <p style="margin-left:0cm;">场景四</p>
+            </td>
+            <td style="vertical-align:top;width:120.6pt;">
+            <p style="margin-left:0cm;">required</p>
+            </td>
+            <td style="vertical-align:top;width:113.9pt;">
+            <p style="margin-left:0cm;">required_new</p>
+            </td>
+            <td style="vertical-align:top;width:123.25pt;">
+            <p style="margin-left:0cm;">user （不成功） Account（不成功）<span style="color:#1c7231;">正确</span></p>
+            </td>
+        </tr><tr><td style="width:54.9pt;">
+            <p style="margin-left:0cm;">场景五</p>
+            </td>
+            <td style="vertical-align:top;width:120.6pt;">
+            <p style="margin-left:0cm;">required</p>
+
+<pre><code>    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#ff0000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#ff0000;&quot;&gt;异常移至createUser方法未尾)&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt; &lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;vertical-align:top;width:113.9pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;required_new&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;vertical-align:top;width:123.25pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;user （不成功） Account（成功）&lt;span style=&quot;color:#1c7231;&quot;&gt;正确&lt;/span&gt;&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:54.9pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;场景六&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;vertical-align:top;width:120.6pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;required&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#ff0000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#ff0000;&quot;&gt;异常移至createUser方法未尾)&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;&lt;span style=&quot;color:#000000;&quot;&gt;（&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;addAccount &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;方法称至当前类&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;）&lt;/span&gt;&lt;/p&gt;
+
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt; &lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;vertical-align:top;width:113.9pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;required_new&lt;/p&gt;
+    &lt;/td&gt;
+    &lt;td style=&quot;vertical-align:top;width:123.25pt;&quot;&gt;
+    &lt;p style=&quot;margin-left:0cm;&quot;&gt;user （不成功） Account（不成功）&lt;/p&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;p style=&quot;margin-left:0cm;&quot;&gt; &lt;/p&gt;</code></pre><div>
+<h2 style="margin-left:0cm;"><strong>三、aop 事物底层实现原理</strong></h2>
+</div>
+
+<p style="margin-left:0cm;"> </p>
+
+<p style="margin-left:0cm;">讲事物原理之前我们先来做一个实验，当场景五的环境改变，把addAccount 方法移至UserService 类下，其它配置和代码不变：</p>
+
+<pre>
+<code class="language-java">@Override
+@Transactional
+public void createUser(String name) {
+    jdbcTemplate.update("INSERT INTO `user` (name) VALUES(?)", name);
+    addAccount(name, 10000);
+    // 人为报错
+    int i = 1 / 0;
+}
+
+@Transactional(propagation = Propagation.REQUIRES_NEW)
+public void addAccount(String name, int initMoney) {
+    String accountid = new SimpleDateFormat("yyyyMMddhhmmss").format(new Date());
+    jdbcTemplate.update("insert INTO account (accountName,user,money) VALUES (?,?,?)", accountid, name, initMoney);
+}
+</code></pre>
+
+<p style="margin-left:0cm;">经过演示我们发现得出的结果与场景五并不 一至，required_new 没有起到其对应的作用。原因在于spring 声明示事物使用动态代理实现，而当调用同一个类的方法时，是会不会走代理逻辑的，自然事物的配置也会失效。</p>
+
+<p style="margin-left:0cm;">通过一个动态代理的实现来模拟这种场景</p>
+
+<pre>
+<code class="language-java">UserSerivce proxyUserSerivce = (UserSerivce) Proxy.newProxyInstance(TestTransaction.class.getClassLoader(),
+        new Class[]{UserSerivce.class}, new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                try {
+                    System.out.println("开启事物:"+method.getName());
+                    return method.invoke(userSerivce, args);
+                } finally {
+                    System.out.println("关闭事物:"+method.getName());
+                }
+            }
+        });
+proxyUserSerivce.createUser("test");
+</code></pre>
+
+<p style="margin-left:0cm;">当我们调用createUser 方法时 仅打印了 createUser  的事物开启、关闭，并没有打印addAccount 方法的事物开启、关闭，由此可见addAccount  的事物配置是失效的。</p>
+
+<p style="margin-left:0cm;">如果业务当中上真有这种场景该如何实现呢？在spring xml中配置 暴露proxy 对象，然后在代码中用AopContext.currentProxy() 就可以获当前代理对象</p>
+
+<p style="margin-left:0cm;">&lt;!-- 配置暴露proxy --&gt;</p>
+
+<p style="margin-left:0cm;">&lt;aop:aspectj-autoproxy expose-proxy="true"/&gt;</p>
+
+<p style="margin-left:0cm;">// 基于代理对象调用创建帐户，事物的配置又生效了</p>
+
+<p style="margin-left:0cm;">((UserSerivce) AopContext.currentProxy()).addAccount(name, 10000);</p>
+
+<p style="margin-left:0cm;"> </p>
+
+<p style="margin-left:0cm;"> </p>
+
+<p style="margin-left:0cm;"> </p>
+</td></tr></tbody></table></td></tr></tbody></table></div>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>坚持技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="yyguy123 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="yyguy123 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/spring/" rel="tag"># spring</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/20/Hello/" rel="prev" title="Hello">
+      <i class="fa fa-chevron-left"></i> Hello
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/01/Java8%20Stream/" rel="next" title="Java8 Stream">
+      Java8 Stream <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text"> </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text">一、数据库的事物的基本特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">3.</span> <span class="nav-text">二、Sring 对事物的支持与使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">4.</span> <span class="nav-text">三、aop 事物底层实现原理</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="yyguy123" src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">yyguy123</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yyguy123" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yyguy123" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yyguy123@gmail.com" title="E-Mail → mailto:yyguy123@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">yyguy123</span>
+</div>
+  
+  <div>
+      <span>版权声明：本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="external nofollow noopener noreferrer">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</span>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '2274aa537532ecf3cabe',
+      clientSecret: '45c6c0de0d52ec8e9523cfaca4ce3c88923f4a3f',
+      repo        : 'yyguy123.github.io',
+      owner       : 'yyguy123',
+      admin       : ['yyguy123'],
+      id          : '934668aa603e2e2179092a419e671304',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

@@ -23,17 +23,23 @@
     var CONFIG = {"hostname":"yyguy123.github.io","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta property="og:type" content="article">
-<meta property="og:title" content="Hello">
-<meta property="og:url" content="http://yyguy123.github.io/2020/03/20/Hello/index.html">
+  <meta name="description" content="目录     1.基于JDK的动态代理  2.基于CGLIB的动态代理  目前java动态代理的实现分为两种  1.基于JDK的动态代理  2.基于CGILB的动态代理  在业务中使用动态代理，一般是为了给需要实现的方法添加预处理或者添加后续操作，但是不干预实现类的正常业务，把一些基本业务和主要的业务逻辑分离。我们一般所熟知的Spring的AOP原理就是基于动态代理实现的。  1.基于JDK的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java动态代理详解">
+<meta property="og:url" content="http://yyguy123.github.io/2020/03/01/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E8%AF%A6%E8%A7%A3/index.html">
 <meta property="og:site_name" content="yyguy123的个人博客">
+<meta property="og:description" content="目录     1.基于JDK的动态代理  2.基于CGLIB的动态代理  目前java动态代理的实现分为两种  1.基于JDK的动态代理  2.基于CGILB的动态代理  在业务中使用动态代理，一般是为了给需要实现的方法添加预处理或者添加后续操作，但是不干预实现类的正常业务，把一些基本业务和主要的业务逻辑分离。我们一般所熟知的Spring的AOP原理就是基于动态代理实现的。  1.基于JDK的">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-03-20T13:57:28.000Z">
-<meta property="article:modified_time" content="2020-03-20T13:57:28.274Z">
+<meta property="og:image" content="https://img-blog.csdn.net/20180821150523827?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMyNTMyMzIx/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
+<meta property="og:image" content="https://img-blog.csdn.net/20180821150918418?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMyNTMyMzIx/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
+<meta property="og:image" content="https://img-blog.csdn.net/201808211529299?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMyNTMyMzIx/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
+<meta property="article:published_time" content="2020-03-01T07:06:05.000Z">
+<meta property="article:modified_time" content="2020-05-01T11:03:21.913Z">
 <meta property="article:author" content="yyguy123">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdn.net/20180821150523827?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMyNTMyMzIx/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
 
-<link rel="canonical" href="http://yyguy123.github.io/2020/03/20/Hello/">
+<link rel="canonical" href="http://yyguy123.github.io/2020/03/01/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E8%AF%A6%E8%A7%A3/">
 
 
 <script id="page-configurations">
@@ -46,7 +52,7 @@
   };
 </script>
 
-  <title>Hello | yyguy123的个人博客</title>
+  <title>java动态代理详解 | yyguy123的个人博客</title>
   
 
 
@@ -190,7 +196,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2020/03/20/Hello/">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2020/03/01/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E8%AF%A6%E8%A7%A3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/uploads/avatar.png">
@@ -203,7 +209,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Hello
+          java动态代理详解
         </h1>
 
         <div class="post-meta">
@@ -213,7 +219,23 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-03-20 21:57:28" itemprop="dateCreated datePublished" datetime="2020-03-20T21:57:28+08:00">2020-03-20</time>
+              <time title="创建时间：2020-03-01 15:06:05" itemprop="dateCreated datePublished" datetime="2020-03-01T15:06:05+08:00">2020-03-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:03:21" itemprop="dateModified" datetime="2020-05-01T19:03:21+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JavaWeb/" itemprop="url" rel="index"><span itemprop="name">JavaWeb</span></a>
+                </span>
             </span>
 
           
@@ -227,7 +249,138 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <a id="more"></a>
+
+<p id="main-toc"><strong>目录</strong></p>
+
+<p id="-toc" style="margin-left:80px;"> </p>
+
+<p id="1.%E5%9F%BA%E4%BA%8EJDK%E7%9A%84%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86-toc" style="margin-left:80px;"><a href="#1.%E5%9F%BA%E4%BA%8EJDK%E7%9A%84%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86">1.基于JDK的动态代理</a></p>
+
+<p id="2.%E5%9F%BA%E4%BA%8ECGLIB%E7%9A%84%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86-toc" style="margin-left:80px;"><a href="#2.%E5%9F%BA%E4%BA%8ECGLIB%E7%9A%84%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86">2.基于CGLIB的动态代理</a></p>
+
+<hr id="hr-toc"><p id="%E7%9B%AE%E5%89%8Djava%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%88%86%E4%B8%BA%E4%B8%A4%E7%A7%8D">目前java动态代理的实现分为两种</p>
+
+<p><strong>1.基于JDK的动态代理</strong></p>
+
+<p><strong>2.基于CGILB的动态代理</strong></p>
+
+<p>在业务中使用动态代理，一般是为了给需要实现的方法添加预处理或者添加后续操作，但是不干预实现类的正常业务，把一些基本业务和主要的业务逻辑分离。我们一般所熟知的Spring的AOP原理就是基于动态代理实现的。</p>
+
+<h3 id="1.%E5%9F%BA%E4%BA%8EJDK%E7%9A%84%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86"><strong>1.基于JDK的动态代理</strong></h3>
+
+<p>基于JDK的动态代理就需要知道两个类：1.InvocationHandler（接口）、2.Proxy（类）</p>
+
+<p>还要知道JDK是基于接口的动态代理</p>
+
+<p>下面我们实际用代码来讲解这两个类的实际作用</p>
+
+<p>1.第一步，创建一个接口</p>
+
+<p>public interface Subject {<br>
+    void hello(String param);<br>
+}<br>
+2.第二步，实现接口</p>
+
+<p>public class SubjectImpl implements Subject {<br>
+    @Override<br>
+    public void hello(String param) {<br>
+        System.out.println("hello  " + param);<br>
+    }<br>
+}<br>
+3.第三步，创建SubjectImpl的代理类</p>
+
+<p>public class SubjectProxy implements InvocationHandler {<br>
+    private Subject subject;</p>
+
+<p>    public SubjectProxy(Subject subject) {<br>
+        this.subject = subject;<br>
+    }</p>
+
+<p>    @Override<br>
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {<br>
+        System.out.println("--------------begin-------------");<br>
+        Object invoke = method.invoke(subject, args);<br>
+        System.out.println("--------------end-------------");<br>
+        return invoke;<br>
+    }<br>
+}<br>
+invoke方法的说明：</p>
+
+<p><img alt src="https://img-blog.csdn.net/20180821150523827?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMyNTMyMzIx/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"></p>
+
+<p>4.编写代理类实际的调用，利用Proxy类创建代理之后的Subject类。</p>
+
+<p>public class Main {</p>
+
+<p>    public static void main(String[] args) {<br>
+        Subject subject = new SubjectImpl();<br>
+        InvocationHandler subjectProxy = new SubjectProxy(subject);<br>
+        Subject proxyInstance = (Subject) Proxy.newProxyInstance(subjectProxy.getClass().getClassLoader(), subject.getClass().getInterfaces(), subjectProxy);<br>
+        proxyInstance.hello("world");<br>
+    }</p>
+
+<p>}</p>
+
+<p><img alt src="https://img-blog.csdn.net/20180821150918418?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMyNTMyMzIx/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"><br>
+输出：</p>
+
+<p>--------------begin-------------<br>
+hello  world<br>
+--------------end-------------</p>
+
+<p>看这个结果，实际上在Subject类中只会输出一条hello world，但是在被代理之后，实际调用的方法是SubjectProxy的invoke方法，这样可以在不修改业务类的情况下对业务类增加一些日志等其他操作，甚至可以直接修改有返回值方法的返回值。</p>
+
+<h3 id="2.%E5%9F%BA%E4%BA%8ECGLIB%E7%9A%84%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86"><strong>2.基于CGLIB的动态代理</strong></h3>
+
+<p>本文主要讲的是CGLIB的动态代理，因为基于JDK的动态代理一定要继承一个接口，而绝大部分情况是基于POJO类的动态代理，那么CGLIB就是一个很好的选择，在Hibernate框架中PO的字节码生产工作就是靠CGLIB来完成的。还是先看代码。</p>
+
+<p>1.引入CGLIB的jar包</p>
+
+<p>2.创建代理类</p>
+
+<p>public class CGsubject {<br>
+    public void sayHello(){<br>
+        System.out.println("hello world");<br>
+    }<br>
+}<br>
+如果直接对这个类创建对象，那么调用sayHello方法，控制台就会输出hello world，现在我们还是要对输出添加前置和后置的log输出。来打印输出前和输出后的时间。</p>
+
+<p>3.实现MethodInterceptor接口，对方法进行拦截处理。</p>
+
+<p>public class HelloInterceptor implements MethodInterceptor{<br>
+    @Override<br>
+    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {<br>
+        System.out.println("begin time -----&gt; "+ System.currentTimeMillis());<br>
+        Object o1 = methodProxy.invokeSuper(o, objects);<br>
+        System.out.println("end time -----&gt; "+ System.currentTimeMillis());<br>
+        return o1;<br>
+    }<br>
+}</p>
+
+<p><img alt src="https://img-blog.csdn.net/201808211529299?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMyNTMyMzIx/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"><br>
+4.创建被代理类</p>
+
+<p>public class Main {</p>
+
+<p>    public static void main(String[] args) {<br>
+        Enhancer enhancer = new Enhancer();<br>
+        enhancer.setSuperclass(CGsubject.class);<br>
+        enhancer.setCallback(new HelloInterceptor());<br>
+        CGsubject cGsubject = (CGsubject) enhancer.create();<br>
+        cGsubject.sayHello();<br>
+    }</p>
+
+<p>}<br>
+利用Enhancer来生产被代理类，这样可以拦截方法，对方法进行前置和后置log的添加。</p>
+
+<p>输出：</p>
+
+<p>begin time -----&gt; 1534836443741<br>
+hello world<br>
+end time -----&gt; 1534836443786<br>
+ </p>
+
     </div>
 
     
@@ -262,12 +415,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/03/20/Git%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E5%92%8C%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/" rel="prev" title="Git基本概念和底层原理">
-      <i class="fa fa-chevron-left"></i> Git基本概念和底层原理
+    <a href="/2020/03/01/MyBatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%BA%8C)%E2%80%94%E2%80%94%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E5%AE%9E%E7%8E%B0%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8/" rel="prev" title="MyBatis源码解析(二)——动态代理实现函数调用">
+      <i class="fa fa-chevron-left"></i> MyBatis源码解析(二)——动态代理实现函数调用
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/04/07/Spring%E4%BA%8B%E5%8A%A1/" rel="next" title="Spring事务">
-      Spring事务 <i class="fa fa-chevron-right"></i>
+    <a href="/2020/03/20/Git%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E5%92%8C%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/" rel="next" title="Git基本概念和底层原理">
+      Git基本概念和底层原理 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -329,6 +482,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1.%E5%9F%BA%E4%BA%8EJDK%E7%9A%84%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">1.基于JDK的动态代理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2.%E5%9F%BA%E4%BA%8ECGLIB%E7%9A%84%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">2.基于CGLIB的动态代理</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -475,7 +629,7 @@ NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
       repo        : 'yyguy123.github.io',
       owner       : 'yyguy123',
       admin       : ['yyguy123'],
-      id          : '1098725a3ae830fed905ab80aba9ca69',
+      id          : 'b10cf9230d324962aac47806bf239714',
         language: 'zh-CN',
       distractionFreeMode: true
     });

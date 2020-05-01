@@ -23,17 +23,24 @@
     var CONFIG = {"hostname":"yyguy123.github.io","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta property="og:type" content="article">
-<meta property="og:title" content="Hello">
-<meta property="og:url" content="http://yyguy123.github.io/2020/03/20/Hello/index.html">
+  <meta name="description" content="前言  在Linux或Windows乃至其他的系统，我们经常会需要进行磁盘的挂载。通常从挂载的方式的上分为本地挂载和远程挂载。Linux的本地挂载就不介绍了，这篇文章介绍的是远程挂载网络磁盘。     远程挂载网络磁盘  实际上，这个操作与使用nfs共享一个文件的方法是相同的。思路是服务端将一块磁盘空间本地挂载到一个目录，然后通过网络使用nfs将这个目录进行共享，客户端最后将服务端共享的目录挂">
+<meta property="og:type" content="article">
+<meta property="og:title" content="（Linux）远程挂载网络磁盘详解---nfs共享">
+<meta property="og:url" content="http://yyguy123.github.io/2019/06/11/%EF%BC%88Linux%EF%BC%89%E8%BF%9C%E7%A8%8B%E6%8C%82%E8%BD%BD%E7%BD%91%E7%BB%9C%E7%A3%81%E7%9B%98%E8%AF%A6%E8%A7%A3---nfs%E5%85%B1%E4%BA%AB/index.html">
 <meta property="og:site_name" content="yyguy123的个人博客">
+<meta property="og:description" content="前言  在Linux或Windows乃至其他的系统，我们经常会需要进行磁盘的挂载。通常从挂载的方式的上分为本地挂载和远程挂载。Linux的本地挂载就不介绍了，这篇文章介绍的是远程挂载网络磁盘。     远程挂载网络磁盘  实际上，这个操作与使用nfs共享一个文件的方法是相同的。思路是服务端将一块磁盘空间本地挂载到一个目录，然后通过网络使用nfs将这个目录进行共享，客户端最后将服务端共享的目录挂">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-03-20T13:57:28.000Z">
-<meta property="article:modified_time" content="2020-03-20T13:57:28.274Z">
+<meta property="og:image" content="https://img-blog.csdn.net/20180915190249681?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
+<meta property="og:image" content="https://img-blog.csdn.net/2018091520415162?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
+<meta property="og:image" content="https://img-blog.csdn.net/20180915205422918?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
+<meta property="og:image" content="https://img-blog.csdn.net/20180915211531532?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
+<meta property="article:published_time" content="2019-06-11T05:28:04.000Z">
+<meta property="article:modified_time" content="2020-05-01T11:15:31.008Z">
 <meta property="article:author" content="yyguy123">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdn.net/20180915190249681?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
 
-<link rel="canonical" href="http://yyguy123.github.io/2020/03/20/Hello/">
+<link rel="canonical" href="http://yyguy123.github.io/2019/06/11/%EF%BC%88Linux%EF%BC%89%E8%BF%9C%E7%A8%8B%E6%8C%82%E8%BD%BD%E7%BD%91%E7%BB%9C%E7%A3%81%E7%9B%98%E8%AF%A6%E8%A7%A3---nfs%E5%85%B1%E4%BA%AB/">
 
 
 <script id="page-configurations">
@@ -46,7 +53,7 @@
   };
 </script>
 
-  <title>Hello | yyguy123的个人博客</title>
+  <title>（Linux）远程挂载网络磁盘详解---nfs共享 | yyguy123的个人博客</title>
   
 
 
@@ -190,7 +197,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2020/03/20/Hello/">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2019/06/11/%EF%BC%88Linux%EF%BC%89%E8%BF%9C%E7%A8%8B%E6%8C%82%E8%BD%BD%E7%BD%91%E7%BB%9C%E7%A3%81%E7%9B%98%E8%AF%A6%E8%A7%A3---nfs%E5%85%B1%E4%BA%AB/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/uploads/avatar.png">
@@ -203,7 +210,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Hello
+          （Linux）远程挂载网络磁盘详解---nfs共享
         </h1>
 
         <div class="post-meta">
@@ -213,7 +220,23 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-03-20 21:57:28" itemprop="dateCreated datePublished" datetime="2020-03-20T21:57:28+08:00">2020-03-20</time>
+              <time title="创建时间：2019-06-11 13:28:04" itemprop="dateCreated datePublished" datetime="2019-06-11T13:28:04+08:00">2019-06-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:15:31" itemprop="dateModified" datetime="2020-05-01T19:15:31+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
             </span>
 
           
@@ -227,7 +250,192 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <a id="more"></a>
+
+<h1><strong>前言</strong></h1>
+
+<hr><p>在Linux或Windows乃至其他的系统，我们经常会需要进行磁盘的挂载。通常从挂载的方式的上分为本地挂载和远程挂载。Linux的本地挂载就不介绍了，这篇文章介绍的是远程挂载网络磁盘。</p>
+
+<hr><h1> </h1>
+
+<h1><strong>远程挂载网络磁盘</strong></h1>
+
+<hr><p>实际上，这个操作与使用nfs共享一个文件的方法是相同的。思路是服务端将一块磁盘空间本地挂载到一个目录，然后通过网络使用nfs将这个目录进行共享，客户端最后将服务端共享的目录挂载到自己本地的一个目录，这样就使客户端拥有了一块网络磁盘。</p>
+
+<p>优点是:服务端的同一块磁盘可以挂载到不同的客户端，实现文件的共享；可以扩充客户端的存储空间。<br>
+缺点是：依赖网络，当网络联通失败，客户端挂载的网络磁盘会无法使用。</p>
+
+<p>做网络挂载，服务端与客户端网络要联通，最好是在同一局域网内，还要注意防火墙的设置。<br>
+ </p>
+
+<hr><h2><strong>NFS简介</strong></h2>
+
+<ul><li>
+    <p>Sun公司于1984年发布。</p>
+    </li>
+    <li>
+    <p>NFS 是一种可分散式的网络文件系统。</p>
+    </li>
+    <li>
+    <p>可以通过网络使不同的机器、不同的操作系统，能够分享资料，使客户端能通过网络访问并分享文件到位于服务端的磁盘中。</p>
+    </li>
+    <li>NFS在文件传送或信息传送过程中依赖于RPC协议。RPC负责负责信息的传输。</li>
+</ul><hr><h2> </h2>
+
+<h2><strong>服务端操作</strong></h2>
+
+<hr><p>【1】安装NFS程序</p>
+
+<p>yum -y install nfs*</p>
+
+<p>rpcbind,在centos6以前自带的yum源中为portmap。<br>
+使用yum安装nfs时会下载依赖，因此只要下载nfs即可，无需再下载rpcbind.</p>
+
+<p>【2】查看是否安装了nfs与rpcbind</p>
+
+<p>rpm -qa |grep nfs<br>
+rpm -qa |grep rpcbind<br><img alt="è¿éåå¾çæè¿°" class="has" src="https://img-blog.csdn.net/20180915190249681?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"></p>
+
+<p>【3】创建共享的目录并共享</p>
+
+<p>如要共享的目录已存在请跳过创建</p>
+
+<p>&lt;1&gt;mkdir /mnt/nfs01</p>
+
+<p>&lt;2&gt;vim /etc/exports<br>
+/mnt/nfs01 10.10.10.0/24 (rw,no_root_squash,no_all_squash,sync)<br>
+ </p>
+
+<pre class="has">
+<code class="language-bash">
+配置
+
+
+/mnt/nfs01      10.10.10.0/24    (rw,no_root_squash,no_all_squash,sync)
+
+要共享的目录     要分享给的客户端   客户端对此共享目录的权限
+
+----------
+
+
+客户端指定
+
+
+192.168.1.125           指定特定的的IP可以共享nfs目录
+
+*                       指定所有网段及ip都可以共享nfs目录
+
+192.168.1.0/24          指定子网中的所有主机都可以共享nfs目录
+
+2018fs.wxyonghe.com     指定域名的主机可以共享nfs目录
+
+----------
+
+
+权限
+
+
+rw                      可读可写     
+
+ro                      只读(还与文件系统的rwx有关)
+
+sync　　                 数据同步写入到内存与硬盘中
+
+async                   数据先暂存于内存当中，不会直接写入硬盘
+
+wdelay                  当有写操作，就会检查是否有相关的写操作，并在一起执行(默认设置)
+
+no_wdelay               当有写操作就立即执行，通常要与sync配合使用
+
+root_squash             当客户端登陆NFS的身份为root用户时，将客户端的root用户及所属组都映射为匿名用户或用户组（默认设置） 
+
+no_root_squash　　       使客户端可以使用root身份及权限来操作共享的目录
+
+all_squash              无论客户端登陆NFS的身份为何，都将映射为匿名用户
+
+no_all_squash           无论客户端登陆NFS的身份为何，都将映射为root用户（默认设置）
+
+anonuid                 将远程访问的所有用户都映射为匿名用户，并指定该用户为本地用户
+
+anongid                 将远程访问的所有用户组都映射为匿名用户组账户，并指定该匿名用户组账户为本地用户组账户
+
+secure                  使客户端只能从小于1024的tcp/ip端口连接服务端(默认设置)
+
+insecure                允许客户端从大于1024的tcp/ip端口连接服务端
+
+subtree                 当共享的目录是一个子目录，服务端会检查其父目录的权限(默认设置)
+
+no_subtree              当共享的目录是一个子目录，服务端不检查其父目录的权限
+</code></pre>
+
+<p>【4】启动nfs,rpcbind,并设为开机自启</p>
+
+<p>(centos7)<br>
+systemctl start nfs<br>
+systemctl start rpcbind<br>
+systemctl enable nfs<br>
+systemclt enable rpcbind</p>
+
+<p>(centos6)<br>
+service nfs start<br>
+service rpcbind start</p>
+
+<p>【5】查看是否共享成功</p>
+
+<p>showmount -e localhost<br><img alt="è¿éåå¾çæè¿°" class="has" src="https://img-blog.csdn.net/2018091520415162?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"></p>
+
+<p>可看到共享的目录及客户端，即为成功</p>
+
+<hr><p> </p>
+
+<h2><strong>客户端操作</strong></h2>
+
+<hr><p>【1】安装NFS程序</p>
+
+<p>yum -y install nfs*</p>
+
+<p>【2】启动nfs</p>
+
+<p>(centos7)<br>
+systemctl start nfs<br>
+systemctl start rpcbind<br>
+systemctl enable nfs<br>
+systemctl enable rpcbind</p>
+
+<p>(centos6)<br>
+service nfs start<br>
+service rpcbind start<br>
+chkconfig nfs on<br>
+chkconfig rpcbind on</p>
+
+<p>【3】创建挂载目录</p>
+
+<p>mkdir /data/nfsone</p>
+
+<p>【4】查看是否共享成功</p>
+
+<p>showmount -e nfs服务端IP</p>
+
+<p>showmount -e 10.10.20.212<br><img alt="è¿éåå¾çæè¿°" class="has" src="https://img-blog.csdn.net/20180915205422918?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"></p>
+
+<p>【5】网络挂载</p>
+
+<p>mount -t nfs -o nolock 服务端IP:共享目录绝对路径 本地挂载目录<br>
+mount -t nfs -o nolock 10.10.20.212:/mnt/nfs01 /data/nfsone</p>
+
+<p>centos7的nfs默认使用的是nfs4,所以mount -t 无需指定nfs4也可以</p>
+
+<p>【6】查看是否成功</p>
+
+<p>df -Th<br><img alt="è¿éåå¾çæè¿°" class="has" src="https://img-blog.csdn.net/20180915211531532?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"></p>
+
+<p>【7】卸载网络磁盘</p>
+
+<p>与卸载本地挂载相同</p>
+
+<p>umount /data/nfsone<br>
+或<br>
+umount 10.10.20.212:/mnt/nfs01</p>
     </div>
 
     
@@ -262,12 +470,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/03/20/Git%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E5%92%8C%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/" rel="prev" title="Git基本概念和底层原理">
-      <i class="fa fa-chevron-left"></i> Git基本概念和底层原理
+    <a href="/2019/03/19/Java%E5%AF%BC%E5%87%BACSV%E6%A0%BC%E5%BC%8F%E6%96%87%E4%BB%B6/" rel="prev" title="Java导出CSV格式文件">
+      <i class="fa fa-chevron-left"></i> Java导出CSV格式文件
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/04/07/Spring%E4%BA%8B%E5%8A%A1/" rel="next" title="Spring事务">
-      Spring事务 <i class="fa fa-chevron-right"></i>
+    <a href="/2019/11/05/Java%E9%80%9A%E8%BF%87%E5%BA%8F%E5%88%97%E5%8C%96%E5%AE%9E%E7%8E%B0%E6%B7%B1%E5%BA%A6%E5%A4%8D%E5%88%B6/" rel="next" title="Java通过序列化实现深度复制">
+      Java通过序列化实现深度复制 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -329,6 +537,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#"><span class="nav-number">2.</span> <span class="nav-text"> </span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#"><span class="nav-number">3.</span> <span class="nav-text">远程挂载网络磁盘</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">3.1.</span> <span class="nav-text">NFS简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">3.2.</span> <span class="nav-text"> </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">3.3.</span> <span class="nav-text">服务端操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">3.4.</span> <span class="nav-text">客户端操作</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -475,7 +684,7 @@ NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
       repo        : 'yyguy123.github.io',
       owner       : 'yyguy123',
       admin       : ['yyguy123'],
-      id          : '1098725a3ae830fed905ab80aba9ca69',
+      id          : '755e844bba78d9e0ebd838a76cf80395',
         language: 'zh-CN',
       distractionFreeMode: true
     });
