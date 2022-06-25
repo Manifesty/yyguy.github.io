@@ -188,6 +188,860 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2019/11/05/Java%E9%80%9A%E8%BF%87%E5%BA%8F%E5%88%97%E5%8C%96%E5%AE%9E%E7%8E%B0%E6%B7%B1%E5%BA%A6%E5%A4%8D%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/11/05/Java%E9%80%9A%E8%BF%87%E5%BA%8F%E5%88%97%E5%8C%96%E5%AE%9E%E7%8E%B0%E6%B7%B1%E5%BA%A6%E5%A4%8D%E5%88%B6/" class="post-title-link" itemprop="url">Java通过序列化实现深度复制</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-05 23:29:04" itemprop="dateCreated datePublished" datetime="2019-11-05T23:29:04+08:00">2019-11-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:03:21" itemprop="dateModified" datetime="2020-05-01T19:03:21+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Java学习笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+
+<pre class="has">
+<code class="language-java">package beanCopy;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+public class SerializeTest {
+
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+
+        Son son=new Son("qwer", "15");
+        List sons=new ArrayList&lt;Son&gt;();
+        sons.add(son);
+        Person p1=new Person("zs", "30",sons);
+
+        ByteArrayOutputStream bos=new ByteArrayOutputStream();
+        ObjectOutputStream oos=new ObjectOutputStream(bos);
+
+        oos.writeObject(p1);
+
+        ByteArrayInputStream bis=new ByteArrayInputStream(bos.toByteArray());
+        ObjectInputStream ois=new ObjectInputStream(bis);
+
+        Person p2=(Person) ois.readObject();
+
+        System.out.println(p1);
+        System.out.println(p2);
+
+
+    }
+
+}
+
+
+class Person implements Serializable{
+
+    private String name;
+
+    private String age;
+
+    private List&lt;Son&gt; sons;
+
+
+    /*@Override
+    public String toString() {
+        return "Person [name=" + name + ", age=" + age + ", sons=" + sons + "]";
+    }*/
+
+
+
+    public Person(String name, String age, List&lt;Son&gt; sons) {
+        super();
+        this.name = name;
+        this.age = age;
+        this.sons = sons;
+    }
+
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+
+
+}
+
+
+class Son implements Serializable{
+    private String name;
+
+    private String age;
+
+
+
+    /*@Override
+    public String toString() {
+        return "Son [name=" + name + ", age=" + age + "]";
+    }*/
+
+    public Son(String name, String age) {
+        super();
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+
+}</code></pre>
+
+<p>输出</p>
+
+<p><img alt class="has" height="74" src="https://img-blog.csdnimg.cn/20191105233038132.png" width="378"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2019/06/11/%EF%BC%88Linux%EF%BC%89%E8%BF%9C%E7%A8%8B%E6%8C%82%E8%BD%BD%E7%BD%91%E7%BB%9C%E7%A3%81%E7%9B%98%E8%AF%A6%E8%A7%A3---nfs%E5%85%B1%E4%BA%AB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/06/11/%EF%BC%88Linux%EF%BC%89%E8%BF%9C%E7%A8%8B%E6%8C%82%E8%BD%BD%E7%BD%91%E7%BB%9C%E7%A3%81%E7%9B%98%E8%AF%A6%E8%A7%A3---nfs%E5%85%B1%E4%BA%AB/" class="post-title-link" itemprop="url">（Linux）远程挂载网络磁盘详解---nfs共享</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-06-11 13:28:04" itemprop="dateCreated datePublished" datetime="2019-06-11T13:28:04+08:00">2019-06-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:15:31" itemprop="dateModified" datetime="2020-05-01T19:15:31+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+
+<h1><strong>前言</strong></h1>
+
+<hr><p>在Linux或Windows乃至其他的系统，我们经常会需要进行磁盘的挂载。通常从挂载的方式的上分为本地挂载和远程挂载。Linux的本地挂载就不介绍了，这篇文章介绍的是远程挂载网络磁盘。</p>
+
+<hr><h1> </h1>
+
+<h1><strong>远程挂载网络磁盘</strong></h1>
+
+<hr><p>实际上，这个操作与使用nfs共享一个文件的方法是相同的。思路是服务端将一块磁盘空间本地挂载到一个目录，然后通过网络使用nfs将这个目录进行共享，客户端最后将服务端共享的目录挂载到自己本地的一个目录，这样就使客户端拥有了一块网络磁盘。</p>
+
+<p>优点是:服务端的同一块磁盘可以挂载到不同的客户端，实现文件的共享；可以扩充客户端的存储空间。<br>
+缺点是：依赖网络，当网络联通失败，客户端挂载的网络磁盘会无法使用。</p>
+
+<p>做网络挂载，服务端与客户端网络要联通，最好是在同一局域网内，还要注意防火墙的设置。<br>
+ </p>
+
+<hr><h2><strong>NFS简介</strong></h2>
+
+<ul><li>
+    <p>Sun公司于1984年发布。</p>
+    </li>
+    <li>
+    <p>NFS 是一种可分散式的网络文件系统。</p>
+    </li>
+    <li>
+    <p>可以通过网络使不同的机器、不同的操作系统，能够分享资料，使客户端能通过网络访问并分享文件到位于服务端的磁盘中。</p>
+    </li>
+    <li>NFS在文件传送或信息传送过程中依赖于RPC协议。RPC负责负责信息的传输。</li>
+</ul><hr><h2> </h2>
+
+<h2><strong>服务端操作</strong></h2>
+
+<hr><p>【1】安装NFS程序</p>
+
+<p>yum -y install nfs*</p>
+
+<p>rpcbind,在centos6以前自带的yum源中为portmap。<br>
+使用yum安装nfs时会下载依赖，因此只要下载nfs即可，无需再下载rpcbind.</p>
+
+<p>【2】查看是否安装了nfs与rpcbind</p>
+
+<p>rpm -qa |grep nfs<br>
+rpm -qa |grep rpcbind<br><img alt="è¿éåå¾çæè¿°" class="has" src="https://img-blog.csdn.net/20180915190249681?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"></p>
+
+<p>【3】创建共享的目录并共享</p>
+
+<p>如要共享的目录已存在请跳过创建</p>
+
+<p>&lt;1&gt;mkdir /mnt/nfs01</p>
+
+<p>&lt;2&gt;vim /etc/exports<br>
+/mnt/nfs01 10.10.10.0/24 (rw,no_root_squash,no_all_squash,sync)<br>
+ </p>
+
+<pre class="has">
+<code class="language-bash">
+配置
+
+
+/mnt/nfs01      10.10.10.0/24    (rw,no_root_squash,no_all_squash,sync)
+
+要共享的目录     要分享给的客户端   客户端对此共享目录的权限
+
+----------
+
+
+客户端指定
+
+
+192.168.1.125           指定特定的的IP可以共享nfs目录
+
+*                       指定所有网段及ip都可以共享nfs目录
+
+192.168.1.0/24          指定子网中的所有主机都可以共享nfs目录
+
+2018fs.wxyonghe.com     指定域名的主机可以共享nfs目录
+
+----------
+
+
+权限
+
+
+rw                      可读可写     
+
+ro                      只读(还与文件系统的rwx有关)
+
+sync　　                 数据同步写入到内存与硬盘中
+
+async                   数据先暂存于内存当中，不会直接写入硬盘
+
+wdelay                  当有写操作，就会检查是否有相关的写操作，并在一起执行(默认设置)
+
+no_wdelay               当有写操作就立即执行，通常要与sync配合使用
+
+root_squash             当客户端登陆NFS的身份为root用户时，将客户端的root用户及所属组都映射为匿名用户或用户组（默认设置） 
+
+no_root_squash　　       使客户端可以使用root身份及权限来操作共享的目录
+
+all_squash              无论客户端登陆NFS的身份为何，都将映射为匿名用户
+
+no_all_squash           无论客户端登陆NFS的身份为何，都将映射为root用户（默认设置）
+
+anonuid                 将远程访问的所有用户都映射为匿名用户，并指定该用户为本地用户
+
+anongid                 将远程访问的所有用户组都映射为匿名用户组账户，并指定该匿名用户组账户为本地用户组账户
+
+secure                  使客户端只能从小于1024的tcp/ip端口连接服务端(默认设置)
+
+insecure                允许客户端从大于1024的tcp/ip端口连接服务端
+
+subtree                 当共享的目录是一个子目录，服务端会检查其父目录的权限(默认设置)
+
+no_subtree              当共享的目录是一个子目录，服务端不检查其父目录的权限
+</code></pre>
+
+<p>【4】启动nfs,rpcbind,并设为开机自启</p>
+
+<p>(centos7)<br>
+systemctl start nfs<br>
+systemctl start rpcbind<br>
+systemctl enable nfs<br>
+systemclt enable rpcbind</p>
+
+<p>(centos6)<br>
+service nfs start<br>
+service rpcbind start</p>
+
+<p>【5】查看是否共享成功</p>
+
+<p>showmount -e localhost<br><img alt="è¿éåå¾çæè¿°" class="has" src="https://img-blog.csdn.net/2018091520415162?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"></p>
+
+<p>可看到共享的目录及客户端，即为成功</p>
+
+<hr><p> </p>
+
+<h2><strong>客户端操作</strong></h2>
+
+<hr><p>【1】安装NFS程序</p>
+
+<p>yum -y install nfs*</p>
+
+<p>【2】启动nfs</p>
+
+<p>(centos7)<br>
+systemctl start nfs<br>
+systemctl start rpcbind<br>
+systemctl enable nfs<br>
+systemctl enable rpcbind</p>
+
+<p>(centos6)<br>
+service nfs start<br>
+service rpcbind start<br>
+chkconfig nfs on<br>
+chkconfig rpcbind on</p>
+
+<p>【3】创建挂载目录</p>
+
+<p>mkdir /data/nfsone</p>
+
+<p>【4】查看是否共享成功</p>
+
+<p>showmount -e nfs服务端IP</p>
+
+<p>showmount -e 10.10.20.212<br><img alt="è¿éåå¾çæè¿°" class="has" src="https://img-blog.csdn.net/20180915205422918?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"></p>
+
+<p>【5】网络挂载</p>
+
+<p>mount -t nfs -o nolock 服务端IP:共享目录绝对路径 本地挂载目录<br>
+mount -t nfs -o nolock 10.10.20.212:/mnt/nfs01 /data/nfsone</p>
+
+<p>centos7的nfs默认使用的是nfs4,所以mount -t 无需指定nfs4也可以</p>
+
+<p>【6】查看是否成功</p>
+
+<p>df -Th<br><img alt="è¿éåå¾çæè¿°" class="has" src="https://img-blog.csdn.net/20180915211531532?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0dYXzFfMTFfcmVhbA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70"></p>
+
+<p>【7】卸载网络磁盘</p>
+
+<p>与卸载本地挂载相同</p>
+
+<p>umount /data/nfsone<br>
+或<br>
+umount 10.10.20.212:/mnt/nfs01</p>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2019/03/19/Java%E5%AF%BC%E5%87%BACSV%E6%A0%BC%E5%BC%8F%E6%96%87%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/03/19/Java%E5%AF%BC%E5%87%BACSV%E6%A0%BC%E5%BC%8F%E6%96%87%E4%BB%B6/" class="post-title-link" itemprop="url">Java导出CSV格式文件</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-03-19 18:52:31" itemprop="dateCreated datePublished" datetime="2019-03-19T18:52:31+08:00">2019-03-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:17:33" itemprop="dateModified" datetime="2020-05-01T19:17:33+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Java学习笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+
+<p>导出csv格式文件的本质是导出以逗号为分隔的文本数据</p>
+
+<pre class="has">
+<code>import java.io.BufferedWriter;  
+import java.io.File;  
+import java.io.FileInputStream;  
+import java.io.FileNotFoundException;  
+import java.io.FileOutputStream;  
+import java.io.IOException;  
+import java.io.InputStream;  
+import java.io.OutputStream;  
+import java.io.OutputStreamWriter;  
+import java.net.URLEncoder;  
+import java.util.ArrayList;  
+import java.util.Iterator;  
+import java.util.LinkedHashMap;  
+import java.util.List;  
+import java.util.Map;  
+
+import javax.servlet.http.HttpServletResponse;  
+
+import com.alibaba.druid.util.StringUtils;
+
+
+
+/** 
+ * 文件操作 
+ */  
+public class CSVUtils {  
+
+
+    /**
+    * 功能说明：获取UTF-8编码文本文件开头的BOM签名。
+    * BOM(Byte Order Mark)，是UTF编码方案里用于标识编码的标准标记。例：接收者收到以EF BB BF开头的字节流，就知道是UTF-8编码。
+    * @return UTF-8编码文本文件开头的BOM签名
+    */
+    public static String getBOM() {
+
+         byte b[] = {(byte)0xEF, (byte)0xBB, (byte)0xBF};
+         return new String(b);
+    }
+
+
+  /** 
+   * 生成CVS文件
+   * @param exportData 
+   *       源数据List 
+   * @param map 
+   *       csv文件的列表头map 
+   * @param outPutPath 
+   *       文件路径 
+   * @param fileName 
+   *       文件名称 
+   * @return 
+      */  
+    @SuppressWarnings("rawtypes")  
+    public static File createCSVFile(List exportData, LinkedHashMap map, String outPutPath,  
+                   String fileName) {  
+
+    File csvFile = null;  
+    BufferedWriter csvFileOutputStream = null;  
+    try {  
+      File file = new File(outPutPath);  
+      if (!file.exists()) {  
+        file.mkdirs();  
+      }  
+      //定义文件名格式并创建  
+      csvFile =new File(outPutPath+fileName+".csv");
+      file.createNewFile();  
+      // UTF-8使正确读取分隔符","  
+      //如果生产文件乱码，windows下用gbk，linux用UTF-8
+      csvFileOutputStream = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(  
+        csvFile), "UTF-8"), 1024);  
+
+      //写入前段字节流，防止乱码
+      csvFileOutputStream.write(getBOM());
+      // 写入文件头部
+      for (Iterator propertyIterator = map.entrySet().iterator(); propertyIterator.hasNext();) {  
+        java.util.Map.Entry propertyEntry = (java.util.Map.Entry) propertyIterator.next();  
+        csvFileOutputStream.write((String) propertyEntry.getValue() != null ? (String) propertyEntry.getValue() : "" );  
+        if (propertyIterator.hasNext()) {  
+          csvFileOutputStream.write(",");  
+        }  
+      }  
+      csvFileOutputStream.newLine();  
+      // 写入文件内容  
+      for (Iterator iterator = exportData.iterator(); iterator.hasNext();) {  
+          Object row = (Object) iterator.next();
+        for (Iterator propertyIterator = map.entrySet().iterator(); propertyIterator  
+          .hasNext();) {  
+          java.util.Map.Entry propertyEntry = (java.util.Map.Entry) propertyIterator  
+            .next();  
+          String str=row!=null?((String)((Map)row).get( propertyEntry.getKey())):"";
+
+          if(StringUtils.isEmpty(str)){
+              str="";
+          }else{
+              str=str.replaceAll("\"","\"\"");
+              if(str.indexOf(",")&gt;=0){
+                  str="\""+str+"\"";
+              }
+          }
+          csvFileOutputStream.write(str);  
+          if (propertyIterator.hasNext()) {  
+            csvFileOutputStream.write(",");  
+          }  
+        }  
+        if (iterator.hasNext()) {  
+          csvFileOutputStream.newLine();  
+        }  
+      }  
+      csvFileOutputStream.flush();  
+    } catch (Exception e) {  
+      e.printStackTrace();  
+    } finally {  
+      try {  
+        csvFileOutputStream.close();  
+      } catch (IOException e) {  
+        e.printStackTrace();  
+      }  
+    }  
+    return csvFile;  
+  }  
+
+  /**
+   *     生成并下载csv文件
+   * @param response
+   * @param exportData
+   * @param map
+   * @param outPutPath
+   * @param fileName
+   * @throws IOException
+      */
+    @SuppressWarnings("rawtypes")
+    public static void exportDataFile(HttpServletResponse response,List exportData, LinkedHashMap map, String outPutPath,String fileName) throws IOException{
+      File csvFile = null;  
+        BufferedWriter csvFileOutputStream = null;  
+        try {  
+          File file = new File(outPutPath);  
+          if (!file.exists()) {  
+            file.mkdirs();  
+          }  
+          //定义文件名格式并创建  
+          csvFile =new File(outPutPath+fileName+".csv");
+          if(csvFile.exists()){
+             csvFile.delete(); 
+          }
+          csvFile.createNewFile();  
+          // UTF-8使正确读取分隔符","  
+          //如果生产文件乱码，windows下用gbk，linux用UTF-8
+          csvFileOutputStream = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(csvFile), "UTF-8"), 1024);  
+          //写入前段字节流，防止乱码
+          csvFileOutputStream.write(getBOM());
+          // 写入文件头部  
+          for (Iterator propertyIterator = map.entrySet().iterator(); propertyIterator.hasNext();) {  
+            java.util.Map.Entry propertyEntry = (java.util.Map.Entry) propertyIterator.next();  
+            csvFileOutputStream.write((String) propertyEntry.getValue() != null ? (String) propertyEntry.getValue() : "" );  
+            if (propertyIterator.hasNext()) {  
+              csvFileOutputStream.write(",");  
+            }  
+          }  
+          csvFileOutputStream.newLine();  
+          // 写入文件内容  
+          for (Iterator iterator = exportData.iterator(); iterator.hasNext();) {  
+            Object row = (Object) iterator.next();  
+            for (Iterator propertyIterator = map.entrySet().iterator(); propertyIterator  
+              .hasNext();) {  
+              java.util.Map.Entry propertyEntry = (java.util.Map.Entry) propertyIterator  
+                .next();  
+              String str=row!=null?((String)((Map)row).get( propertyEntry.getKey())):"";
+              if(StringUtils.isEmpty(str)){
+                  str="";
+              }else{
+                  str=str.replaceAll("\"","\"\"");
+                  if(str.indexOf(",")&gt;=0){
+                      str="\""+str+"\"";
+                  }
+              }
+              csvFileOutputStream.write(str);  
+              if (propertyIterator.hasNext()) {  
+                csvFileOutputStream.write(",");  
+              }  
+            }  
+            if (iterator.hasNext()) {  
+              csvFileOutputStream.newLine();  
+            }  
+          }  
+          csvFileOutputStream.flush();  
+        } catch (Exception e) {  
+          e.printStackTrace();  
+        } finally {  
+          try {  
+            csvFileOutputStream.close();  
+          } catch (IOException e) {  
+            e.printStackTrace();  
+          }  
+        }  
+
+
+
+
+        InputStream in = null;  
+        try {  
+          in = new FileInputStream(outPutPath+fileName+".csv");  
+          int len = 0;  
+          byte[] buffer = new byte[1024];  
+
+          OutputStream out = response.getOutputStream(); 
+          response.reset(); 
+
+          response.setContentType("application/csv;charset=UTF-8");  
+          response.setHeader("Content-Disposition","attachment; filename=" + URLEncoder.encode(fileName+".csv", "UTF-8"));  
+          response.setCharacterEncoding("UTF-8"); 
+          while ((len = in.read(buffer)) &gt; 0) {  
+            out.write(new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF });  
+            out.write(buffer, 0, len);  
+          }
+          out.close();
+        } catch (FileNotFoundException e) {  
+        } finally {  
+          if (in != null) {  
+            try {  
+              in.close();  
+            } catch (Exception e) {  
+              throw new RuntimeException(e);  
+            }  
+          }  
+        }
+
+
+  }
+
+  /** 
+   * 删除该目录filePath下的所有文件 
+   * @param filePath 
+   *      文件目录路径 
+      */  
+    public static void deleteFiles(String filePath) {  
+
+    File file = new File(filePath);  
+    if (file.exists()) {  
+      File[] files = file.listFiles();  
+      for (int i = 0; i &lt; files.length; i++) {  
+        if (files[i].isFile()) {  
+          files[i].delete();  
+        }  
+      }  
+    }  
+  }  
+
+  /** 
+   * 删除单个文件 
+   * @param filePath 
+   *     文件目录路径 
+   * @param fileName 
+   *     文件名称 
+      */  
+    public static void deleteFile(String filePath, String fileName) {  
+
+    File file = new File(filePath);  
+    if (file.exists()) {  
+      File[] files = file.listFiles();  
+      for (int i = 0; i &lt; files.length; i++) {  
+        if (files[i].isFile()) {  
+          if (files[i].getName().equals(fileName)) {  
+            files[i].delete();  
+            return;  
+          }  
+        }  
+      }  
+    }  
+  }  
+
+  /** 
+   * 测试数据 
+   * @param args 
+      */  
+    @SuppressWarnings({ "rawtypes", "unchecked" })  
+    public static void main(String[] args) {  
+
+    List exportData = new ArrayList&lt;Map&gt;();  
+    Map row1 = new LinkedHashMap&lt;String, String&gt;();  
+    row1.put("1", "11");  
+    row1.put("2", "12");  
+    row1.put("3", "13");  
+    row1.put("4", "14");  
+    exportData.add(row1);  
+    row1 = new LinkedHashMap&lt;String, String&gt;();  
+    row1.put("1", "21");  
+    row1.put("2", "22");  
+    row1.put("3", "23");  
+    row1.put("4", "24");  
+    exportData.add(row1);  
+    LinkedHashMap map = new LinkedHashMap();  
+
+    //设置列名
+    map.put("1", "第一列名称");  
+    map.put("2", "第二列名称");  
+    map.put("3", "第三列名称");  
+    map.put("4", "第四列名称");  
+    //这个文件上传到路径，可以配置在数据库从数据库读取，这样方便一些！
+    String path = "E:/";  
+
+   //文件名=生产的文件名称+时间戳
+    String fileName = "文件导出";  
+    File file = CSVUtils.createCSVFile(exportData, map, path, fileName);  
+    String fileName2 = file.getName();  
+    System.out.println("文件名称：" + fileName2);  
+  }  
+}</code></pre>
+
+<p><img alt class="has" src="https://images2018.cnblogs.com/blog/1443172/201808/1443172-20180813231232388-1283590677.png"></p>
+
+<p>转自<a href="https://www.cnblogs.com/hanfengyeqiao/p/9471694.html" target="_blank" rel="external nofollow noopener noreferrer">https://www.cnblogs.com/hanfengyeqiao/p/9471694.html</a></p>
+
+<p> </p>
+
+<p>需要注意的是生成的csv其中的数字若过长，csv中查看没有问题，但是用excel打开数字就会变成科学计数法 </p>
+
+<p>解决方法是在生成csv的时候,在数字的前面或后面加上"\t"制表符，再用excel打开问题解决！如 “1234567890\ t”,“\ t1213212312”</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2018/11/22/Redis%E7%AC%94%E8%AE%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -709,7 +1563,7 @@ Master接到命令启动后台的存盘进程，同时收集所有接收到的�
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">24</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

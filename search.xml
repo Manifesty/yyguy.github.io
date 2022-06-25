@@ -1,6 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>一些问题</title>
+    <url>/2022/06/25/%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/</url>
+    <content><![CDATA[<p>同步和异步、阻塞和非阻塞<br>    同步和异步关注的是消息通信机制，<br>    所谓同步，就是在发出调用时没得到结果前该调用就不返回，一旦调用返回就得到返回值<br>    异步：调用发出后就直接返回，没有返回结果；一个异步调用发出后，调用者不会立刻得到结果，被调用者通过状态、通知来通知调用者或者通过回调函数处理这个调用</p>
+<pre><code>阻塞和非阻塞关注的是程序在等待调用结果时的状态
+阻塞调用是指调用结果返回之前，当前线程会被挂起，调用线程只有在得到结果之后才会返回
+非阻塞调用是指在不能立刻得到结果之前，该调用不会阻塞当前线程
+这里阻塞非阻塞和是否同步异步无关</code></pre><p>​<br>NIO由原来的阻塞读写变成了单线程轮询事件，找到可读写的网络描述符进行读写，除了事件轮询是阻塞的，剩余都是纯cpu操作，没必要开启多线程，解决了线程切换问题<br>​    事件分发器，单线程选择就绪事件<br>​    IO处理器，conect\read\write等纯CPU操作，一般开启cpu核心个线程数<br>​    业务线程<br>​    </p>
+<p>反射：通过类限定名获取到字节码，将字节码中方法、变量、构造函数映射为对应的Method\Filed\Constructor等类<br>    getMethods获取public的方法（包括父类）<br>    getDeclaredMethods获取当前类声明的所有方法<br>    getDeclaredMethods从缓存或JVM中获取该class声明的方法列表，searchMethods方法从返回的方法列表找到一个匹配名称和参数的方法对象，找到就copy一份返回，每次调用getDeclaredMethods返回的都是新对象；先从reflectionDate中获取declaredMethods，为空就到JVM获取并赋值给reflectionDate</p>
+<pre><code>Class.forName 会初始化static块
+ClassLoader.loadClass不会执行静态块
+
+JDK动态代理Porxy  InvocationHandler  接口、实现类、代理类    代理类中有实现类的引用 </code></pre><p>cglib动态代理基于asm框架 无反射机制 不需要接口  空间换时间</p>
+<p>常见线程池参数：<br>    corePoolSize：核心线程数         corePoolSize = tasks/taskTime<br>    queueCapacity:任务队列容量         queueCapacity = corePoolSize/taskTime  *  respTime<br>    maxPoolSize：最大线程数<br>    keepAliveTIme：线程空闲时间<br>    allowCoreThreadTimeout:是否允许核心线程空闲退出  默认false</p>
+<p>常见tomcat参数：<br>内存：<br>    -server  :服务器模式<br>    -Xms    ：java虚拟机初始化最小内存<br>    -Xmx    ：java虚拟机可用最大内存<br>    -Xss    ：每个java线程堆栈大小<br>    -XX:NewSize    :堆区域新生代内存默认大小<br>    -XX:MaxNewSize    :堆区域新生代内存最大可分配大小<br>    -XX:PermSize    :内存永久保留区域<br>    -XX:MaxPermSize    :内存最大永久保留区域<br>    -XX:+UseParNewGC    :对新生代采用多线程并行回收<br>    -XX:BiasedLocking    ：优化线程</p>
+<p>并发：<br>    minSpareThreads:初始化时创建的socket连接数<br>    maxSpareThreads:最大空闲socket连接数<br>    maxThreads：客户请求最大线程数<br>    acceptAccount：监听端口队列最大数<br>    enableLookups：是否反查域名  设为false<br>    disableUploadTimeout：是否使用上传超时机制<br>    connectionUploadTimeout：上传超时时间<br>    keepAliveTimeout: 长连接最大保持时间<br>    URIEncoding：指定tomcat容器URL编码格式<br>    connectionTimeout：网络连接超时</p>
+<p>工厂模式、策略模式、代理模式、单例模式、装饰类模式</p>
+<p>代理：<br>    代理类和目标类实现同一接口，代理类持有目标类引用<br>策略：<br>    配置类配置多种策略类，策略类实现同一接口，context环境类取策略类处理<br>装饰类：<br>    装饰类持有目标类引用，目标类作为参数传入装饰类得到增强<br>单例：<br>    实例化bean后，只暴露一个获取bean的方法<br>工厂：<br>    大量产品需要创建且具有共同接口时使用，一般使用静态工厂</p>
+<p>Spring的IOC、AOP<br>IOC：控制反转，将创建对象的控制权交给IOC容器，由主动创建变为被动接收；<br>DI：依赖注入，外部容器动态将依赖对象注入到组件中<br>    注入方式：构造、set、接口注入</p>
+<p>bean实例化的几种方式：有参构造、无参构造、静态工厂、实例工厂<br>bean的生命周期：spring容器创建对象、执行init方法、调用自己方法、spring容器关闭时执行destory方法<br>spring加载流程：listener加载配置文件，读取信息到context，context按需动态创建、注入bean,</p>
+<p>Spring事务传播机制：<br>    required（默认）：当前无事务就新建一个事务，有就加入那个事务<br>    supports：支持当前事务，若当前无事务就以非事务运行<br>    mandatory：使用当前事务，没有事务抛出异常<br>    requires_new：新建事务，若当前存在事务，把当前事务挂起<br>    not_supported：以非事务运行，存在事务则把当前事务挂起<br>    never：以非事务运行，存在事务则抛异常<br>    nested：存在事务就嵌套在事务内运行，没有则跟required一样</p>
+<p>实验：ServiceA中调用serviceB中的方法，在不同传播机制下的表现（以下异常都为插入后进行by/zero运算）<br>                    ServiceA                    ServiceB                            场景<br>Transaction            required                    required                            A、B共用一个事务，有一个异常全部回滚<br>                    required                    requires_new                        B异常AB都回滚，A异常A回滚B提交<br>                    required                    supports                            AB异常都全部回滚<br>                    required                    mandatory                            AB异常都全部回滚<br>                    required                    not_supported                        AB异常都会导致A回滚、B提交<br>                    required                    never                                运行时会抛出存在事务异常<br>                    required                    nested                                AB异常都全部回滚</p>
+<pre><code>never/not_supported            required/requires_new/nested        A异常AB都提交，B异常A提交B回滚</code></pre><p>nested和required的区别：required是合并为一个事务，B抛异常就算被A捕获也都会回滚；nested嵌套事务，B异常被A捕获A可以插入B回滚    </p>
+<p>spring的事务超时=事务开始时到最后一个statement创建时间 + 最后一个statement执行超时时间<br>isolation事务隔离级别<br>数据库事务隔离级别：Oracle只支持已提交读和串行化，MySQL支持四种：未提交读，已提交读，可重复读，串行化。<br>若spring+oracle，配置隔离级别为Read UnCommited/Repeatable，不起效果。</p>
+<p>系统之间交互时事务超时问题：可以不使用事务包裹交互时的操作，将交互前后的数据库操作拆成两个事务<br>并发时事务问题：使用Synchronized修饰的方法也被@Transactional修饰时，可能出现代码执行完了锁被释放但事务正要提交时其他线程进入读取到数据库的数据然后操作，<br>但是之后前一个线程操作提交了，当前线程的操作都是基于旧数据会有问题。</p>
+<p>SpringMVC工作流程：<br>    1、用户发送请求到前端控制器DispatcherServlet<br>    2、DispatcherServlet收到请求调用HandlerMapping处理器映射器<br>    3、处理器映射器找到具体处理器（根据xml配置、注解等方式），生成处理器对象及处理器拦截器（如果有则生成）返回给DispatcherServlet<br>    4、DispatcherServlet调用HandlerAdapter处理器适配器<br>    5、HandlerAdapter经过适配调用具体处理器（Controller）<br>    6、Controller执行完返回ModelAndView<br>    7、HandlerAdapter将Controller执行结果ModelAndView返回给DispatcherServlet<br>    8、DispatcherServlet将ModelAndView传给ViewResolver视图解析器<br>    9、ViewResolver解析后返回具体view<br>    10、DispatcherServlet根据view进行渲染视图（将模型数据填充至视图）<br>    11、DispatcherServlet响应用户</p>
+<p>Java8新特性<br>    1、Lambda表达式，增加函数式接口概念（），在可以使用Lambda表达式的地方，方法声明时必须包含一个函数式接口，任何函数式接口都可被Lambda表达式替换。如Comparator<br>    2、新的日期API，原API非线程安全、时区处理麻烦；新的java.time包涵盖了所有处理日期的操作<br>    3、optional，不用显式进行空值检测<br>    4、构造器和方法引用<br>    5、接口新增默认方法<br>    6、Stream流式操作</p>
+<p>​    </p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Zookeeper</title>
+    <url>/2022/06/25/Zookeeper/</url>
+    <content><![CDATA[<p>Zookeeper=�ļ�ϵͳ+����֪ͨ����</p>
+<p>�ļ�ϵͳ�� �ڵ���Դ洢����  1M<br>����֪ͨ���ƣ� �ͻ���ע������ڵ㣬�ڵ㷢���仯���ڵ����ݸı䡢��ɾ������Ŀ¼�ڵ����Ӻ�ɾ����ʱ��Zookeeper��֪ͨ�ͻ���</p>
+<p>zookeeper�������ݽڵ�</p>
+<p>persistent–�־û��ڵ�<br>  �ͻ�����zookeeper�Ͽ����Ӻ� �ýڵ���Ȼ����<br>persitent_sequential �־�����ڵ�<br>  �ͻ�����zookeeper�Ͽ����Ӻ󣬸ýڵ����ɴ��ڣ�ֻ��zookeeper���ýڵ����ƽ���˳����<br>ephemeral–��ʱ�ڵ�<br>  �ͻ�����zookeeper�Ͽ����Ӻ� �ýڵ㱻ɾ��<br>ephemeral_sequential ��ʱ����ڵ�<br>  �ͻ�����zookeeper�Ͽ����Ӻ� �ýڵ㱻ɾ�� ֻ��zookeeper���ýڵ����ƽ���˳����</p>
+<p>������ʱ�ڵ㼴��ʵ�ֲַ�ʽ��   ��ռ��<br>��ʼ–&gt;������ʱ�ڵ�/lock –&gt; ����ʧ�������/lock�ڵ㲢�ȴ�;�����ɹ����ȡ����ִ�����߼�Ȼ��ɾ��/lock���ͷ��������¼��ͻᱻ���������ٴγ��Դ�����ʱ�ڵ�;<br>����Ĳ���ɾ���ڵ��ͬʱ��֪ͨ���пͻ���<br>��ʹ����ʱ����ڵ��Ż���   ʱ����<br>��ʼ–&gt;��/locks�´�����ʱ����ڵ�–&gt;��ȡ/locks�������ӽڵ�–&gt;���ӽڵ㰴����С��������–&gt;��ǰ�ڵ�����Ƿ���С��<br>�������������������Լ����С1�Ľڵ��ɾ���¼�;�����ȡ����ִ�����߼���ɾ���ڵ��ͷ��������¼��ͻᱻ���������ظ�����ȡ/locks�������ӽڵ㡣��������ϵ�в�����</p>
+<p>zookeeper��Ϊ�ֲ�ʽ������ȱ�㣺<br>  �ŵ㣺��������ʱʱ���ͷ������ɿ��Ը�<br>  ȱ�㣺�����Ե�  ��ΪҪƵ������ɾ���ڵ�</p>
+<h5 id="Zookeeperѡ��ͶƱ����"><a href="#Zookeeperѡ��ͶƱ����" class="headerlink" title="Zookeeperѡ��ͶƱ����"></a>Zookeeperѡ��ͶƱ����</h5><ol>
+<li>ֻ�������˵�zk�ڵ���ܲ���ͶƱ</li>
+<li>ÿ��zk��������ʱ������һ�ֶ��Լ���ͶƱ</li>
+<li>leader��ɫ�����������������������������ͶƱ������zk��Ⱥ�ڵ������һ�룬���̱�Ϊleader</li>
+<li>ͶƱ������Ҫ������myid���-Ȩ��</li>
+</ol>
+<p>���̣�</p>
+<ol>
+<li>����zk21������ͶƱ����Ⱥ��ֻ��zk21����1ƱͶ���Լ�</li>
+<li>����zk22������ͶƱ���Լ�Ͷ���Լ���zk21Ͷ���Լ���ͨ��myid������1Ʊ����2Ʊ</li>
+<li>����zk23���Լ�Ͷ�Լ���ͨ��myid���� zk21��zk22Ͷ��zk23����3Ʊ��Ʊ���������Ϊleader</li>
+<li>����zk24���Ѵ���leader ֻ��Ϊfollower</li>
+<li>����zk25���Ѵ���leader ֻ��Ϊfollower</li>
+</ol>
+<p>��������leader���أ� myidȨ�� + ����˳��</p>
+<p>����ѡ�٣��ȱȽ�zxid������ID���ٱȽ�myid��Ʊ�����뼰����Ϊleader</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>xxl-job</title>
+    <url>/2022/06/25/xxl-job/</url>
+    <content><![CDATA[<p>ԭ����ʱ����������ȱ�ݣ�<br> 1����֧�ַ�Ƭ���񣺴�����������ʱ���������Ƭִ����������ͬ����<br> 2����֧����������ͳһ��������������������¹رա���������<br> 3����֧�ּ�Ⱥ�����������ظ�ִ������<br> 4����֧��ʧ�����ԣ������쳣�������սᡢ���ܸ�������״̬������������ִ��<br> 5����֧�ֶ�̬�����������������������޸��������<br> 6���ޱ������ƣ�����ʧ�ܺ�û�б�������<br> 7����������ͳ������ͳ�ƣ�������������ʱ����������ִ������޷���Ч��ͳ��ִ�����</p>
+<p>xxl-job<br>   ����������������ͨѶ<br>   ִ������ͨѶ</p>
+<p>����ģʽһ��ѡbeanģʽ  ����GLUE��ֱ��ʹ�õ�ǰ��������Ϊִ�������������Դ����ȥִ��</p>
+<p>��Ƭ����<br>   ·�ɲ���ѡ��Ƭ�㲥����������������ȡ����ʶ���Լ�Ҫ����ִ��</p>
+<p>ִ�����Զ�ע�������������ֶ�¼�벻�������������ˣ��ֶ�¼��Ҫ����ѡ��·�ɲ��ԣ�����·�ɲ���Ϊ ��һ�� ʱ���ֶ�¼��ĵ�һ̨�������������ִ��ʧ��</p>
+<p>appName��ͬΪͬһ��ִ������</p>
+<p>Ϊ������������ͬʱ��������ͨ��mysql������ʵ�ֲַ�ʽ����for update��䣩<br>admin������<br>    ��ѯ�Զ�ע���ִ�������Ƴ�90s��ûע��ģ�ÿ30s���һ��<br>    ʧ�������⣬���ݶ�Ӧ���ý��и澯�����Բ���</p>
+<p>XxljobDynamicScheduler��ʼ��ʱ��<br>  JobRegistryMonitor.getInstance.start();//��������ע���ػ��߳�  ά�ֺ�ִ�����������<br>  JobFaileMonitorHelper.getInstance.start();//����ʧ�ܴ������ػ��߳�<br>  NetComServerFactory.putService(Admin.class,XxljobDynamicScheduler.adminBiz);//��ʼ�����ص������ķ���<br>  NetComServerFactory.setAccessToken(accessToken);<br>  initI18n();//���ʻ�</p>
+<p>1��JobRegistryMonitor.getInstance.start();<br>   ����һ�������̣߳�ÿ30s��ѵ���ݿ⣬���ĳ��ִ������ע���ź��ڽ�90sû��д�����ݿ��xxl_job_qrtz_trigger_registry����ô����������Ϊ��ִ����������<br>��������ݿ��xxl_job_qrtz_trigger_group��ʹÿ��ִ������ֻ�������ŵ�ִ�����������ִ�������������������ֵġ�ÿ��ִ�����鶼��һ��Ψһ��appName��<br>ִ�������������ע��ʱ����ͨ�����appName��־�����������ĸ�ִ������</p>
+<p>2��JobFaileMonitorHelper.getInstance.start();<br>   ÿ��10sִ��һ���߼������ݿ��xxl_job_qrtz_trigger_log�����ÿ������ÿ�ε�ִ�м�¼���������¼������ִ��״̬����ĳ������״̬��Ϊ500��<br>��ô����ִ�м�¼����ʧ�ܸ��յġ���ôʧ���ػ��߳̾ͻ������������executorFailRetryCount��ʧ�����Դ�����ǰ����������ʱ���ã��Ƿ����0��������0��<br>�᳢����ִ����������񣬲���Ӧ�������ݿ����ִ����־��executorFailRetryCountֵ��һ����󷢳�ʧ�ܸ澯��</p>
+<p>3����ʼ�����ص������ĵķ���Mapһ��accessTokenֵ����������ʵ����HashMap�������������<br>4�����ʻ���֧����Ӣ��</p>
+<p>��δ�����<br>timewheelʱ���� ������Map&lt;Integer,List&gt;<br>�����㷨��<br>JobScheduleHelper<br> scheduleThread��ѭ�� ��������for update���л�ȡ������ʸ����� ���õ���now 5s�ڵ������б����ݣ�scheduleList ���������������<br> forѭ������scheduleList����<br> 1����ǰ���񴥷�ʱ�䳬ʱ5s���ϣ�������һ�δ���ʱ��+5s &lt; now����ֱ��������ִ�У�����trigger_next_time<br> 2����������һ�δ���ʱ��&lt; now &lt;= ��һ�δ���ʱ��+5s�����߳�ִ�д����߼�����������һ�δ���ʱ����5s�ڣ�<br> ��ŵ�ʱ�����ڣ�Map&lt;Integer,List&gt;����(0-59)=&gt;����id�б�����������trigger_next_time<br> 3����now &lt;= ������һ�δ���ʱ�䣩���Դ���ʱ����������60ȡģֱ�ӷŵ�ʱ�����ڣ�����trigger_next_time</p>
+<p> ringData�Ĵ����߼��ڵڶ����ػ��߳�ringThread��<br>  ringThread��ѭ�� ȡ��ǰ�����̶Ⱥ�ǰһ���̶ȣ���ringData�л�ȡҪִ�е�����</p>
+<p>������scheduleThread����ringThread��������������ȵĶ���JobTriggerPoolHelper�������������̳߳�fastTriggerPool��slowTriggerPool<br>�����̳߳ظ��룬���Ϊfast��slow��1���Ӵ������������ʱ��500ms����10�Σ��ô��������ж�Ϊ�������������Զ���������slow�̳߳أ�����ľ������̣߳����ϵͳ�ȶ���<br>triggerPool.execute{<br>  …<br>  XxlJobTrigger.trigger —-&gt; processTrigger—&gt; runExecutor –&gt; XxljobScheduler.getExecutorBiz�����executorBiz��XxlRpcReference.getObject()��ȡ���Ĵ�����<br>  executorBiz.run �˴�ִ�еľ���XxlRpcReference��invoke���� ����Զ�̵���<br>  …<br>  }</p>
+<p>ִ������<br>    XxlJobExecutorApplication –&gt; XxlJobSpringExecutor(����adminAddressΪ�������ĵ�ַ) ʵ����ApplicationContextAware������������Ϣ–&gt; start<br>–&gt; ���ñ���˽�з���ȡ��JobHandlerʵ���࣬�ٵ���registJobHandler(name,handler)����ע��  ά����һ��Map –&gt;���ø���start���� �󲿷�ҵ���߼��ڴ˴���<br>–&gt; ��־��������ʼ������adminBizList�ֶ��з���XxlRpcReferenceBean���صĴ����ࡢ������־������������ص������̡߳�����XxlRpcProviderFactory</p>
+<p>XxlRpcProviderFactory ���Է���Rpc���÷����ṩ�˵Ĺ����࣬������һ����netty��ΪͨѶģ�ͣ�hessian��Ϊ���л���ʽ�ģ�ExecutorServiceRegistry��Ϊע���߼�<br>ʵ����ķ����ṩ�ˣ�����������������һ������ExecutorBiz�����������ʵ����ΪExecutorBizImpl ����start���ִ�����˵ķ���¶�� ExecutorServiceRegistry<br>������start ��30s�ļ���͵������Ľ�������֪ͨ��Ȼ�����server��start���� ��ʱserverΪNettyHttpServer<br>��������ṹ������netty�����˸����� ChannelHandler��NettyHttpServerHandler ����˽�з���process ���������xxlRpcProviderFactory��invokeService�������<br>����ʵ�ֵķ������</p>
+<p>ExecutorBizImpl<br>XxlJobExecutor�ڲ����и���jobIdΪkey��ִ�����������߳�Ϊvalue���ֶ�jobThreadRepository����������ȥ���Ի�ȡ��ǰ����ִ�����������̣߳�<br>����о͸����������õ�����ģʽ���д��������û������ִ�д�������̣߳��͵���XxlJobExecutor.registJobThread����һ���̣߳���������������͸��������<br>�Ǵ�jobThreadRepository��ȡ����Ҳ�������´������߳�  JobThread��run�������triggerQueue��poll������Ȼ����֮ǰ���õ�handler����execute�������ò�����<br>idleTimes�ֶν����������ת�Ĵ������ƣ�����ִ�����������������¶ExecutorBiz���񣬽��������������TriggerParam����JobThread�߳�������������õ�ҵ��<br>handler��ִ��</p>
+<p>��ѯ�����ܰ��������ܳ��������Դ<br>Ȩ�أ��ɰ��������ܷ�������<br>һ����hash�������ռ䰴˳ʱ�뷽����֯��Բ���ϵĵ��0��2��32�η���������������ʹ��hash���й�ϣ�������ѡ������IP����������ȷ���������ڹ�ϣ����λ�ã���<br>����keyʹ����ͬ��hash�������ϣֵ���Ӵ�λ��˳ʱ���һ̨�����ķ�����������ö�λ���ķ�������ʹ������ڵ����������б���⡣<br>ʵ��Ӧ��ͨ��������ڵ�����Ϊ32��������  TreeMap<br>LRU���������ʹ�ã���̭�ʱ��δ��ʹ�õ�    �����һ�α�ʹ�õ��������ȵ�ʱ�䳤��<br>LFU�����ٷ����㷨����̭һ��ʱ���ڷ��ʴ������ٵ�  ��һ��ʱ����ڱ�ʹ�õ�Ƶ��</p>
+]]></content>
+  </entry>
+  <entry>
     <title>Sql优化</title>
     <url>/2022/06/25/Sql%E4%BC%98%E5%8C%96/</url>
     <content><![CDATA[<p>数据库sql优化：<br>    1、避免全表扫描，应考虑在where和order by后的字段建立索引<br>    2、尽量避免在where子句中对字段进行null值判断，否则会放弃索引使用全表扫描<br>    3、尽量避免在where子句使用！= 或 &lt;&gt; 否则会放弃索引使用全表扫描<br>    4、尽量避免在where子句使用or来连接，否则会放弃索引使用全表扫描，可使用union all<br>    5、in和not in要慎用，否则会放弃索引使用全表扫描，连续的值推荐使用between<br>    6、通配符（%）不要放在索引字段词首，否则会放弃索引使用全表扫描<br>    7、尽量避免在where子句对字段进行函数操作。否则会放弃索引使用全表扫描<br>    8、尽量避免在where子句对字段进行表达式操作，否则会放弃索引使用全表扫描<br>    9、不要在where子句“=”左边进行函数或其他运算，否则可能会导致系统无法正确使用索引<br>    10、若使用索引字段为条件，且该索引为复合索引，那么必须使用到该索引中第一个字段作为索引条件时才能保证系统使用该索引，并应尽可能让字段顺序与索引顺序一致<br>    11、并非所有索引都对查询有效，当索引列有大量数据重复时，sql可能不会去利用索引<br>    12、索引不是越多越好，提高select效率，降低了insert、update效率，因为insert/update可能会重建索引，一个表索引最好不超过6个<br>    13、一般char比varchar2效率高，但varchar2更节省空间，在节省很多空间情况下varchar2效率更高；含中文字符用nchar/nvarchar2,纯英文和数字用char/varchar2<br>    14、尽可能使用varchar代替char，节省空间<br>    15、不要使用select * from  t，解析时会将<em>转化为列名，降低效率<br>    16、避免频繁创建删除临时表<br>    17、避免大事务操作<br>    18、尽量避免向客户端返回大数据量<br>    19、新建临时表数据量量很大时采用select into代替create table 避免大量log<br>    20、多表查询时数据量少的表放在后面，因为oracle解析器按照从右到左的顺序处理from后的表名<br>    21、一般count（一个索引字段）&gt;count（</em>）&gt;count（一个非索引字段）<br>    22、IN和EXISTS<br>        IN：子查询先产生结果集  select * form tableA where x in (select y from tableB); 适合tableB记录少，tableA记录多且有索引的情况<br>        EXISTS：先主查询    select * from tableA where exists(select * from tableB b where b.id=a.id) 适合tableA记录少，tableB记录多且有索引的情况<br>    23、decode：避免重复扫描相同记录<br>        decode(k ,v1, v2 ,v3): 当k值为v1时返回v2 否则返回v3<br>        decode(k,v1,v2,v3,v4): 当k值为v1时返回v2，为v3时返回v4<br>    24、高效删除重复记录： delete from emp e where e.rowid &gt; (select min(m.rowid) from emp m where m.emp_no=e.emp_no);</p>

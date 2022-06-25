@@ -23,19 +23,19 @@
     var CONFIG = {"hostname":"yyguy123.github.io","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Kafka：    一个分布式的基于 发布&#x2F;订阅 模式的消息队列  主要用于大数据实时处理领域 使用消息队列的好处：    1、解耦，允许独立扩展和修改两边的处理过程    2、可恢复性，系统一部分组件失效时不会影响到整个系统    3、缓冲，优化数据流经过系统的速度    4、削峰 运用场景：    1、异步处理：        例如用户注册后需发注册邮件和注册短信，传统作法有串行和并行两种，串">
+  <meta name="description" content="Zookeeper&#x3D;�ļ�ϵͳ+����֪ͨ���� �ļ�ϵͳ�� �ڵ���Դ洢����  1M����֪ͨ���ƣ� �ͻ���ע������ڵ㣬�ڵ㷢���仯���ڵ����ݸı䡢��ɾ������Ŀ¼�ڵ����Ӻ�ɾ����ʱ��Zookeeper��֪ͨ�ͻ��� zookeeper�������ݽڵ� persistent–�־û��ڵ�  �ͻ�����zookeeper�Ͽ��">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Kafka">
-<meta property="og:url" content="http://yyguy123.github.io/2022/06/25/Kafka/index.html">
+<meta property="og:title" content="Zookeeper">
+<meta property="og:url" content="http://yyguy123.github.io/2022/06/25/Zookeeper/index.html">
 <meta property="og:site_name" content="yyguy123的个人博客">
-<meta property="og:description" content="Kafka：    一个分布式的基于 发布&#x2F;订阅 模式的消息队列  主要用于大数据实时处理领域 使用消息队列的好处：    1、解耦，允许独立扩展和修改两边的处理过程    2、可恢复性，系统一部分组件失效时不会影响到整个系统    3、缓冲，优化数据流经过系统的速度    4、削峰 运用场景：    1、异步处理：        例如用户注册后需发注册邮件和注册短信，传统作法有串行和并行两种，串">
+<meta property="og:description" content="Zookeeper&#x3D;�ļ�ϵͳ+����֪ͨ���� �ļ�ϵͳ�� �ڵ���Դ洢����  1M����֪ͨ���ƣ� �ͻ���ע������ڵ㣬�ڵ㷢���仯���ڵ����ݸı䡢��ɾ������Ŀ¼�ڵ����Ӻ�ɾ����ʱ��Zookeeper��֪ͨ�ͻ��� zookeeper�������ݽڵ� persistent–�־û��ڵ�  �ͻ�����zookeeper�Ͽ��">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-06-25T10:33:33.676Z">
-<meta property="article:modified_time" content="2022-03-14T07:19:02.643Z">
+<meta property="article:published_time" content="2022-06-25T11:10:37.033Z">
+<meta property="article:modified_time" content="2022-06-25T11:09:47.951Z">
 <meta property="article:author" content="yyguy123">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://yyguy123.github.io/2022/06/25/Kafka/">
+<link rel="canonical" href="http://yyguy123.github.io/2022/06/25/Zookeeper/">
 
 
 <script id="page-configurations">
@@ -48,7 +48,7 @@
   };
 </script>
 
-  <title>Kafka | yyguy123的个人博客</title>
+  <title>Zookeeper | yyguy123的个人博客</title>
   
 
 
@@ -192,7 +192,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2022/06/25/Kafka/">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2022/06/25/Zookeeper/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/uploads/avatar.png">
@@ -205,7 +205,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Kafka
+          Zookeeper
         </h1>
 
         <div class="post-meta">
@@ -215,14 +215,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-06-25 18:33:33" itemprop="dateCreated datePublished" datetime="2022-06-25T18:33:33+08:00">2022-06-25</time>
+              <time title="创建时间：2022-06-25 19:10:37" itemprop="dateCreated datePublished" datetime="2022-06-25T19:10:37+08:00">2022-06-25</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-14 15:19:02" itemprop="dateModified" datetime="2022-03-14T15:19:02+08:00">2022-03-14</time>
+                <time title="修改时间：2022-06-25 19:09:47" itemprop="dateModified" datetime="2022-06-25T19:09:47+08:00">2022-06-25</time>
               </span>
 
           
@@ -236,34 +236,28 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>Kafka：<br>    一个分布式的基于 发布/订阅 模式的消息队列  主要用于大数据实时处理领域</p>
-<p>使用消息队列的好处：<br>    1、解耦，允许独立扩展和修改两边的处理过程<br>    2、可恢复性，系统一部分组件失效时不会影响到整个系统<br>    3、缓冲，优化数据流经过系统的速度<br>    4、削峰</p>
-<p>运用场景：<br>    1、异步处理：<br>        例如用户注册后需发注册邮件和注册短信，传统作法有串行和并行两种，串行：注册信息入库后发送注册邮件、注册短信后返回给用户；并行：信息入库后并行发送邮件和短信，成功后返回。使用消息队列后：信息入库后邮件、短信信息写入消息队列后直接返回。<br>    2、应用解耦：<br>        例如用户下单后订单系统调用库存系统接口，假如库存系统无法访问就会导致下单失败；使用消息队列：订单系统持久化信息后写入消息队列返回下单成功，库存系统拉取消息扣减库存。<br>    3、流量削峰：<br>        例如秒杀活动，服务器收到请求后写入消息队列，秒杀业务根据队列中信息做后续处理<br>    4、日志处理：<br>        日志采集客户端写入kafka队列，日志处理应用消费队列中数据<br>    5、消息通讯：<br>        点对点通讯：A、B使用同一队列 聊天室：多个客户端订阅同一主题；</p>
-<p>消息队列的两种模式：<br>    1、点对点模式（一对一，消费者主动拉取数据，消息收到后消息清除）<br>    2、发布/订阅模式（消费者消费数据后不会清除数据）</p>
-<p>一个kafka集群中有多个broker（每台机器一个broker），一个broker中多个topic，一个topic中有多个分区partition，每个partition可有多个副本，副本必须分布在不同机器否则无意义，副本中有一个leader，其他为follower；只对leader进行读写，follower只是备份；</p>
-<p>消息存储：逻辑上每个partition分为多个segment，每个segment中有存储文件索引的index文件和存储数据的log文件。物理表现为每个partition都有一个文件夹，其中有各个分区的log和index文件，命名规则为当前文件首条消息的offset；</p>
-<p>如何定位到指定offset的消息：通过二分法查找到小于等于指定offset的最大offset文件，用 N=（指定offse - 此文件offset）即可找到指定offset消息的索引，即在此index索引文件中第N条消息在log数据文件中的偏移量，从对应log文件中此偏移量位置开始读取，<br>消息结构包含offset和消息大小，所以可以确定读到哪里截止。</p>
-<p>producer生产消息存放：<br>    1、指定partition、key、value，存到指定分区<br>    2、指定key、value，通过key的hash值与topic的partition取余存到对应分区<br>    3、指定value，第一次调用随机生成一个整数（后续递增），将此值与partition取余得到对应分区，即轮询</p>
-<p>数据可靠性保证：topic每个partition收到producer发送的数据后，都需向producer发送ack，若没收到会重新发送</p>
-<p>何时发送ack?<br>    确保有follower和leader同步完成，leader再发送ack，这样才能保证leader挂掉后能在follower中选出新的leader<br>多少个follower同步完成后发送ack？<br>    方案1、半数以上完成。优点：延迟低  缺点：选举leader时，容忍n台机器故障需要2n+1个副本<br>    方案2、全部完成同步。优点：选举新leader时，容忍n台故障需要n+1个副本  缺点：延迟高<br>Kafka选择了第二种，因为：<br>    1、同样为了容忍n台节点故障，方案1需要多出n个副本，而kafka每个分区都有大量数据，方案一会造成大量数据冗余<br>    2、网络延迟对kafka影响较小</p>
-<p>ISR<br>    方案2当有一个follower因某种故障迟迟不能与leader同步那么leader就会一直等下去，直到同步才会发送ack。怎么解决这个问题？<br>    leader维护了一个动态的in-sync-replica set（ISR），意为和leader保持同步的follower集合，当ISR中follower完成数据同步后leader就会发送ack，若有follower迟迟不能同步，则将该follower踢出ISR，该事件阀值由replica.lag.time.max.ms参数设定，leader故障就会从ISR选举新leader</p>
-<p>ack应答机制（可靠性级别）<br>    0：producer不等待broker的ack，broker一接收到没落盘就返回。beoker故障可能数据丢失。<br>    1：等待ack，leader落盘成功后返回ack，若在follower同步成功前leader故障会导致数据丢失。<br>    -1：等待ack，leader和follower全部落盘成功才返回。若在follower同步后，broker发送ack之前，leader故障会导致数据重复。</p>
-<p>Log文件中的LEO和HW<br>    LEO：log end offse，每个副本最后一个offset<br>    HW：high watermark，所有副本中最小的LEO，消费者能见到的最大offset</p>
-<p>1、follower故障<br>    故障后会被临时踢出ISR，待该follower恢复后。会读取磁盘上次记录的HW，将高于HW部分截掉，从HW开始向leader同步，等该follower的LEO大于等于该partition的HW，及即follower追上leader后，重新加入ISR</p>
-<p>2、leader故障<br>    leader故障后会从ISR选出新的leader，为保证多个副本数据一致性，其余follower会先将各自log文件高于HW部分截掉，然后从新的leader同步数据<br>    （只能保证副本间数据一致性，不保证数据不丢失或不重复）</p>
-<p>Exactly Once语义<br>    Ack级别设为,-1,保证不会丢失数据，即At Least Once<br>    Ack级别设为0，保证生产者只发送一次，即At Most Once<br>    Kafka0.11版本之前不能保证既不重复也不丢失，0.11后增加幂等性，At Least Once + 幂等性 = Exactly Once<br>启用幂等性只需将producer参数中enable.idompotence设为true即可，开启后producer会在初始化时分配一个PID，发往同一partition的消息会带上sequence Number，而Broker端会对&lt;PID,Partition,SeqNumber&gt;缓存，当相同主键消息提交时broker只会持久化一条</p>
-<p>消费者：<br>    消费方式：Kafka采用pull拉模式从broker中读取数据<br>    push推模式很难适应消费速率不同的消费者，因为发送速率由broker决定<br>    pull模式缺点是无数据时也会循环取空数据；针对这点Kafka在消费时会传入一个timeout参数，无数据时会等上timeout的时间再返回。</p>
-<p>消费者分区分配：<br>    1、Range（默认）：假如有10个分区0-9 3个消费者C1 C2 C3 则C1：0,1,2,3 C2:4,5,6 C3:7,8,9<br>        基于主题，同一个消费者组哪些成员指定了相同的主题则由这些成员去消费该主题分区。如有一个主题分区为0-6这7个分区，同组两个消费者B、D消费该主题，则B被分配0-3这4个分区，D被分配4-6这三个。<br>        当同组多个消费者消费主题相同且数量较多时，可能会导致B消费20个，D消费15个，消费不平衡。<br>    2、RoundRobin: 轮询  3个消费者C0 C1 C2 集群中三个主题t0,t1,t2 这三个主题分别有1、2、3个分区，即t0p0,t1p0,t1p1,t2p0,t2p1,t2p2这6个分区<br>        C0订阅主题t0，消费者C1订阅了主题t0和t1，C2订阅了t0 t1 t2<br>        C0：t0p0     C1:t1p0     C2:t1p1、t2p0、t2p1、t2p2</p>
-<pre><code>3、Sticky：黏性分区  1、轮询  2、最优配置 3、分配尽可能和上次分配的保持相同
-    C0：t0p0     C1:t1p0、t1p1    C2:t2p0、t2p1、t2p2</code></pre><p>Rebalance触发时机:<br>    1、组成员个数发生变化<br>    2、订阅topic个数发生变化<br>    3、订阅topic的分区数发生变化</p>
-<p>消费者offset维护：<br>    0.9之前默认将offset保存在Zookeeper中，0.9之后默认将offset保存在Kafka一个内置的topic中_consumer_offsets<br>    消费者组G+主题T+分区P来确定offset</p>
-<p>reset：若存在已提交的offset，不管设置为earliest或者latest都会从已提交的offset处开始消费；若不存在已提交的offset，earliest表示从头开始消费，latest表示消费最新数据。<br>none:topic各分区都存在已提交的offset时从offset开始消费，只要有一个分区不存在已提交的offset抛出异常</p>
-<p>Kafka事务<br>    Producer事务：PID和Transaction ID绑定，producer重启后可通过Transaction ID获取原来的PID；Transaction Coordinator会将事务状态保存到Kafka的一个内部topic</p>
-<pre><code>Consumer事务：
-事务机制主要从Producer方面考虑，对于Consumer而言无法保证commit的信息被精确消费，由于Consumer可通过offset访问任意信息，而且不同Segment File生命周期不同，同一事务消息可能出现重启后被删除的情况</code></pre><p>Kafka API<br>    Producer发送消息：异步发送，main线程将消息发送给RecordAccumulator，Sender线程不断从中拉取消息发送到Kafka broker<br>    batch.size：数据累积到batch.size后sender才会发送数据<br>    linger.ms：如果数据迟迟未达到batch.size,sender等待linger.ms之后就会发送数据。</p>
-<p>自定义分区 Partition</p>
-<p>自定义存储offset：ConsumerRebalanceListener<br>    自动提交/手动提交可能会导致漏消费数据/重复消费数据，可自定义存储offset</p>
-<p>自定义拦截器  ProducerInterceptor</p>
+        <p>Zookeeper=�ļ�ϵͳ+����֪ͨ����</p>
+<p>�ļ�ϵͳ�� �ڵ���Դ洢����  1M<br>����֪ͨ���ƣ� �ͻ���ע������ڵ㣬�ڵ㷢���仯���ڵ����ݸı䡢��ɾ������Ŀ¼�ڵ����Ӻ�ɾ����ʱ��Zookeeper��֪ͨ�ͻ���</p>
+<p>zookeeper�������ݽڵ�</p>
+<p>persistent–�־û��ڵ�<br>  �ͻ�����zookeeper�Ͽ����Ӻ� �ýڵ���Ȼ����<br>persitent_sequential �־�����ڵ�<br>  �ͻ�����zookeeper�Ͽ����Ӻ󣬸ýڵ����ɴ��ڣ�ֻ��zookeeper���ýڵ����ƽ���˳����<br>ephemeral–��ʱ�ڵ�<br>  �ͻ�����zookeeper�Ͽ����Ӻ� �ýڵ㱻ɾ��<br>ephemeral_sequential ��ʱ����ڵ�<br>  �ͻ�����zookeeper�Ͽ����Ӻ� �ýڵ㱻ɾ�� ֻ��zookeeper���ýڵ����ƽ���˳����</p>
+<p>������ʱ�ڵ㼴��ʵ�ֲַ�ʽ��   ��ռ��<br>��ʼ–&gt;������ʱ�ڵ�/lock –&gt; ����ʧ�������/lock�ڵ㲢�ȴ�;�����ɹ����ȡ����ִ�����߼�Ȼ��ɾ��/lock���ͷ��������¼��ͻᱻ���������ٴγ��Դ�����ʱ�ڵ�;<br>����Ĳ���ɾ���ڵ��ͬʱ��֪ͨ���пͻ���<br>��ʹ����ʱ����ڵ��Ż���   ʱ����<br>��ʼ–&gt;��/locks�´�����ʱ����ڵ�–&gt;��ȡ/locks�������ӽڵ�–&gt;���ӽڵ㰴����С��������–&gt;��ǰ�ڵ�����Ƿ���С��<br>�������������������Լ����С1�Ľڵ��ɾ���¼�;�����ȡ����ִ�����߼���ɾ���ڵ��ͷ��������¼��ͻᱻ���������ظ�����ȡ/locks�������ӽڵ㡣��������ϵ�в�����</p>
+<p>zookeeper��Ϊ�ֲ�ʽ������ȱ�㣺<br>  �ŵ㣺��������ʱʱ���ͷ������ɿ��Ը�<br>  ȱ�㣺�����Ե�  ��ΪҪƵ������ɾ���ڵ�</p>
+<h5 id="Zookeeperѡ��ͶƱ����"><a href="#Zookeeperѡ��ͶƱ����" class="headerlink" title="Zookeeperѡ��ͶƱ����"></a>Zookeeperѡ��ͶƱ����</h5><ol>
+<li>ֻ�������˵�zk�ڵ���ܲ���ͶƱ</li>
+<li>ÿ��zk��������ʱ������һ�ֶ��Լ���ͶƱ</li>
+<li>leader��ɫ�����������������������������ͶƱ������zk��Ⱥ�ڵ������һ�룬���̱�Ϊleader</li>
+<li>ͶƱ������Ҫ������myid���-Ȩ��</li>
+</ol>
+<p>���̣�</p>
+<ol>
+<li>����zk21������ͶƱ����Ⱥ��ֻ��zk21����1ƱͶ���Լ�</li>
+<li>����zk22������ͶƱ���Լ�Ͷ���Լ���zk21Ͷ���Լ���ͨ��myid������1Ʊ����2Ʊ</li>
+<li>����zk23���Լ�Ͷ�Լ���ͨ��myid���� zk21��zk22Ͷ��zk23����3Ʊ��Ʊ���������Ϊleader</li>
+<li>����zk24���Ѵ���leader ֻ��Ϊfollower</li>
+<li>����zk25���Ѵ���leader ֻ��Ϊfollower</li>
+</ol>
+<p>��������leader���أ� myidȨ�� + ����˳��</p>
+<p>����ѡ�٣��ȱȽ�zxid������ID���ٱȽ�myid��Ʊ�����뼰����Ϊleader</p>
 
     </div>
 
@@ -299,12 +293,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2022/06/25/JVM/" rel="prev" title="JVM">
-      <i class="fa fa-chevron-left"></i> JVM
+    <a href="/2022/06/25/xxl-job/" rel="prev" title="xxl-job">
+      <i class="fa fa-chevron-left"></i> xxl-job
     </a></div>
       <div class="post-nav-item">
-    <a href="/2022/06/25/Mysql%E7%B4%A2%E5%BC%95/" rel="next" title="Mysql索引">
-      Mysql索引 <i class="fa fa-chevron-right"></i>
+    <a href="/2022/06/25/%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/" rel="next" title="一些问题">
+      一些问题 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -366,6 +360,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#Zookeeperѡ��ͶƱ����"><span class="nav-number">1.</span> <span class="nav-text">Zookeeperѡ��ͶƱ����</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -512,7 +507,7 @@ NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
       repo        : 'yyguy123.github.io',
       owner       : 'yyguy123',
       admin       : ['yyguy123'],
-      id          : 'fe4efc04f6aba8351b2ae94db4258fa6',
+      id          : '39b5c51de93ad31edc3574380cae5cae',
         language: 'zh-CN',
       distractionFreeMode: true
     });

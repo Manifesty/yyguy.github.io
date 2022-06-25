@@ -188,6 +188,263 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2022/06/25/%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/25/%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/" class="post-title-link" itemprop="url">一些问题</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-25 19:10:37" itemprop="dateCreated datePublished" datetime="2022-06-25T19:10:37+08:00">2022-06-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-25 19:09:35" itemprop="dateModified" datetime="2022-06-25T19:09:35+08:00">2022-06-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>同步和异步、阻塞和非阻塞<br>    同步和异步关注的是消息通信机制，<br>    所谓同步，就是在发出调用时没得到结果前该调用就不返回，一旦调用返回就得到返回值<br>    异步：调用发出后就直接返回，没有返回结果；一个异步调用发出后，调用者不会立刻得到结果，被调用者通过状态、通知来通知调用者或者通过回调函数处理这个调用</p>
+<pre><code>阻塞和非阻塞关注的是程序在等待调用结果时的状态
+阻塞调用是指调用结果返回之前，当前线程会被挂起，调用线程只有在得到结果之后才会返回
+非阻塞调用是指在不能立刻得到结果之前，该调用不会阻塞当前线程
+这里阻塞非阻塞和是否同步异步无关</code></pre><p>​<br>NIO由原来的阻塞读写变成了单线程轮询事件，找到可读写的网络描述符进行读写，除了事件轮询是阻塞的，剩余都是纯cpu操作，没必要开启多线程，解决了线程切换问题<br>​    事件分发器，单线程选择就绪事件<br>​    IO处理器，conect\read\write等纯CPU操作，一般开启cpu核心个线程数<br>​    业务线程<br>​    </p>
+<p>反射：通过类限定名获取到字节码，将字节码中方法、变量、构造函数映射为对应的Method\Filed\Constructor等类<br>    getMethods获取public的方法（包括父类）<br>    getDeclaredMethods获取当前类声明的所有方法<br>    getDeclaredMethods从缓存或JVM中获取该class声明的方法列表，searchMethods方法从返回的方法列表找到一个匹配名称和参数的方法对象，找到就copy一份返回，每次调用getDeclaredMethods返回的都是新对象；先从reflectionDate中获取declaredMethods，为空就到JVM获取并赋值给reflectionDate</p>
+<pre><code>Class.forName 会初始化static块
+ClassLoader.loadClass不会执行静态块
+
+JDK动态代理Porxy  InvocationHandler  接口、实现类、代理类    代理类中有实现类的引用 </code></pre><p>cglib动态代理基于asm框架 无反射机制 不需要接口  空间换时间</p>
+<p>常见线程池参数：<br>    corePoolSize：核心线程数         corePoolSize = tasks/taskTime<br>    queueCapacity:任务队列容量         queueCapacity = corePoolSize/taskTime  *  respTime<br>    maxPoolSize：最大线程数<br>    keepAliveTIme：线程空闲时间<br>    allowCoreThreadTimeout:是否允许核心线程空闲退出  默认false</p>
+<p>常见tomcat参数：<br>内存：<br>    -server  :服务器模式<br>    -Xms    ：java虚拟机初始化最小内存<br>    -Xmx    ：java虚拟机可用最大内存<br>    -Xss    ：每个java线程堆栈大小<br>    -XX:NewSize    :堆区域新生代内存默认大小<br>    -XX:MaxNewSize    :堆区域新生代内存最大可分配大小<br>    -XX:PermSize    :内存永久保留区域<br>    -XX:MaxPermSize    :内存最大永久保留区域<br>    -XX:+UseParNewGC    :对新生代采用多线程并行回收<br>    -XX:BiasedLocking    ：优化线程</p>
+<p>并发：<br>    minSpareThreads:初始化时创建的socket连接数<br>    maxSpareThreads:最大空闲socket连接数<br>    maxThreads：客户请求最大线程数<br>    acceptAccount：监听端口队列最大数<br>    enableLookups：是否反查域名  设为false<br>    disableUploadTimeout：是否使用上传超时机制<br>    connectionUploadTimeout：上传超时时间<br>    keepAliveTimeout: 长连接最大保持时间<br>    URIEncoding：指定tomcat容器URL编码格式<br>    connectionTimeout：网络连接超时</p>
+<p>工厂模式、策略模式、代理模式、单例模式、装饰类模式</p>
+<p>代理：<br>    代理类和目标类实现同一接口，代理类持有目标类引用<br>策略：<br>    配置类配置多种策略类，策略类实现同一接口，context环境类取策略类处理<br>装饰类：<br>    装饰类持有目标类引用，目标类作为参数传入装饰类得到增强<br>单例：<br>    实例化bean后，只暴露一个获取bean的方法<br>工厂：<br>    大量产品需要创建且具有共同接口时使用，一般使用静态工厂</p>
+<p>Spring的IOC、AOP<br>IOC：控制反转，将创建对象的控制权交给IOC容器，由主动创建变为被动接收；<br>DI：依赖注入，外部容器动态将依赖对象注入到组件中<br>    注入方式：构造、set、接口注入</p>
+<p>bean实例化的几种方式：有参构造、无参构造、静态工厂、实例工厂<br>bean的生命周期：spring容器创建对象、执行init方法、调用自己方法、spring容器关闭时执行destory方法<br>spring加载流程：listener加载配置文件，读取信息到context，context按需动态创建、注入bean,</p>
+<p>Spring事务传播机制：<br>    required（默认）：当前无事务就新建一个事务，有就加入那个事务<br>    supports：支持当前事务，若当前无事务就以非事务运行<br>    mandatory：使用当前事务，没有事务抛出异常<br>    requires_new：新建事务，若当前存在事务，把当前事务挂起<br>    not_supported：以非事务运行，存在事务则把当前事务挂起<br>    never：以非事务运行，存在事务则抛异常<br>    nested：存在事务就嵌套在事务内运行，没有则跟required一样</p>
+<p>实验：ServiceA中调用serviceB中的方法，在不同传播机制下的表现（以下异常都为插入后进行by/zero运算）<br>                    ServiceA                    ServiceB                            场景<br>Transaction            required                    required                            A、B共用一个事务，有一个异常全部回滚<br>                    required                    requires_new                        B异常AB都回滚，A异常A回滚B提交<br>                    required                    supports                            AB异常都全部回滚<br>                    required                    mandatory                            AB异常都全部回滚<br>                    required                    not_supported                        AB异常都会导致A回滚、B提交<br>                    required                    never                                运行时会抛出存在事务异常<br>                    required                    nested                                AB异常都全部回滚</p>
+<pre><code>never/not_supported            required/requires_new/nested        A异常AB都提交，B异常A提交B回滚</code></pre><p>nested和required的区别：required是合并为一个事务，B抛异常就算被A捕获也都会回滚；nested嵌套事务，B异常被A捕获A可以插入B回滚    </p>
+<p>spring的事务超时=事务开始时到最后一个statement创建时间 + 最后一个statement执行超时时间<br>isolation事务隔离级别<br>数据库事务隔离级别：Oracle只支持已提交读和串行化，MySQL支持四种：未提交读，已提交读，可重复读，串行化。<br>若spring+oracle，配置隔离级别为Read UnCommited/Repeatable，不起效果。</p>
+<p>系统之间交互时事务超时问题：可以不使用事务包裹交互时的操作，将交互前后的数据库操作拆成两个事务<br>并发时事务问题：使用Synchronized修饰的方法也被@Transactional修饰时，可能出现代码执行完了锁被释放但事务正要提交时其他线程进入读取到数据库的数据然后操作，<br>但是之后前一个线程操作提交了，当前线程的操作都是基于旧数据会有问题。</p>
+<p>SpringMVC工作流程：<br>    1、用户发送请求到前端控制器DispatcherServlet<br>    2、DispatcherServlet收到请求调用HandlerMapping处理器映射器<br>    3、处理器映射器找到具体处理器（根据xml配置、注解等方式），生成处理器对象及处理器拦截器（如果有则生成）返回给DispatcherServlet<br>    4、DispatcherServlet调用HandlerAdapter处理器适配器<br>    5、HandlerAdapter经过适配调用具体处理器（Controller）<br>    6、Controller执行完返回ModelAndView<br>    7、HandlerAdapter将Controller执行结果ModelAndView返回给DispatcherServlet<br>    8、DispatcherServlet将ModelAndView传给ViewResolver视图解析器<br>    9、ViewResolver解析后返回具体view<br>    10、DispatcherServlet根据view进行渲染视图（将模型数据填充至视图）<br>    11、DispatcherServlet响应用户</p>
+<p>Java8新特性<br>    1、Lambda表达式，增加函数式接口概念（），在可以使用Lambda表达式的地方，方法声明时必须包含一个函数式接口，任何函数式接口都可被Lambda表达式替换。如Comparator<br>    2、新的日期API，原API非线程安全、时区处理麻烦；新的java.time包涵盖了所有处理日期的操作<br>    3、optional，不用显式进行空值检测<br>    4、构造器和方法引用<br>    5、接口新增默认方法<br>    6、Stream流式操作</p>
+<p>​    </p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2022/06/25/Zookeeper/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/25/Zookeeper/" class="post-title-link" itemprop="url">Zookeeper</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-25 19:10:37" itemprop="dateCreated datePublished" datetime="2022-06-25T19:10:37+08:00">2022-06-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-25 19:09:47" itemprop="dateModified" datetime="2022-06-25T19:09:47+08:00">2022-06-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Zookeeper=�ļ�ϵͳ+����֪ͨ����</p>
+<p>�ļ�ϵͳ�� �ڵ���Դ洢����  1M<br>����֪ͨ���ƣ� �ͻ���ע������ڵ㣬�ڵ㷢���仯���ڵ����ݸı䡢��ɾ������Ŀ¼�ڵ����Ӻ�ɾ����ʱ��Zookeeper��֪ͨ�ͻ���</p>
+<p>zookeeper�������ݽڵ�</p>
+<p>persistent–�־û��ڵ�<br>  �ͻ�����zookeeper�Ͽ����Ӻ� �ýڵ���Ȼ����<br>persitent_sequential �־�����ڵ�<br>  �ͻ�����zookeeper�Ͽ����Ӻ󣬸ýڵ����ɴ��ڣ�ֻ��zookeeper���ýڵ����ƽ���˳����<br>ephemeral–��ʱ�ڵ�<br>  �ͻ�����zookeeper�Ͽ����Ӻ� �ýڵ㱻ɾ��<br>ephemeral_sequential ��ʱ����ڵ�<br>  �ͻ�����zookeeper�Ͽ����Ӻ� �ýڵ㱻ɾ�� ֻ��zookeeper���ýڵ����ƽ���˳����</p>
+<p>������ʱ�ڵ㼴��ʵ�ֲַ�ʽ��   ��ռ��<br>��ʼ–&gt;������ʱ�ڵ�/lock –&gt; ����ʧ�������/lock�ڵ㲢�ȴ�;�����ɹ����ȡ����ִ�����߼�Ȼ��ɾ��/lock���ͷ��������¼��ͻᱻ���������ٴγ��Դ�����ʱ�ڵ�;<br>����Ĳ���ɾ���ڵ��ͬʱ��֪ͨ���пͻ���<br>��ʹ����ʱ����ڵ��Ż���   ʱ����<br>��ʼ–&gt;��/locks�´�����ʱ����ڵ�–&gt;��ȡ/locks�������ӽڵ�–&gt;���ӽڵ㰴����С��������–&gt;��ǰ�ڵ�����Ƿ���С��<br>�������������������Լ����С1�Ľڵ��ɾ���¼�;�����ȡ����ִ�����߼���ɾ���ڵ��ͷ��������¼��ͻᱻ���������ظ�����ȡ/locks�������ӽڵ㡣��������ϵ�в�����</p>
+<p>zookeeper��Ϊ�ֲ�ʽ������ȱ�㣺<br>  �ŵ㣺��������ʱʱ���ͷ������ɿ��Ը�<br>  ȱ�㣺�����Ե�  ��ΪҪƵ������ɾ���ڵ�</p>
+<h5 id="Zookeeperѡ��ͶƱ����"><a href="#Zookeeperѡ��ͶƱ����" class="headerlink" title="Zookeeperѡ��ͶƱ����"></a>Zookeeperѡ��ͶƱ����</h5><ol>
+<li>ֻ�������˵�zk�ڵ���ܲ���ͶƱ</li>
+<li>ÿ��zk��������ʱ������һ�ֶ��Լ���ͶƱ</li>
+<li>leader��ɫ�����������������������������ͶƱ������zk��Ⱥ�ڵ������һ�룬���̱�Ϊleader</li>
+<li>ͶƱ������Ҫ������myid���-Ȩ��</li>
+</ol>
+<p>���̣�</p>
+<ol>
+<li>����zk21������ͶƱ����Ⱥ��ֻ��zk21����1ƱͶ���Լ�</li>
+<li>����zk22������ͶƱ���Լ�Ͷ���Լ���zk21Ͷ���Լ���ͨ��myid������1Ʊ����2Ʊ</li>
+<li>����zk23���Լ�Ͷ�Լ���ͨ��myid���� zk21��zk22Ͷ��zk23����3Ʊ��Ʊ���������Ϊleader</li>
+<li>����zk24���Ѵ���leader ֻ��Ϊfollower</li>
+<li>����zk25���Ѵ���leader ֻ��Ϊfollower</li>
+</ol>
+<p>��������leader���أ� myidȨ�� + ����˳��</p>
+<p>����ѡ�٣��ȱȽ�zxid������ID���ٱȽ�myid��Ʊ�����뼰����Ϊleader</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2022/06/25/xxl-job/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/25/xxl-job/" class="post-title-link" itemprop="url">xxl-job</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-25 19:10:37" itemprop="dateCreated datePublished" datetime="2022-06-25T19:10:37+08:00">2022-06-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-06-25 19:09:59" itemprop="dateModified" datetime="2022-06-25T19:09:59+08:00">2022-06-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>ԭ����ʱ����������ȱ�ݣ�<br> 1����֧�ַ�Ƭ���񣺴�����������ʱ���������Ƭִ����������ͬ����<br> 2����֧����������ͳһ��������������������¹رա���������<br> 3����֧�ּ�Ⱥ�����������ظ�ִ������<br> 4����֧��ʧ�����ԣ������쳣�������սᡢ���ܸ�������״̬������������ִ��<br> 5����֧�ֶ�̬�����������������������޸��������<br> 6���ޱ������ƣ�����ʧ�ܺ�û�б�������<br> 7����������ͳ������ͳ�ƣ�������������ʱ����������ִ������޷���Ч��ͳ��ִ�����</p>
+<p>xxl-job<br>   ����������������ͨѶ<br>   ִ������ͨѶ</p>
+<p>����ģʽһ��ѡbeanģʽ  ����GLUE��ֱ��ʹ�õ�ǰ��������Ϊִ�������������Դ����ȥִ��</p>
+<p>��Ƭ����<br>   ·�ɲ���ѡ��Ƭ�㲥����������������ȡ����ʶ���Լ�Ҫ����ִ��</p>
+<p>ִ�����Զ�ע�������������ֶ�¼�벻�������������ˣ��ֶ�¼��Ҫ����ѡ��·�ɲ��ԣ�����·�ɲ���Ϊ ��һ�� ʱ���ֶ�¼��ĵ�һ̨�������������ִ��ʧ��</p>
+<p>appName��ͬΪͬһ��ִ������</p>
+<p>Ϊ������������ͬʱ��������ͨ��mysql������ʵ�ֲַ�ʽ����for update��䣩<br>admin������<br>    ��ѯ�Զ�ע���ִ�������Ƴ�90s��ûע��ģ�ÿ30s���һ��<br>    ʧ�������⣬���ݶ�Ӧ���ý��и澯�����Բ���</p>
+<p>XxljobDynamicScheduler��ʼ��ʱ��<br>  JobRegistryMonitor.getInstance.start();//��������ע���ػ��߳�  ά�ֺ�ִ�����������<br>  JobFaileMonitorHelper.getInstance.start();//����ʧ�ܴ������ػ��߳�<br>  NetComServerFactory.putService(Admin.class,XxljobDynamicScheduler.adminBiz);//��ʼ�����ص������ķ���<br>  NetComServerFactory.setAccessToken(accessToken);<br>  initI18n();//���ʻ�</p>
+<p>1��JobRegistryMonitor.getInstance.start();<br>   ����һ�������̣߳�ÿ30s��ѵ���ݿ⣬���ĳ��ִ������ע���ź��ڽ�90sû��д�����ݿ��xxl_job_qrtz_trigger_registry����ô����������Ϊ��ִ����������<br>��������ݿ��xxl_job_qrtz_trigger_group��ʹÿ��ִ������ֻ�������ŵ�ִ�����������ִ�������������������ֵġ�ÿ��ִ�����鶼��һ��Ψһ��appName��<br>ִ�������������ע��ʱ����ͨ�����appName��־�����������ĸ�ִ������</p>
+<p>2��JobFaileMonitorHelper.getInstance.start();<br>   ÿ��10sִ��һ���߼������ݿ��xxl_job_qrtz_trigger_log�����ÿ������ÿ�ε�ִ�м�¼���������¼������ִ��״̬����ĳ������״̬��Ϊ500��<br>��ô����ִ�м�¼����ʧ�ܸ��յġ���ôʧ���ػ��߳̾ͻ������������executorFailRetryCount��ʧ�����Դ�����ǰ����������ʱ���ã��Ƿ����0��������0��<br>�᳢����ִ����������񣬲���Ӧ�������ݿ����ִ����־��executorFailRetryCountֵ��һ����󷢳�ʧ�ܸ澯��</p>
+<p>3����ʼ�����ص������ĵķ���Mapһ��accessTokenֵ����������ʵ����HashMap�������������<br>4�����ʻ���֧����Ӣ��</p>
+<p>��δ�����<br>timewheelʱ���� ������Map&lt;Integer,List&gt;<br>�����㷨��<br>JobScheduleHelper<br> scheduleThread��ѭ�� ��������for update���л�ȡ������ʸ����� ���õ���now 5s�ڵ������б����ݣ�scheduleList ���������������<br> forѭ������scheduleList����<br> 1����ǰ���񴥷�ʱ�䳬ʱ5s���ϣ�������һ�δ���ʱ��+5s &lt; now����ֱ��������ִ�У�����trigger_next_time<br> 2����������һ�δ���ʱ��&lt; now &lt;= ��һ�δ���ʱ��+5s�����߳�ִ�д����߼�����������һ�δ���ʱ����5s�ڣ�<br> ��ŵ�ʱ�����ڣ�Map&lt;Integer,List&gt;����(0-59)=&gt;����id�б�����������trigger_next_time<br> 3����now &lt;= ������һ�δ���ʱ�䣩���Դ���ʱ����������60ȡģֱ�ӷŵ�ʱ�����ڣ�����trigger_next_time</p>
+<p> ringData�Ĵ����߼��ڵڶ����ػ��߳�ringThread��<br>  ringThread��ѭ�� ȡ��ǰ�����̶Ⱥ�ǰһ���̶ȣ���ringData�л�ȡҪִ�е�����</p>
+<p>������scheduleThread����ringThread��������������ȵĶ���JobTriggerPoolHelper�������������̳߳�fastTriggerPool��slowTriggerPool<br>�����̳߳ظ��룬���Ϊfast��slow��1���Ӵ������������ʱ��500ms����10�Σ��ô��������ж�Ϊ�������������Զ���������slow�̳߳أ�����ľ������̣߳����ϵͳ�ȶ���<br>triggerPool.execute{<br>  …<br>  XxlJobTrigger.trigger —-&gt; processTrigger—&gt; runExecutor –&gt; XxljobScheduler.getExecutorBiz�����executorBiz��XxlRpcReference.getObject()��ȡ���Ĵ�����<br>  executorBiz.run �˴�ִ�еľ���XxlRpcReference��invoke���� ����Զ�̵���<br>  …<br>  }</p>
+<p>ִ������<br>    XxlJobExecutorApplication –&gt; XxlJobSpringExecutor(����adminAddressΪ�������ĵ�ַ) ʵ����ApplicationContextAware������������Ϣ–&gt; start<br>–&gt; ���ñ���˽�з���ȡ��JobHandlerʵ���࣬�ٵ���registJobHandler(name,handler)����ע��  ά����һ��Map –&gt;���ø���start���� �󲿷�ҵ���߼��ڴ˴���<br>–&gt; ��־��������ʼ������adminBizList�ֶ��з���XxlRpcReferenceBean���صĴ����ࡢ������־������������ص������̡߳�����XxlRpcProviderFactory</p>
+<p>XxlRpcProviderFactory ���Է���Rpc���÷����ṩ�˵Ĺ����࣬������һ����netty��ΪͨѶģ�ͣ�hessian��Ϊ���л���ʽ�ģ�ExecutorServiceRegistry��Ϊע���߼�<br>ʵ����ķ����ṩ�ˣ�����������������һ������ExecutorBiz�����������ʵ����ΪExecutorBizImpl ����start���ִ�����˵ķ���¶�� ExecutorServiceRegistry<br>������start ��30s�ļ���͵������Ľ�������֪ͨ��Ȼ�����server��start���� ��ʱserverΪNettyHttpServer<br>��������ṹ������netty�����˸����� ChannelHandler��NettyHttpServerHandler ����˽�з���process ���������xxlRpcProviderFactory��invokeService�������<br>����ʵ�ֵķ������</p>
+<p>ExecutorBizImpl<br>XxlJobExecutor�ڲ����и���jobIdΪkey��ִ�����������߳�Ϊvalue���ֶ�jobThreadRepository����������ȥ���Ի�ȡ��ǰ����ִ�����������̣߳�<br>����о͸����������õ�����ģʽ���д��������û������ִ�д�������̣߳��͵���XxlJobExecutor.registJobThread����һ���̣߳���������������͸��������<br>�Ǵ�jobThreadRepository��ȡ����Ҳ�������´������߳�  JobThread��run�������triggerQueue��poll������Ȼ����֮ǰ���õ�handler����execute�������ò�����<br>idleTimes�ֶν����������ת�Ĵ������ƣ�����ִ�����������������¶ExecutorBiz���񣬽��������������TriggerParam����JobThread�߳�������������õ�ҵ��<br>handler��ִ��</p>
+<p>��ѯ�����ܰ��������ܳ��������Դ<br>Ȩ�أ��ɰ��������ܷ�������<br>һ����hash�������ռ䰴˳ʱ�뷽����֯��Բ���ϵĵ��0��2��32�η���������������ʹ��hash���й�ϣ�������ѡ������IP����������ȷ���������ڹ�ϣ����λ�ã���<br>����keyʹ����ͬ��hash�������ϣֵ���Ӵ�λ��˳ʱ���һ̨�����ķ�����������ö�λ���ķ�������ʹ������ڵ����������б���⡣<br>ʵ��Ӧ��ͨ��������ڵ�����Ϊ32��������  TreeMap<br>LRU���������ʹ�ã���̭�ʱ��δ��ʹ�õ�    �����һ�α�ʹ�õ��������ȵ�ʱ�䳤��<br>LFU�����ٷ����㷨����̭һ��ʱ���ڷ��ʴ������ٵ�  ��һ��ʱ����ڱ�ʹ�õ�Ƶ��</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2022/06/25/Sql%E4%BC%98%E5%8C%96/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -955,284 +1212,6 @@ server {
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2022/06/25/JVM/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/uploads/avatar.png">
-      <meta itemprop="name" content="yyguy123">
-      <meta itemprop="description" content>
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="yyguy123的个人博客">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/25/JVM/" class="post-title-link" itemprop="url">JVM</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-25 18:33:33" itemprop="dateCreated datePublished" datetime="2022-06-25T18:33:33+08:00">2022-06-25</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-23 14:20:04" itemprop="dateModified" datetime="2022-03-23T14:20:04+08:00">2022-03-23</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>����ʱ��������<br>    �̹߳������ѣ���Ŷ���ʵ��������������������Ϣ����������̬����������ʱ�����أ���������һ�ֹ淶�����ô���һ��ʵ��;JDK7�Ժ����ر��ƶ������У��߼��ϻ������ڷ�������<br>    �̸߳��룺�����ջ���洢�ֲ���������������ջ����̬���ӡ��������ڵȣ������ط���ջ�������������ִ��java������¼��������ִ�е�������ֽ���ָ��ĵ�ַ��ִ�б��ط���������ֵΪ�գ�</p>
-<p>����Ĵ�����<br>    �����ڴ淽ʽ<br>        ָ����ײ���ڴ����ʱ����ʹ�ù����ڴ����һ�ߣ�δʹ�õ��ڴ������һ���м����һ��ָ����Ϊָʾ��<br>        �����б����ڴ治����ʱ������¼��Щ�ڴ�����<br>    ѡ�����ַ��䷽ʽȡ���������ռ����Ƿ���пռ�ѹ����������<br>    �̰߳�ȫ�ķ����ڴ棺1��CAS + ʧ������ 2��TLAB �����̷߳��仺�壺ÿ���߳�����Java���з���һС���ڴ�</p>
-<p>�����ڶ��ڴ沼�֣�<br>    1������ͷ<br>        �ٴ洢������������ʱ���ݣ���ϣ�롢GC�ִ����䡢��״̬��־���̳߳��е�����ƫ���߳�ID��ƫ��ʱ�����<br>        ������ָ��<br>    2��ʵ�����ݣ����������洢����Ч��Ϣ��<br>    3��������䣨�κζ���Ĵ�С������8�ֽڵ���������</p>
-<p>����ķ��ʶ�λ��<br>    1��ʹ�þ������   ջ ref –&gt; ���о���� –&gt; ʵ����/������<br>    2��ʹ��ֱ��ָ�루HotSpot��   ջ ref –&gt; ʵ����/������<br>��һ�ֺô��Ƕ����ƶ��������ռ���ֻ��ı����е�ʵ������ָ�룬�����ref<br>�ڶ��ֺô��Ƿ����ٶȿ�</p>
-<p>OutOfMemoryError:<br>    ����������ϴ������󣬱�֤GC Roots������֮���пɴ�·�������������ջ��������Щ����<br>    ջ�����<br>            1���߳�����ջ��ȴ�����������������ȣ����޵����Լ��� StackOverflowError<br>            2�������ջ�ڴ�������̬��չ������������ر�����(HotSpotѡ��֧����չ)������չջ�����޷����뵽�㹻�ڴ�ʱ��OutOfMemoryError<br>    ������������ʱ�����������<br>        ����String.intern��CGLib���ɴ�����̬�� ��JDK8֮�󷽷���Ų��Ԫ�ռ䣬Ԫ�ռ䲻��������У�����ʹ�ñ����ڴ棬���ѳ��������쳣��<br>    ֱ���ڴ�����������ڴ���������ɵ�dump�ļ���С ��ֱ�ӻ���ʹ��DirectMemory������NIO�� ���Ǽ��ֱ���ڴ�</p>
-<p>�������գ�<br>        ���ü�����������������һ����������ÿ����һ���ط���������������ֵ+1������ʧЧʱ-1 ���޷����ѭ���������⣬Java�����������δʹ�ô˷�����<br>        �ɴ��Է�������GC Roots��ʼ���������ù�ϵ������������GC Roots�����������������ж�Ϊ�ɻ��ն���<br>        GC Roots��<br>            1���������ջ�����ر������������õĶ���<br>            2�����������ྲ̬�������õĶ���<br>            3���������г������õĶ���<br>            4�����ط���ջ��JNI���õĶ���<br>            5��������ڲ������ã���פ�쳣����ϵͳ����������������ݶ�Ӧ��Class����<br>            6����ͬ�������еĶ���<br>            7���ִ��ռ����ֲ�����ʱ��������Ķ�����ʱ�Եļ���</p>
-<p>���ã�<br>    ǿ���ã��������ձ���ڵ����ø�ֵ Obj obj=new Obj������ǿ���ù�ϵ��������Զ���ᱻ����<br>    �����ã�SoftReference�ӿڣ���ϵͳ��Ҫ�����ڴ����ǰ���������Щ���󣬻��պ������㹻�ڴ棬�׳��ڴ�����쳣<br>    �����ã�WeakReference�ӿڣ�ֻ�����浽��һ���������շ���Ϊֹ�������ڴ��Ƿ��㹻��������������ù����Ķ���<br>    �����ã�PlantomReference�ӿڣ�����Զ�������ʱ�乹��Ӱ�죬Ҳ�޷�ͨ��������ȡ�ö���ʵ����ֻ��Ϊ���ڶ��󱻻���ʱ�յ�ϵͳ֪ͨ����������ö��У�ReferenceQueue������ʹ�á�</p>
-<p>��������ڽ��пɴ��Է�����û����GC Roots�����������ᱻ��һ�α�ǣ��������ɸѡ�Ƿ���Ҫִ��finalize������<br>������û�и���finalize�����ѱ���������ù����򶼲���ִ��finalize��������ִ����ָ������ᴥ�����������ʼ���У�������֤�ȴ�����������ֹĳ������˷�����ѭ�����ϵͳ������finalize�����Ƕ����������������һ�λ��ᣬֻҪ������������һ��������������</p>
-<p>���շ�������<br>    ��Ҫ���������֣������ĳ����Ͳ���ʹ�õ�����<br>    �������գ��Ѿ�û���κζ������ó������иó���<br>    ����ʹ�õ��ࣺ<br>      1����������ʵ�����ѱ�����<br>      2�����ظ������������ѱ�����<br>      3�������Ӧ��Class����û�����κεط�������</p>
-<p>�ִ��ռ����ۣ�������������˵֮��<br>  ���ִ���˵��������������ǳ���Ϧ���<br>  ǿ�ִ���˵��������������ռ����̵Ķ����Խ��������<br>  ������ü�˵��������������ͬ��������˵��ռ������<br>���ݿ�����ü�˵������Ϊ�������������ɨ�������������ֻ��������������һ��ȫ�����ݽṹ�����伯���������������Ϊ����С�飬��ʶ��������Ŀ��ڴ����ڿ�����ã�����Minor GCʱ�����˿�����õ�С���ڴ����Żᱻ���뵽GC Rootsɨ�裬�˷���Ȼ�ڶ���ı����ù�ϵʱά�����ݵ���ȷ�Ի�����һЩ����ʱ����������ɨ��������������ǻ���ġ�</p>
-<p>Partial GC:ָĿ�겻�������ռ�����Java�ѵ������ռ�<br>    Minor GC��ָĿ��ֻ���������������ռ�<br>    Major GC��ָĿ��ֻ��������������ռ���CMS��<br>    Mixed GC��ָĿ���ռ�����������������������������ռ�<br>Full GC���ռ�����Java�Ѻͷ������������ռ�</p>
-<p>���-����㷨����������ռ��㷨<br>    ȱ�㣺1��ִ��Ч�ʲ��ȶ�����Java���а��������������д󲿷���Ҫ�����գ���ʱ������д�����Ǻ��������<br>          2���ڴ���Ƭ�����⣬����������������ڴ���Ƭ������Ҫ����ϴ����ʱ�޷��ҵ��㹻�����ڴ����ǰ���������ռ�<br>���-�����㷨�����ڴ水��������Ϊ��С��ȵ����飬ÿ��ֻʹ������һ�飬������ڴ�����Ὣ���ŵĶ����Ƶ���һ���ϣ��ٰ���ʹ�ù����ڴ�ռ�һ����������<br>    ȱ�㣺1������ڴ��ж������������������ڴ�临�ƿ���<br>          2���������ڴ���СΪԭ����һ��<br>    ����Java�����������Ȳ��ñ��-�����㷨ȥ����������������������98%��������һ���ռ�������Eden:Survivor��8:1    ��survivor���������һ���������ռ��Ĵ�������Щ����㽫ͨ�����䵣������ֱ�ӽ��������<br>���-�����㷨�������д��������ڴ�ռ��һ���ƶ���Ȼ��ֱ���������߽�������ڴ�<br>    �ƶ��������������������ÿ�λ��ն��д���������������ƶ������������Ǽ�Ϊ���صĲ�������STW<br>    ���ƶ�������ɢ�ڶ��еĴ������¿ռ���Ƭ������ֻ�����������ӵ��ڴ���������ڴ�������������Ʃ�硰�������з���������<br>    �����������㣬�������ռ�ͣ��ʱ�俴�����ƶ�����ʱ��ͣ�ٻ���̣������������������������ƶ�����������<br>    ����һ�ֺ�ϡ��ʽ�Ľ�������������ʱ����ñ��-����㷨��ֱ����Ƭ����Ӱ��������ʱ�����ñ��-�����㷨�ռ�һ�Ρ����ڱ��-�����CMS�ռ���������Ƭ����ʱ���õľ������֡�</p>
-<p>Hotspot�㷨ϸ��ʵ�֣�<br>    OopMap���ݽṹ��һ������ض�����ɣ�Hotspot�ͻ�Ѷ�����ʲôƫ��������ʲô���͵����ݼ���������ڼ�ʱ���������Ҳ�����ض�λ�ü�¼��ջ��ͼĴ�����Щλ�������ã�<br>    �����ռ�����ɨ���ǾͿ�ֱ�ӵ�֪��Щ��Ϣ������������һ����©�شӷ�������GCRoots��ʼ���ҡ�<br>    ����OopMap���ݱ仯��ָ��ǳ��࣬��Ϊÿ��ָ����ɶ�ӦOopMap����Ҫ��������洢�ռ䣬���ֻ���ض�λ�ü�¼��Щ��Ϣ����Щλ�ñ���Ϊ��ȫ�㡣<br>    ǿ��Ҫ�����ִ�дﵽ��ȫ�������ͣ����ȫ���ѡ�����������Ƿ�����ó���ʱ��ִ�е�����Ϊ��׼��ѡ���ģ����� �������á�ѭ����ת���쳣��ת��<br>   ����������ռ�ʱ�����̶߳��ܵ������ȫ�㣺<br>        ����ʽ�жϣ����ڼ������ã������������ռ�ʱ��ϵͳ���Ƚ������û��߳�ȫ���жϣ��������жϵط����ڰ�ȫ��ͻָ������߳�ִ�У�����һ���������ж�ֱ���ܵ���ȫ�㡣<br>        ����ʽ�жϣ��������ռ���Ҫ�ж��߳�ʱ����ֱ�Ӷ��̲߳���������������һ����־λ�����߳�ִ��ʱ��������ȥ��ѯ�����־��һ�������жϱ�־Ϊ������Լ�����İ�ȫ�������жϹ���<br>    ��ѯ��־�ĵط��밲ȫ�����غϵģ����⻹Ҫ�������д��������������Ҫ��Java�ѷ����ڴ�ĵط�������Ϊ�˼���Ƿ񼴽�Ҫ���������ռ�������û���㹻�ڴ�����¶���<br>    �û��̴߳���sleep/blocked״̬ʱ�޷���Ӧ������ж����󣬶�����������������밲ȫ�������<br>    ��ȫ����ָ�ܹ�ȷ����ĳ�δ���Ƭ�������ù�ϵ����仯�����������κεط���ʼ�����ռ����������ġ�</p>
-<pre><code>���伯�뿨����
-    �����ռ������������н�������Ϊ���伯�����ݽṹ�����ڱ��������������ӽ�GC Rootsɨ�跶Χ��
-    ��ʵ�ϲ�ֹ��������������������漰���������ռ���Ϊ�������ռ�������G1��ZGC��Shenandoah�ȶ���������ͬ���⡣    </code></pre><p>JVM���ò���</p>
-<p>-Xms����ʼ�ڴ��С��Ĭ��Ϊ�����ڴ�1/64  �ȼ���-XX��InitialHeapSize<br>-Xmx���������ڴ棬Ĭ��Ϊ�����ڴ�1/4 �ȼ��� -XX��MaxHeapSize<br>-Xss�����õ����߳�ջ�Ĵ�С��һ��Ĭ��Ϊ512k~1024k �ȼ��� -XX��ThreadStackSize</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2020/05/31/Java%E4%B8%AD%E7%9A%84%E9%94%81/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/uploads/avatar.png">
-      <meta itemprop="name" content="yyguy123">
-      <meta itemprop="description" content>
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="yyguy123的个人博客">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/31/Java%E4%B8%AD%E7%9A%84%E9%94%81/" class="post-title-link" itemprop="url">Java中的锁</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-31 16:12:18" itemprop="dateCreated datePublished" datetime="2020-05-31T16:12:18+08:00">2020-05-31</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-31 14:25:13" itemprop="dateModified" datetime="2020-05-31T14:25:13+08:00">2020-05-31</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Java中的锁"><a href="#Java中的锁" class="headerlink" title="Java中的锁"></a>Java中的锁</h1><h2 id="锁的类型"><a href="#锁的类型" class="headerlink" title="锁的类型"></a>锁的类型</h2><p>锁从宏观上分类，分为悲观锁与乐观锁。</p>
-<h3 id="乐观锁"><a href="#乐观锁" class="headerlink" title="乐观锁"></a>乐观锁</h3><p>乐观锁是一种乐观思想，即认为读多写少，遇到并发写的可能性低，每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，采取在写时先读出当前版本号，然后加锁操作（比较跟上一次的版本号，如果一样则更新），如果失败则要重复读-比较-写的操作。</p>
-<p>java中的乐观锁基本都是通过CAS操作实现的，CAS是一种更新的原子操作，比较当前值跟传入值是否一样，一样则更新，否则失败。</p>
-<h3 id="悲观锁"><a href="#悲观锁" class="headerlink" title="悲观锁"></a>悲观锁</h3><p>悲观锁是就是悲观思想，即认为写多，遇到并发写的可能性高，每次去拿数据的时候都认为别人会修改，所以每次在读写数据的时候都会上锁，这样别人想读写这个数据就会block直到拿到锁。java中的悲观锁就是Synchronized,AQS框架下的锁则是先尝试cas乐观锁去获取锁，获取不到，才会转换为悲观锁，如RetreenLock。</p>
-<h2 id="java线程阻塞的代价"><a href="#java线程阻塞的代价" class="headerlink" title="java线程阻塞的代价"></a>java线程阻塞的代价</h2><p>java的线程是映射到操作系统原生线程之上的，如果要阻塞或唤醒一个线程就需要操作系统介入，需要在户态与核心态之间切换，这种切换会消耗大量的系统资源，因为用户态与内核态都有各自专用的内存空间，专用的寄存器等，用户态切换至内核态需要传递给许多变量、参数给内核，内核也需要保护好用户态在切换时的一些寄存器值、变量等，以便内核态调用结束后切换回用户态继续工作。</p>
-<ol>
-<li><p>如果线程状态切换是一个高频操作时，这将会消耗很多CPU处理时间；</p>
-</li>
-<li><p>如果对于那些需要同步的简单的代码块，获取锁挂起操作消耗的时间比用户代码执行的时间还要长，这种同步策略显然非常糟糕的。</p>
-<p>synchronized会导致争用不到锁的线程进入阻塞状态，所以说它是java语言中一个重量级的同步操纵，被称为重量级锁，为了缓解上述性能问题，JVM从1.5开始，引入了轻量锁与偏向锁，默认启用了自旋锁，他们都属于乐观锁。</p>
-</li>
-</ol>
-<h2 id="markword"><a href="#markword" class="headerlink" title="markword"></a>markword</h2><p>markword数据的长度在32位和64位的虚拟机（未开启压缩指针）中分别为32bit和64bit，它的最后2bit是锁状态标志位，用来标记当前对象的状态，对象的所处的状态，决定了markword存储的内容，如下表所示:</p>
-<table>
-<thead>
-<tr>
-<th>状态</th>
-<th>标志位</th>
-<th>存储内容</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>未锁定</td>
-<td>01</td>
-<td>对象哈希码、对象分代年龄</td>
-</tr>
-<tr>
-<td>可偏向</td>
-<td>01</td>
-<td>偏向线程ID、偏向时间戳、对象分代年龄</td>
-</tr>
-<tr>
-<td>轻量级锁定</td>
-<td>00</td>
-<td>指向锁记录的指针</td>
-</tr>
-<tr>
-<td>膨胀(重量级锁定)</td>
-<td>10</td>
-<td>执行重量级锁定的指针</td>
-</tr>
-<tr>
-<td>GC标记</td>
-<td>11</td>
-<td>空(不需要记录信息)</td>
-</tr>
-</tbody></table>
-<h2 id="Java中的锁-1"><a href="#Java中的锁-1" class="headerlink" title="Java中的锁"></a>Java中的锁</h2><p>无锁—–&gt;偏向锁—–&gt;轻量级锁—–&gt;自旋锁（过渡态）—–&gt;重量级锁</p>
-<h3 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a>偏向锁</h3><ol>
-<li><p>检查对象头中markWord标志位是否01 可偏向</p>
-</li>
-<li><p>是则判断线程id是否指向当前线程，若是则执行同步代码。否则CAS获取锁，获取成功执行同步代码，失败表示有竞争，当达到全局安全点时获取偏向锁的线程会挂起 偏向锁升级为轻量级锁，然后被阻塞在安全点的线程继续向下执行同步代码（会STW）</p>
-<p>适用场景：始终只有一个线程执行同步块，执行期间一旦有竞争就升级为轻量级锁同时撤销偏向锁（会STW），有锁竞争时关闭偏向锁</p>
-</li>
-</ol>
-<h3 id="轻量级锁"><a href="#轻量级锁" class="headerlink" title="轻量级锁"></a>轻量级锁</h3><pre><code>1. 拷贝锁对象MarWord到LockRecord，使用CAS尝试将对象的MarkWord更新为指向LockRecord的指针，并将LockRecord的owner指向对象的MarkWord,更新成功则表示拥有该对象锁，并将MarkWord标志位设为轻量级锁00 ，更新失败就检查对象MarkWord是否指向当前线程栈帧，是就说明已有当前对象的锁，否则说明多个线程竞争锁，膨胀为重量级锁标志位改为10 后面等待锁的线程也会进入阻塞状态，当前线程自旋来获取锁</code></pre><h3 id="自旋锁"><a href="#自旋锁" class="headerlink" title="自旋锁"></a>自旋锁</h3><pre><code>1. 尝试获取锁的线程在没有获取锁的时候，去执行一个空循环，即自旋，若干次自旋后还没获取到锁，才被挂起，获取到则执行同步代码</code></pre><h2 id="Synchronized的执行过程"><a href="#Synchronized的执行过程" class="headerlink" title="Synchronized的执行过程"></a>Synchronized的执行过程</h2><pre><code>1. 检测MarkWord是否是当前线程ID，是则处于偏向锁
- 2. 不是则CAS将当前线程ID替换为MarkWord，成功则获得偏向锁，失败则表明有竞争，升级为轻量级锁
- 3. 当前线程使用CAS将MarkWord替换为锁记录指针，成功则获取到锁，失败表示其他线程竞争锁，当前线程尝试用自旋来获取锁
- 4. 自旋成功依然处于轻量级状态，失败则膨胀为重量级锁</code></pre><p>以上几种锁都是JVM的内部实现</p>
-<h2 id="锁优化"><a href="#锁优化" class="headerlink" title="锁优化"></a>锁优化</h2><pre><code>1. 减少锁的时间：不需同步的代码块，能不放在同步块就不要放在同步块
- 2. 减少锁的粒度：用空间换时间，例如JAVA8之前的ConcurrenthashMap中的分段锁
- 3. 锁粗化：循环内的操作需加锁，则应将锁放到循环外
- 4. 使用读写锁：ReentrantReadWriteLock  读加锁并发读，写加锁单线程写
- 5. 读写分离：CopyOnWriteArrayList 读多写少， 读不加锁，写加锁
- 6. 使用CAS：使用volatile + cas  并发少的情况用
- 7. 清楚缓存行的伪共享：32位和64位操作系统缓存32bit/64bit缓存行，可能缓存行中包含除所需同步数据外的其他数据，由于被加锁，其他数据访问时也需经历阻塞获取锁等过程，JDK1.8通过加Contended注解（需在jvm添加-XX：-RestrictContended）</code></pre><p>​    </p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2020/05/01/Java8%20Stream/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/uploads/avatar.png">
-      <meta itemprop="name" content="yyguy123">
-      <meta itemprop="description" content>
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="yyguy123的个人博客">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/01/Java8%20Stream/" class="post-title-link" itemprop="url">Java8 Stream</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-01 19:10:49" itemprop="dateCreated datePublished" datetime="2020-05-01T19:10:49+08:00">2020-05-01</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Lambda表达式基本语法"><a href="#Lambda表达式基本语法" class="headerlink" title="Lambda表达式基本语法"></a>Lambda表达式基本语法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java8_01.Stream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> java.util.Comparator;</span><br><span class="line"><span class="keyword">import</span> java.util.TreeSet;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *   Lambda表达式基本语法：</span></span><br><span class="line"><span class="comment"> *          parameters -&gt; expression</span></span><br><span class="line"><span class="comment"> *  一、 无参  无返回值</span></span><br><span class="line"><span class="comment"> *       () -&gt; System.out.println("Hello Lambda");</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  二、 有参  无返回值</span></span><br><span class="line"><span class="comment"> *       x -&gt; System.out.println(x);</span></span><br><span class="line"><span class="comment"> *       (x,y) -&gt; System.out.println(x +y);</span></span><br><span class="line"><span class="comment"> *  三、 有参  有返回值 Lambda体有多条语句</span></span><br><span class="line"><span class="comment"> *       (x,y) -&gt; &#123;System.out.println(x +y); return x+y;&#125;</span></span><br><span class="line"><span class="comment"> *       若Lambda体只有一条语句可省略&#123;&#125;和return</span></span><br><span class="line"><span class="comment"> *       (x,y) -&gt; x+y</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  Java8 内置四大核心函数式接口</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  Consumer&lt;T&gt;: 消费型接口</span></span><br><span class="line"><span class="comment"> *      void accept(T t);</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  Supplier&lt;T&gt;: 供给型接口</span></span><br><span class="line"><span class="comment"> *      T get();</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  Function&lt;T,R&gt;: 函数型接口</span></span><br><span class="line"><span class="comment"> *      R apply(T t);</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  Predicate&lt;T&gt;: 断言型接口</span></span><br><span class="line"><span class="comment"> *      boolean test(T t);</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  方法引用：若Lambda体中内容有方法已经实现，可以使用方法引用</span></span><br><span class="line"><span class="comment"> *  主要有三种语法格式：</span></span><br><span class="line"><span class="comment"> *      对象::实例方法名</span></span><br><span class="line"><span class="comment"> *      类::静态方法名</span></span><br><span class="line"><span class="comment"> *      类::实例方法名</span></span><br><span class="line"><span class="comment"> *  注意：</span></span><br><span class="line"><span class="comment"> *      ①Lambda体中调用方法的参数列表和返回值类型要与函数式接口中参数列表和返回值类型保持一致</span></span><br><span class="line"><span class="comment"> *      ②若Lambda参数列表中第一参数是方法调用者，第二参数是实例方法的参数，可以使用ClassName::method</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  构造器引用： ClassName::new</span></span><br><span class="line"><span class="comment"> *      需要调用的构造器参数列表与函数式接口中抽象方法参数列表保持一致</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  数组引用：Type[]::new</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestLambda</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Comparator&lt;Integer&gt; com = <span class="keyword">new</span> Comparator&lt;Integer&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(Integer o1, Integer o2)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> Integer.compare(o1,o2);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        TreeSet&lt;Integer&gt; tree =<span class="keyword">new</span> TreeSet&lt;&gt;(com);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Lambda表达式</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span></span>&#123;</span><br><span class="line">        TreeSet&lt;Integer&gt; tree = <span class="keyword">new</span> TreeSet&lt;&gt;((x,y) -&gt; Integer.compare(x,y));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="Stream流式操作"><a href="#Stream流式操作" class="headerlink" title="Stream流式操作"></a>Stream流式操作</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java8_01.Stream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">import</span> java.util.stream.Collectors;</span><br><span class="line"><span class="keyword">import</span> java.util.stream.Stream;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Stream的三个步骤</span></span><br><span class="line"><span class="comment"> * 1、创建Stream</span></span><br><span class="line"><span class="comment"> * 2、中间操作</span></span><br><span class="line"><span class="comment"> * 3、终止操作</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StreamDemo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 一、创建Stream</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//1、通过Collection系列集合提供的stream()或parallelStream()</span></span><br><span class="line">        List&lt;String&gt; list=<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        Stream&lt;String&gt; stream = list.stream();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2、通过Arrays中的静态方法stream()获取数组流</span></span><br><span class="line">        User[] users=<span class="keyword">new</span> User[<span class="number">10</span>];</span><br><span class="line">        Stream&lt;User&gt; stream1 = Arrays.stream(users);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//3、通过Stream中的静态方法of()</span></span><br><span class="line">        Stream&lt;String&gt; ss = Stream.of(<span class="string">"aa"</span>, <span class="string">"bb"</span>, <span class="string">"cc"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//4、创建无限流</span></span><br><span class="line">        <span class="comment">//迭代</span></span><br><span class="line">        Stream.iterate(<span class="number">0</span>,x -&gt; x+<span class="number">2</span>).limit(<span class="number">10</span>).forEach(System.out::println);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//生成</span></span><br><span class="line">        Stream.generate(() -&gt; Math.random()).limit(<span class="number">5</span>).forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 二、中间操作</span></span><br><span class="line"><span class="comment">     * 筛选与切片</span></span><br><span class="line"><span class="comment">     * filter--接收Lambda  从流中过滤某些元素</span></span><br><span class="line"><span class="comment">     * limit--截断流，使其元素不超过给定数量</span></span><br><span class="line"><span class="comment">     * skip(n)--跳过元素，返回一个跳过了前n个元素的流，若流中元素不足n个，则返回一个空流</span></span><br><span class="line"><span class="comment">     * distinct--通过流中元素的hashCode和equals去重元素</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * filter</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span>  <span class="title">test2</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        List&lt;User&gt; userList = User.getUserList();</span><br><span class="line">        <span class="comment">//中间操作</span></span><br><span class="line">        <span class="comment">//中间操作不会执行任何操作，只有执行终止操作，中间操作才会被全部执行 “惰性求值”</span></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 内部迭代:迭代操作由StreamAPI完成</span></span><br><span class="line"><span class="comment">         * 这里 “Stream的中间操作” 会输出userList.size()次</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        Stream&lt;User&gt; userStream = userList.stream().filter(e -&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            System.out.println(<span class="string">"Stream的中间操作"</span>);</span><br><span class="line">            <span class="keyword">return</span> e.getAge() &gt; <span class="number">30</span>;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//终止操作  一次性执行全部内容</span></span><br><span class="line">        userStream.forEach(System.out::println);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * limit</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test3</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 这里 “断路” 不一定会输出userList.size()次 找到两条符合条件记录就不会再遍历</span></span><br><span class="line"><span class="comment">         * 短路操作</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        List&lt;User&gt; userList = User.getUserList();</span><br><span class="line">        userList.stream().filter(e -&gt; &#123;</span><br><span class="line">            System.out.println(<span class="string">"短路"</span>);</span><br><span class="line">            <span class="keyword">return</span> e.getAge() &gt; <span class="number">22</span>;</span><br><span class="line">        &#125;).limit(<span class="number">2</span>).forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * skip</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test4</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;User&gt; userList = User.getUserList();</span><br><span class="line">        <span class="comment">//满足filter条件的结果集跳过两个元素后输出</span></span><br><span class="line">        userList.stream().filter(e -&gt; e.getAge() &gt; <span class="number">20</span>).skip(<span class="number">2</span>).forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * distinct</span></span><br><span class="line"><span class="comment">     * 注意：distinct 是通过流中元素的hashCode和equals去重元素，必要时需重写hashCode和equals</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test5</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;User&gt; userList = User.getUserList();</span><br><span class="line">        userList.stream().distinct().forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 映射</span></span><br><span class="line"><span class="comment">     * map--接受Lambda，将元素转换为其他形式或提取信息。</span></span><br><span class="line"><span class="comment">     *      接收一个函数作为参数，该函数会被应用到每个元素上，并将其映射为一个新元素</span></span><br><span class="line"><span class="comment">     * flatMap--接收一个函数作为参数，将流中每个值都换成另一个流，然后把所有流连接成一个流</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test6</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;String&gt; list = Arrays.asList(<span class="string">"aaa"</span>, <span class="string">"bbb"</span>, <span class="string">"ccc"</span>, <span class="string">"ddd"</span>, <span class="string">"eee"</span>);</span><br><span class="line">        list.stream().map((str) -&gt; str.toUpperCase()).forEach(System.out::println);</span><br><span class="line">        System.out.println(<span class="string">"----------------------------"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/*Stream&lt;Stream&lt;Character&gt;&gt; streamStream = list.stream().map(StreamDemo::filterCharacter);</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">        streamStream.forEach(sm -&gt; &#123;sm.forEach(System.out::println);&#125;);*/</span></span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">"----------------------------"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//flatMap</span></span><br><span class="line">        Stream&lt;Character&gt; characterStream = list.stream().flatMap(StreamDemo::filterCharacter);</span><br><span class="line">        characterStream.forEach(System.out::println);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Stream&lt;Character&gt; <span class="title">filterCharacter</span><span class="params">(String str)</span></span>&#123;</span><br><span class="line">        List&lt;Character&gt; list =<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span>(Character ch:str.toCharArray())&#123;</span><br><span class="line">                list.add(ch);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> list.stream();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 排序</span></span><br><span class="line"><span class="comment">     * sorted--自然排序（comparable）</span></span><br><span class="line"><span class="comment">     * sorted（comparator）--定制排序（Comparator）</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sortTest</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;String&gt; list = Arrays.asList(<span class="string">"ccc"</span>, <span class="string">"aaa"</span>, <span class="string">"abc"</span>, <span class="string">"cbd"</span>);</span><br><span class="line">        list.stream().sorted().forEach(System.out::println);</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">"-------------------"</span>);</span><br><span class="line"></span><br><span class="line">        List&lt;User&gt; userList = User.getUserList();</span><br><span class="line">        userList.stream().sorted((e1,e2) -&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(e1.getAge()==e2.getAge())&#123;</span><br><span class="line">                <span class="keyword">return</span> e1.getName().compareTo(e2.getName());</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">return</span>  e1.getAge() - e2.getAge();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;).forEach(System.out::println);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 终止操作</span></span><br><span class="line"><span class="comment">     **/</span></span><br><span class="line"></span><br><span class="line">     <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *查找与匹配</span></span><br><span class="line"><span class="comment">     * allMatch--检查是否匹配所有元素</span></span><br><span class="line"><span class="comment">     * anyMatch--检查是否至少匹配一个元素</span></span><br><span class="line"><span class="comment">     * noneMatch--检查是否没有匹配所有元素</span></span><br><span class="line"><span class="comment">     * findFirst--返回第一个元素</span></span><br><span class="line"><span class="comment">     * findAny--返回当前流中任意元素</span></span><br><span class="line"><span class="comment">     * count--返回流中元素总个数</span></span><br><span class="line"><span class="comment">     * max--返回流中最大值</span></span><br><span class="line"><span class="comment">     * min--返回流中最小值</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;User&gt; users = Arrays.asList(</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"001"</span>, <span class="number">38</span>, User.Status.VOCATION),</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"003"</span>, <span class="number">20</span>, User.Status.BUSY),</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"005"</span>, <span class="number">18</span>, User.Status.FREE),</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"004"</span>, <span class="number">35</span>, User.Status.BUSY),</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"002"</span>, <span class="number">27</span>, User.Status.FREE)</span><br><span class="line">        );</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> b1 = users.stream().allMatch(e -&gt; e.getStatus().equals(User.Status.BUSY));</span><br><span class="line">        System.out.println(b1);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> b2 = users.stream().anyMatch(e -&gt; e.getStatus().equals(User.Status.BUSY));</span><br><span class="line">        System.out.println(b2);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> b3 = users.stream().noneMatch(e -&gt; e.getStatus().equals(User.Status.BUSY));</span><br><span class="line">        System.out.println(b3);</span><br><span class="line"></span><br><span class="line">        Optional&lt;User&gt; first = users.stream().sorted((e1, e2) -&gt; Integer.compare(e1.getAge(), e2.getAge()))</span><br><span class="line">                .findFirst();</span><br><span class="line">        System.out.println(first.get());</span><br><span class="line"></span><br><span class="line">        <span class="comment">//parallelStream  并行</span></span><br><span class="line">        Optional&lt;User&gt; any = users.parallelStream().filter(e -&gt; e.getStatus().equals(User.Status.FREE))</span><br><span class="line">                .findAny();</span><br><span class="line">        System.out.println(any.get());</span><br><span class="line"></span><br><span class="line">        System.out.println(users.stream().count());</span><br><span class="line"></span><br><span class="line">        Optional&lt;User&gt; max = users.stream().max((e1, e2) -&gt; Integer.compare(e1.getAge(), e2.getAge()));</span><br><span class="line">        System.out.println(max.get());</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 归约</span></span><br><span class="line"><span class="comment">     * reduce(T,BinaryOperator) / reduce(BinaryOperator)  可将流中元素反复结合起来，得到一个值</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">reduceTest</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;Integer&gt; list = Arrays.asList(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>);</span><br><span class="line">        Integer sum = list.stream().reduce(<span class="number">0</span>, (x, y) -&gt; x + y);</span><br><span class="line">        System.out.println(sum);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 收集</span></span><br><span class="line"><span class="comment">     * collect--将流转换为其他形式，接收一个Collect接口的实现 用于给Stream中元素做汇总的方法</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">collectTest</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;User&gt; users = Arrays.asList(</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"001"</span>, <span class="number">38</span>, User.Status.VOCATION),</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"003"</span>, <span class="number">20</span>, User.Status.BUSY),</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"005"</span>, <span class="number">18</span>, User.Status.FREE),</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"004"</span>, <span class="number">35</span>, User.Status.BUSY),</span><br><span class="line">                <span class="keyword">new</span> User(<span class="string">"002"</span>, <span class="number">27</span>, User.Status.FREE)</span><br><span class="line">        );</span><br><span class="line">        users.stream().map(User::getName).collect(Collectors.toList()).forEach(System.out::println);</span><br><span class="line">        users.stream().map(User::getName).collect(Collectors.toSet()).forEach(System.out::println);</span><br><span class="line">        users.stream().map(User::getName).collect(Collectors.toCollection(HashSet::<span class="keyword">new</span>)).forEach(System.out::println);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="并行流"><a href="#并行流" class="headerlink" title="并行流"></a>并行流</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java8_01.parallelStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.RecursiveTask;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ForkJoinCaculate</span> <span class="keyword">extends</span> <span class="title">RecursiveTask</span>&lt;<span class="title">Long</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">long</span> start;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">long</span> end;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> THRESHOLD=<span class="number">10000</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ForkJoinCaculate</span><span class="params">(<span class="keyword">long</span> start, <span class="keyword">long</span> end)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.start = start;</span><br><span class="line">        <span class="keyword">this</span>.end = end;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Long <span class="title">compute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> length=end -start;</span><br><span class="line">        <span class="keyword">if</span>(length&lt;=THRESHOLD)&#123;</span><br><span class="line">            <span class="keyword">long</span> sum=<span class="number">0</span>;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">long</span> i=start;i&lt;=end;i++)&#123;</span><br><span class="line">                sum+=i;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> sum;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">long</span> middle = (start + end) /<span class="number">2</span>;</span><br><span class="line">            ForkJoinCaculate left=<span class="keyword">new</span> ForkJoinCaculate(start,middle);</span><br><span class="line">            left.fork();</span><br><span class="line"></span><br><span class="line">            ForkJoinCaculate right=<span class="keyword">new</span> ForkJoinCaculate(middle+<span class="number">1</span>,end);</span><br><span class="line">            right.fork();</span><br><span class="line">            <span class="keyword">return</span> left.join() + right.join();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java8_01.parallelStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.time.Duration;</span><br><span class="line"><span class="keyword">import</span> java.time.Instant;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ForkJoinPool;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ForkJoinTask;</span><br><span class="line"><span class="keyword">import</span> java.util.stream.LongStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestForkJoin</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Instant start = Instant.now();</span><br><span class="line"></span><br><span class="line">        ForkJoinPool pool=<span class="keyword">new</span> ForkJoinPool();</span><br><span class="line">        ForkJoinTask&lt;Long&gt; task=<span class="keyword">new</span> ForkJoinCaculate(<span class="number">0</span>,<span class="number">100000000000L</span>);</span><br><span class="line">        Long sum=pool.invoke(task);</span><br><span class="line">        System.out.println(sum);</span><br><span class="line"></span><br><span class="line">        Instant end = Instant.now();</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">"耗时（ms）："</span>+ Duration.between(start,end).toMillis());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Instant start = Instant.now();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> sum=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">long</span> i=<span class="number">0</span>;i&lt;=<span class="number">100000000000L</span>;i++)&#123;</span><br><span class="line">            sum+=i;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(sum);</span><br><span class="line">        Instant end = Instant.now();</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">"耗时（ms）："</span>+ Duration.between(start,end).toMillis());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Java8并行流</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test3</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Instant start = Instant.now();</span><br><span class="line"></span><br><span class="line">        LongStream.rangeClosed(<span class="number">0</span>,<span class="number">100000000000L</span>)</span><br><span class="line">                .parallel()</span><br><span class="line">                .reduce(<span class="number">0</span>,Long::sum);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//System.out.println(sum);</span></span><br><span class="line">        Instant end = Instant.now();</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">"耗时（ms）："</span>+ Duration.between(start,end).toMillis());</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="Java8日期API"><a href="#Java8日期API" class="headerlink" title="Java8日期API"></a>Java8日期API</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java8_01.optional;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> java.text.DateFormat;</span><br><span class="line"><span class="keyword">import</span> java.text.SimpleDateFormat;</span><br><span class="line"><span class="keyword">import</span> java.time.*;</span><br><span class="line"><span class="keyword">import</span> java.time.format.DateTimeFormatter;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestSimpleDateFormat</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">        SimpleDateFormat dateFormat=<span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyyMMdd"</span>);</span><br><span class="line"></span><br><span class="line">        Callable&lt;Date&gt; task=<span class="keyword">new</span> Callable&lt;Date&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> Date <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> dateFormat.parse(<span class="string">"20200425"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        ExecutorService pool = Executors.newFixedThreadPool(<span class="number">10</span>);</span><br><span class="line">        List&lt;Future&gt; results = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</span><br><span class="line">            results.add(pool.submit(task));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(Future&lt;Date&gt; future: results)&#123;</span><br><span class="line">            System.out.println(future.get());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        pool.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line"></span><br><span class="line">       ThreadLocal&lt;DateFormat&gt; df = <span class="keyword">new</span> ThreadLocal&lt;DateFormat&gt;()&#123;</span><br><span class="line">           <span class="function"><span class="keyword">protected</span> DateFormat <span class="title">initialValue</span><span class="params">()</span></span>&#123;</span><br><span class="line">               <span class="keyword">return</span> <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyyMMdd"</span>);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;;</span><br><span class="line"></span><br><span class="line">        Callable&lt;Date&gt; task=<span class="keyword">new</span> Callable&lt;Date&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> Date <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> df.get().parse(<span class="string">"20200425"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        ExecutorService pool = Executors.newFixedThreadPool(<span class="number">10</span>);</span><br><span class="line">        List&lt;Future&gt; results = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</span><br><span class="line">            results.add(pool.submit(task));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(Future&lt;Date&gt; future: results)&#123;</span><br><span class="line">            System.out.println(future.get());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        pool.shutdown();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test3</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">        DateTimeFormatter dtf=DateTimeFormatter.ofPattern(<span class="string">"yyyyMMdd"</span>);</span><br><span class="line"></span><br><span class="line">        Callable&lt;LocalDate&gt; task=<span class="keyword">new</span> Callable&lt;LocalDate&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> LocalDate <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> LocalDate.parse(<span class="string">"20200425"</span>,dtf);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        ExecutorService pool = Executors.newFixedThreadPool(<span class="number">10</span>);</span><br><span class="line">        List&lt;Future&gt; results = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</span><br><span class="line">            results.add(pool.submit(task));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(Future&lt;Date&gt; future: results)&#123;</span><br><span class="line">            System.out.println(future.get());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        pool.shutdown();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test4</span><span class="params">()</span></span>&#123;</span><br><span class="line">        LocalDateTime ldt =LocalDateTime.now();</span><br><span class="line">        System.out.println(ldt);</span><br><span class="line"></span><br><span class="line">        LocalDateTime ldt2 =LocalDateTime.of(<span class="number">2020</span>,<span class="number">04</span>,<span class="number">25</span>,<span class="number">23</span>,<span class="number">00</span>,<span class="number">18</span>);</span><br><span class="line">        System.out.println(ldt2);</span><br><span class="line"></span><br><span class="line">        LocalDateTime ldt3 =ldt2.plusYears(<span class="number">2</span>);</span><br><span class="line">        System.out.println(ldt3);</span><br><span class="line"></span><br><span class="line">        LocalDateTime ldt4 =ldt2.minusMonths(<span class="number">2</span>);</span><br><span class="line">        System.out.println(ldt4);</span><br><span class="line"></span><br><span class="line">        System.out.println(ldt2.getYear());</span><br><span class="line">        System.out.println(ldt2.getMonthValue());</span><br><span class="line">        System.out.println(ldt2.getDayOfMonth());</span><br><span class="line">        System.out.println(ldt2.getMinute());</span><br><span class="line">        System.out.println(ldt2.getSecond());</span><br><span class="line"></span><br><span class="line">        System.out.println(LocalDateTime.parse(<span class="string">"2020-04-25T23:00:18"</span>).</span><br><span class="line">                format(DateTimeFormatter.ofPattern(<span class="string">"yyyyMMdd"</span>)));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test5</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        Instant in1=Instant.now();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span>&#123;</span><br><span class="line">            Thread.sleep(<span class="number">1000</span>);</span><br><span class="line"></span><br><span class="line">        &#125;<span class="keyword">catch</span>(InterruptedException e)&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Instant in2=Instant.now();</span><br><span class="line">        Duration duration =Duration.between(in1,in2);</span><br><span class="line">        System.out.println(duration.toMillis());</span><br><span class="line"></span><br><span class="line">        LocalDate ld1=LocalDate.of(<span class="number">2018</span>,<span class="number">07</span>,<span class="number">01</span>);</span><br><span class="line">        LocalDate ld2=LocalDate.now();</span><br><span class="line"></span><br><span class="line">        Period p=Period.between(ld1,ld2);</span><br><span class="line"></span><br><span class="line">        System.out.println(p);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test6</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Instant instant =Instant.now();</span><br><span class="line">        LocalDateTime ld=LocalDateTime.ofInstant(instant,ZoneId.of(<span class="string">"Asia/Shanghai"</span>));</span><br><span class="line">        System.out.println(ld);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1304,7 +1283,7 @@ server {
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">24</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
