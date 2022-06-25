@@ -1,6 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Kubernetes</title>
+    <url>/2022/06/25/Kubernetes/</url>
+    <content><![CDATA[<h1 id="Kubernetes"><a href="#Kubernetes" class="headerlink" title="Kubernetes"></a>Kubernetes</h1><p>高可用集群副本数据最好是 &gt;=3 基数个  方便选举</p>
+<p>在K8S中，由Master控制节点和Worker节点共同构成一个集群。</p>
+<blockquote>
+<p><strong>Master节点</strong>：</p>
+<p>API Server：所有服务访问的统一入口，以restful风格进行操作，同时交给etcd存储（是唯一能访问etcd的组件），提供认证、授权、访问控制、API注册与发现等机制，可通过kubectl命令行工具、dashboard可视化面板访问。<br>Controller Manager：维持副本期望数目；处理集群中常规后台任务，一个资源对应一个控制器，同时监控集群状态，确保实际状态和最终状态一致。<br>Scheduler：节点的调度，选择合适的节点进行分配任务<br>etcd：键值对数据库，储存K8S集群所有重要信息（持久化）</p>
+<p><strong>Worker节点</strong></p>
+<p>Kubelet：直接跟容器引擎交互实现容器的生命周期管理；相当于Master节点派到node节点的代表，管理本机容器，上报数据到API Server。<br>Kube-proxy：负责写入规则至 IPTABLES、IPVS 实现服务映射访问；实现服务（service）抽象组件，屏蔽PodIP变化和负载均衡。<br>Container Runtime：容器运行时。K8S支持多个容器运行环境：Docker、Containerd、CRI-O、Rktlet以及任何实现Kubernetes CRI（容器运行环境接口）的软件。</p>
+</blockquote>
+<p>CoreDNS：可以为集群中的SVC创建一个域名IP的对应关系解析<br>Dashboard：给K8S集群提供一个B/S结构访问体系<br>Ingress Controller：官方只能实现四层代理，INGRESS可以实现七层代理<br>Federation：提供一个可以跨集群中心多K8S统一管理功能<br>Promethues：提供K8S集群的监控能力<br>ELK：提供K8S集群日志统一分析介入平台</p>
+<p><strong>流程样例</strong></p>
+<ol>
+<li>通过kubectl命令行工具向API Server发送一个请求：创建ReplicaSet（用来确保容器应用的副本数始终保持在用户定义的副本数，支持集合式的selector；虽然ReplicaSet可独立使用，但还是建议使用Deployment来自动管理ReplicaSet，这样无需担心与其他机制不兼容问题，例如ReplicaSet不支持rolling-update但Deployment支持），API Server会将此请求存储在etcd中</li>
+<li>Controller Manager会接收到一个通知</li>
+<li>Controller Manager发现现在的集群状态和预期状态不一致，因此需要创建Pod，此信息会通知到Scheduler</li>
+<li>Scheduler会选择空闲的Worker节点，然后通过API Server更新Pod定义</li>
+<li>API Server会通知到Worker节点上的kubelet</li>
+<li>kubelet指示当前节点上的Container Runtime运行对应的容器</li>
+<li>Container Runtime下载镜像并启动容器</li>
+</ol>
+<h3 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h3><p><strong>Pod</strong></p>
+<ul>
+<li>Pod是最小调度单元</li>
+<li>Pod里面会包含一个或多个容器（Container）</li>
+<li>Pod内的容器共享存储及网络，可通过localhost通信</li>
+</ul>
+<p><strong>Deployment</strong></p>
+<p>Deployment是在Pod这个抽象上更为上层的一个抽象，它可以定义一组Pod的副本数目以及这个Pod的版本。一般大家用Deployment这个抽象来做应用的真正的管理，而Pod是组成Deployment最小的单元</p>
+<ul>
+<li>定义一组Pod的副本数量、版本等</li>
+<li>通过控制器维护Pod数目</li>
+<li>自动恢复失败的Pod</li>
+<li>通过控制器以指定的策略控制版本</li>
+</ul>
+<p><strong>Service</strong></p>
+<p>Pod是不稳定的，IP是会变化的，所以需要一层抽象来屏蔽这种变化，这层抽象叫做Service</p>
+<ul>
+<li>提供访问一个或者多个Pod实例稳定的访问地址</li>
+<li>支持多种访问方式<ul>
+<li>ClusterIP（对集群内部访问）</li>
+<li>NodePort（对集群外部访问）</li>
+<li>LoadBalancer（集群外部负载均衡）</li>
+</ul>
+</li>
+</ul>
+<p><strong>Volume</strong></p>
+<p>Volume就是存储卷，在Pod中可以声明卷来访问文件系统，同时Volume也是一个抽象层，其具体的后端存储可以是本地存储、NFS网络存储、云存储、分布式存储</p>
+<ul>
+<li>声明在Pod中容器可以访问的文件系统</li>
+<li>可以被挂载在Pod中一个或多个容器的指定路径下</li>
+<li>支持多种后端储存</li>
+</ul>
+<p><strong>Namespace</strong></p>
+<p>Namespace（命名空间）是用来做资源的逻辑隔离的，比如上面的Pod、Deployment、Service都属于资源，不同Namespace下资源可以重名。同一Namespace下资源名需唯一</p>
+<ul>
+<li>一个集群内部的逻辑隔离机制</li>
+<li>每个资源都属于一个NameSpace</li>
+<li>同一个Namespace中资源命名唯一</li>
+<li>不同Namespace中资源可重名</li>
+</ul>
+<p><strong>kubectl命令行工具</strong></p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> kubectl api-resources 显示K8S支持的资源类型</span></span><br><span class="line">NAME                   SHORTNAMES</span><br><span class="line">namespace               ns</span><br><span class="line">nodes                   no</span><br><span class="line">persistentvolumeclaims  pvc</span><br><span class="line">persistentvolumes       pv</span><br><span class="line">pods                    po</span><br><span class="line">statefulsets            sts</span><br><span class="line">services                svc</span><br><span class="line">deployments             deploy</span><br><span class="line"><span class="meta">#</span><span class="bash"> kubectl get pods  等价于   kubectl get po</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> kubectl create deployment web --image=nginx:1.14</span></span><br><span class="line">这句话表示创建一个deployment资源，取名叫web，指定镜像为nginx的1.14版本。一般不这么部署应用，不好复用，一般通过yaml文件来部署，如下</span><br><span class="line"><span class="meta">#</span><span class="bash"> kubectl create deployment web --image=nginx:1.14 --dry-run -o yaml &gt; web.yaml</span></span><br><span class="line">  --dry-run 表示试运行</span><br><span class="line">  -o yaml 表示以yaml格式输出</span><br><span class="line"><span class="meta">  &gt;</span><span class="bash"> web.yaml 表示将输出的内容重定向到web.yaml文件中</span></span><br><span class="line">用下面命令应用web.yaml，web.yaml声明了一个deployment和一个pod</span><br><span class="line"><span class="meta">#</span><span class="bash"> kubectl apply -f web.yaml   默认replicas=1</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> kubectl get deploy,po -o wide  查看Deployment和Pod</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> kubectl scale deploy web --replicas=10   扩容</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> kubectl scale deploy web --replicas=1    缩容</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>节点污点</strong></p>
+<p>Taint污点：节点不做普通分配调度，是节点属性，属性值有三个</p>
+<ul>
+<li>NoSchedule：一定不被调度</li>
+<li>PreferNoSchedule：尽量不被调度（有被调度的几率）</li>
+<li>NoExecute：不会调度，并且还会驱逐Node已有Pod</li>
+</ul>
+<p>也就是说，给节点打上污点，那么调度的时候就会根据上面的属性来调度，一般来说Master节点的污点值是NoSchedule</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> kubectl describe node my-master | grep Taints  查看my-master污点值</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> kubectl taint node my-master node-role.kubernetes.io/master:NoSchedule-  去掉my-master节点的NoSchedule污点</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Pod调度策略</strong></p>
+<p>Pod调度策略会影响到Pod最终被调度到哪个节点上，Pod调度策略有三类</p>
+<ul>
+<li>Pod声明的<em>requests</em>和<em>limits</em>，前者就是Pod需要多少资源，后者表示Pod最多用多少资源（CPU内存等）</li>
+<li>节点标签选择器，会选择符合标签的节点进行调度</li>
+<li>节点亲和性，分为硬亲和和软亲和，前者必须满足，后者尝试满足，不强制</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> kubectl delete deploy web  删除之前部署的deploy</span></span><br></pre></td></tr></table></figure>
+
+<p>web.yaml新增resources声明</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">     <span class="attr">app:</span> <span class="string">web</span></span><br><span class="line">   <span class="attr">name:</span> <span class="string">web</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">	<span class="attr">replicas:</span> <span class="number">1</span></span><br><span class="line">	<span class="attr">selector:</span></span><br><span class="line">		<span class="attr">matchLabels:</span></span><br><span class="line">			<span class="attr">app:</span> <span class="string">web</span></span><br><span class="line">	<span class="attr">strategy:</span> <span class="string">&#123;&#125;</span></span><br><span class="line">	<span class="attr">template:</span></span><br><span class="line">		<span class="attr">metadata:</span></span><br><span class="line">			<span class="attr">labels:</span></span><br><span class="line">				<span class="attr">app:</span> <span class="string">web</span></span><br><span class="line">		<span class="attr">spec:</span></span><br><span class="line">			<span class="attr">containers:</span></span><br><span class="line">			<span class="bullet">-</span> <span class="attr">image:</span> <span class="string">nginx:1.14</span></span><br><span class="line">			<span class="attr">name:</span> <span class="string">nginx</span></span><br><span class="line">			<span class="comment"># 方式一：secret挂载到容器</span></span><br><span class="line">			<span class="attr">volumeMounts:</span></span><br><span class="line">				<span class="bullet">-</span> <span class="attr">name:</span> <span class="string">secret-volume</span></span><br><span class="line">				 <span class="attr">mountPath:</span> <span class="string">/etc/secret-volume</span></span><br><span class="line">			<span class="attr">volumes:</span></span><br><span class="line">			<span class="bullet">-</span> <span class="attr">name:</span> <span class="string">secret-volume</span></span><br><span class="line">			  <span class="attr">secret:</span></span><br><span class="line">			  	<span class="attr">secretName:</span> <span class="string">test-secret</span></span><br><span class="line">			<span class="comment"># 方式二：环境变量声明secret</span></span><br><span class="line">			<span class="attr">env:</span></span><br><span class="line">			<span class="bullet">-</span> <span class="attr">name:</span> <span class="string">SECRET_USERNAME</span></span><br><span class="line">				<span class="attr">valueFrom:</span></span><br><span class="line">					<span class="attr">secretKeyRef:</span></span><br><span class="line">						<span class="attr">name:</span> <span class="string">test-secret</span></span><br><span class="line">						<span class="attr">key:</span> <span class="string">username</span></span><br><span class="line">			<span class="comment">#requests和limits</span></span><br><span class="line">			<span class="attr">resources:</span></span><br><span class="line">				<span class="attr">requests:</span></span><br><span class="line">					<span class="attr">memory:</span> <span class="string">"3Gi"</span></span><br><span class="line">				<span class="attr">limits:</span></span><br><span class="line">					<span class="attr">memory:</span> <span class="string">"4Gi"</span></span><br><span class="line">			<span class="comment"># nodeSelector</span></span><br><span class="line">			<span class="attr">nodeSelector:</span></span><br><span class="line">				<span class="attr">test123_env:</span> <span class="string">prod</span></span><br><span class="line">			<span class="comment"># 节点亲和性</span></span><br><span class="line">			<span class="attr">affinity:</span></span><br><span class="line">				<span class="attr">nodeAffinity:</span></span><br><span class="line">					<span class="attr">requiredDuringSchedulingIgnoredDuringException:</span></span><br><span class="line">						<span class="attr">nodeSelectorTerms:</span></span><br><span class="line">							<span class="bullet">-</span> <span class="attr">matchExpressions:</span></span><br><span class="line">							<span class="bullet">-</span> <span class="attr">key:</span> <span class="string">test123_env</span></span><br><span class="line">							<span class="attr">operator:</span> <span class="string">In</span></span><br><span class="line">							<span class="attr">values:</span></span><br><span class="line">							<span class="bullet">-</span> <span class="string">dev</span></span><br><span class="line">							<span class="bullet">-</span> <span class="string">test</span></span><br><span class="line">					<span class="attr">preferreDuringSchedulingIgnoredDuringException:</span></span><br><span class="line">					<span class="bullet">-</span> <span class="attr">weight:</span> <span class="number">1</span></span><br><span class="line">					<span class="attr">preference:</span></span><br><span class="line">					<span class="bullet">-</span> <span class="attr">matchExpressions:</span></span><br><span class="line">						<span class="bullet">-</span> <span class="attr">key:</span> <span class="string">group</span></span><br><span class="line">						<span class="attr">operator:</span> <span class="string">In</span></span><br><span class="line">						<span class="attr">values:</span></span><br><span class="line">						<span class="bullet">-</span> <span class="string">ttttest</span></span><br><span class="line"><span class="attr">status:</span> <span class="string">&#123;&#125;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> kubectl apply -f web.yaml  这里虚拟机内存如果就2G，Pod会在挂起状态，因为资源不满足</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除deploy并给master节点打上标签test123_env=prod，标签就是键值对，随便起名</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> kubectl delete deploy web </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> kubectl label node my-master test123_env=prod</span></span><br><span class="line">最后执行理论上所有Pod都应该被调度到master节点，但是发现所有Pod都被挂起了，因为master节点默认污点值是NoSchedule：节点污点值的优先级是高于节点标签的！</span><br><span class="line"><span class="meta">#</span><span class="bash"> requiredDuringSchedulingIgnoredDuringException: 硬亲和，test123_env等于dev或者<span class="built_in">test</span>，必须满足</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> preferreDuringSchedulingIgnoredDuringException: 软亲和，group等于ttttest，非必须满足</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Secret和配置管理"><a href="#Secret和配置管理" class="headerlink" title="Secret和配置管理"></a>Secret和配置管理</h3><p><strong>Secret</strong></p>
+<p>Secret在K8S中表示一个存储在etcd中的配置，这个配置是秘密、安全的，通常用Base64编码，此配置可通过挂载卷或者环境变量的方式供Pod访问。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 首先将明文转成base64编码</span></span><br><span class="line">echo -n 'root' | base64    结果是cm9vdA==</span><br><span class="line">echo -n '123456' | base64   结果是MTIzNDU2</span><br><span class="line">通过下面secret.yaml声明创建一个Secret</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Secret</span><br><span class="line">metadata:</span><br><span class="line">	name: test-secret</span><br><span class="line">data:</span><br><span class="line">	username: cm9vdA==</span><br><span class="line">	password: MTIzNDU2</span><br></pre></td></tr></table></figure>
+
+<p>既然是Base64的编码方式（不是加密方式），为什么说Secret是安全的呢？此处的安全是K8S提供的，主要是以下几点：</p>
+<ul>
+<li>传输安全（K8S中与API Server的交互都是HTTPS的）</li>
+<li>存储安全（Secret被挂载到容器时存储在tmpfs中，只存在于内存中而不是磁盘中，Pod销毁Secret随之消失）</li>
+<li>访问安全（Pod间的Secret是隔离的，一个Pod不能访问另一个Pod的Secret）</li>
+</ul>
+<h3 id="ConfigMap"><a href="#ConfigMap" class="headerlink" title="ConfigMap"></a>ConfigMap</h3><p>ConfigMap可以看做是不需要加密，不需要安全属性的Secret，也是和配置相关的，创建ConfigMap的过程如下，首先创建一个配置文件例如redis.properties，包含以下内容</p>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="meta">redis.port</span>=<span class="string">127.0.0.1</span></span><br><span class="line"><span class="meta">redis.port</span>=<span class="string">6379</span></span><br><span class="line"><span class="meta">redis.password</span>=<span class="string">123456</span></span><br></pre></td></tr></table></figure>
+
+<p>以下命令从文件redis.properties创建了一个名为redis-config的ConfigMap</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">kubectl create configmap redis-config --from-file=redis.properties</span><br></pre></td></tr></table></figure>
+
+<h3 id="存储编排"><a href="#存储编排" class="headerlink" title="存储编排"></a>存储编排</h3><p>PV： PersistentVolume，持久化卷<br>PVC：PersistentVolumeClaim，持久化卷声明</p>
+<p>PV说白了就是一层存储的抽象，底层的存储可以是本地磁盘，也可以是网络磁盘比如NFS、Ceph之类。<br>PVC其实在Pod和PV之前又增加了一层抽象，这样做的目的在于将Pod的存储行为与具体的存储设备解耦，试想一下如果哪天NFS网络存储的IP地址变化了，若没有PVC就需要每个Pod改一下IP的声明。</p>
+<p><strong>本地存储</strong></p>
+<p>本地存储即对应K8S中的hostPath</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Spring</title>
+    <url>/2022/06/25/Spring/</url>
+    <content><![CDATA[<h2 id="Spring中bean的生命周期"><a href="#Spring中bean的生命周期" class="headerlink" title="Spring中bean的生命周期"></a>Spring中bean的生命周期</h2><ol>
+<li>解析类得到BeanDefinition</li>
+<li>如果有多个构造方法，推断构造方法，进而实例化对象</li>
+<li>对对象中加了@Autowired注解的属性进行填充</li>
+<li>回调Aware方法，例如BeanNameAware（可在运行时获取beanName），BeanFactoryAware（可在运行时获取BeanFactory实例）</li>
+<li>调用BeanPostProcessor的初始化前方法</li>
+<li>调用初始化方法</li>
+<li>调用BeanPostProcessor初始化后的方法，这里会进行AOP</li>
+<li>如果当前创建的bean是单例的则会吧bean放入单例池</li>
+<li>使用bean</li>
+<li>Spring容器关闭时调用DispossableBean中的destory方法</li>
+</ol>
+<h2 id="Spring循环依赖"><a href="#Spring循环依赖" class="headerlink" title="Spring循环依赖"></a>Spring循环依赖</h2><p>循环依赖在Spring容器中注入依赖的对象，有两种情况：</p>
+<p>​    1、构造器方式注入依赖 （无法解决  例如new ServiceA(new ServiceB(new ServiceA(new …)))）</p>
+<p>​    2、以set方式注入依赖 ( <font color="red"> spring内部通过3级缓存来解决循环依赖</font>)</p>
+<p><font color="red">默认的单例（singleton）的场景是支持循环依赖的，不报错；原型（Prototype）的场景是不支持循环依赖的，会报错</font></p>
+<h5 id="三级缓存"><a href="#三级缓存" class="headerlink" title="三级缓存"></a>三级缓存</h5><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DefaultSingletonBeanRegistry</span> <span class="keyword">extends</span> <span class="title">SimpleAliasRegistry</span> <span class="keyword">implements</span> <span class="title">SingletonBeanRegistry</span></span>&#123;</span><br><span class="line">    <span class="comment">//一级缓存</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String,Object&gt; singletonObjects = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;(<span class="number">256</span>);</span><br><span class="line">    <span class="comment">//二级缓存</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String,Object&gt; earlySingletonObjects = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">16</span>);</span><br><span class="line">    <span class="comment">//三级缓存</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String,ObjectFactory&lt;?&gt;&gt; singletonFactories = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">16</span>);</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>实例化：内存中申请一块内存空间</p>
+<p>初始化：完成属性的各种赋值</p>
+<p>一级缓存singletonObjects：存放的是已经初始化好的bean</p>
+<p>二级缓存earlySingletonObjects：存放早期暴露出来的bean对象，已实例化未初始化的bean</p>
+<p>三级缓存Map&lt;String,ObjectFactory&lt;&gt;?&gt; singletonFactories，存放可以生成bean的工厂，存放的是FactoryBean，假如A类实现了FactoryBean，那么依赖注入的时候不是A类，而是A类产生的Bean，若要取A类的实例,getBean(“&amp;A的bean id”)</p>
+<blockquote>
+<p>FactoryBean和BeanFactory区别</p>
+<p>BeanFactory是个spring容器中一个顶级接口 ，是IOC容器或者对象工厂，在spring中所有bean都是由BeanFactory管理的，spring容器给了很多实现ClasspathXmlApplicationContext等</p>
+<p>FactoryBean是个接口  是一种工厂bean，可以产生bean的bean</p>
+</blockquote>
+<h4 id="A-B对象在三级缓存中的迁移说明"><a href="#A-B对象在三级缓存中的迁移说明" class="headerlink" title="A/B对象在三级缓存中的迁移说明"></a>A/B对象在三级缓存中的迁移说明</h4><ol>
+<li>A创建过程中需要B，于是A将自己放到三级缓存中，去实例化B</li>
+<li>B实例化的时候发现需要A，于是B先查一级缓存，没有再查二级缓存，还是没有再查三级缓存，找到A然后把三级缓存中的A放到二级缓存，并删除三级缓存中的A</li>
+<li>B顺利初始化完毕，将自己放到一级缓存中（此时B里面的A依然是创建中的状态），然后接着回来创建A，此时B已经创建结束，直接从一级缓存里拿到B，然后完成创建，并将A自己放到一级缓存中。</li>
+</ol>
+<h3 id="为什么要三级缓存？"><a href="#为什么要三级缓存？" class="headerlink" title="为什么要三级缓存？"></a>为什么要三级缓存？</h3><p>一级、二级缓存用于IOC，三级缓存用于AOP</p>
+<h5 id="一级缓存singletonObjects"><a href="#一级缓存singletonObjects" class="headerlink" title="一级缓存singletonObjects"></a>一级缓存singletonObjects</h5><p>实际上，一级缓存已经可以解决循环依赖问题，bean被实例化后即使没有初始化也不影响对象间引用持有；一级缓存关键点在于bean实例化与初始化的分离。</p>
+<h5 id="三级缓存-singletonFactories"><a href="#三级缓存-singletonFactories" class="headerlink" title="三级缓存 singletonFactories"></a>三级缓存 singletonFactories</h5><p>仅使用一级缓存根本问题就是我们拿到的是bean的原始引用，如果需要的是bean的代理对象怎么办，spring中充斥着大量动态代理模式的架构，所以，spring在bean实例化后，将原始bean放入三级缓存中，三级缓存中实际存入的是ObjectFactory接口签名的回调实现，如果有动态代理需求，里面可以埋点进行处理，将原始bean包装后返回。通过三级缓存我们可以拿到可能经过包装的对象，解决对象代理封装的问题。</p>
+<h5 id="二级缓存earlySingletonObjects"><a href="#二级缓存earlySingletonObjects" class="headerlink" title="二级缓存earlySingletonObjects"></a>二级缓存earlySingletonObjects</h5><p>从软件设计角度考虑，三个缓存代表三种不同职责，根据单一职责原理，从设计角度就需要分离三种职责的缓存。</p>
+<p>一级缓存是完整的bean，可以被外界任意使用，不会有歧义。</p>
+<p>二级缓存是不完整的bean，没有完成初始化，它与一级缓存的分离主要是职责的分离及边界的划分，可以试想一个Map缓存中既有完整可用的bean，也有不完整的只能持有引用的bean，在复杂度很高的架构中，很容易出现歧义，并带来一些不可预知的错误。</p>
+<p>三级缓存其职责就是包装一个bean，有回调逻辑，所以它的作用非常清晰，并且只能处于第三层。</p>
+<p>整个使用过程中，要获取一个bean，从一级缓存一直查找到三级缓存，缓存bean的时候是从三级缓存到一级缓存顺序保存，且在缓存过程中，三个缓存是互斥的，只会保持bean在一个缓存中，而且最终都会在一级缓存中。</p>
+<h1 id="Spring-AOP"><a href="#Spring-AOP" class="headerlink" title="Spring AOP"></a>Spring AOP</h1><p>createBean()中的resolveBeforeInstantiation()方法在bean还没实例化前执行，提供bean后置处理器一个返回代理的机会，判断是否需要创建代理，不需要就直接创建bean，否则创建的是代理对象</p>
+<p>resolveBeforeInstantiation(beanName,bdbToUse)方法里调用InstantiationAwareBeanPostProcessor这个bean的后置处理器方法，从类名字上看是拦截bean实例化阶段，通过调用postProcessBeforeInstantiation方法生成对象。</p>
+<p>我们先来看一般怎么使用Spring AOP的：写一个@Aspect注解的切面类并使用@EnableAspectJAutoProxy注解启用代理，点进去发现它导入了一个AspectJAutoProxyRegistrar到Spring容器中，该类是一个ImportBeanDefinitionRegistrar类，会在解析配置类的时候调用registerBeanDefinitions方法，该方法会向容器中注入一个AnnotationAwareAspectJAutoProxyCreator类的bean定义，AnnotationAwareAspectJAutoProxyCreator是一个InstantiationAwareBeanPostProcessor。</p>
+<p>这里就跟上面吻合了，实例化bean时先执行InstantiationAwareBeanPostProcessor，若有返回对象则使用该对象，否则才会去创建实例。所以@EnableAspectJAutoProxy注解的作用就是向容器中添加一个InstantiationAwareBeanPostProcessor类，拦截bean的创建并生成代理对象。postProcessBeforeInstantiation中的createProxy方法点进去可以发现动态代理创建有两种方式，如果该类是接口，则使用jdk动态代理，否则使用cglib动态代理。</p>
+<h5 id="为什么JDK动态代理只能代理接口？"><a href="#为什么JDK动态代理只能代理接口？" class="headerlink" title="为什么JDK动态代理只能代理接口？"></a>为什么JDK动态代理只能代理接口？</h5><p>JDK动态代理在创建代理对象时，默认让代理对象继承了Proxy类，java不支持多继承，所以JDK只能通过接口实现动态代理。cglib实现动态代理的逻辑是用子类继承被代理类，没有单继承的限制了。</p>
+]]></content>
+  </entry>
+  <entry>
     <title>一些问题</title>
     <url>/2022/06/25/%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/</url>
     <content><![CDATA[<p>同步和异步、阻塞和非阻塞<br>    同步和异步关注的是消息通信机制，<br>    所谓同步，就是在发出调用时没得到结果前该调用就不返回，一旦调用返回就得到返回值<br>    异步：调用发出后就直接返回，没有返回结果；一个异步调用发出后，调用者不会立刻得到结果，被调用者通过状态、通知来通知调用者或者通过回调函数处理这个调用</p>

@@ -188,6 +188,978 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2020/03/01/MyBatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%B8%80)%E2%80%94%E2%80%94MyBatis%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E8%A7%A3%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/01/MyBatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%B8%80)%E2%80%94%E2%80%94MyBatis%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E8%A7%A3%E6%9E%90/" class="post-title-link" itemprop="url">MyBatis源码解析(一)——MyBatis初始化过程解析</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-01 15:03:52" itemprop="dateCreated datePublished" datetime="2020-03-01T15:03:52+08:00">2020-03-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:03:21" itemprop="dateModified" datetime="2020-05-01T19:03:21+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mybatis/" itemprop="url" rel="index"><span itemprop="name">Mybatis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+
+<h1>1. 准备工作</h1>
+
+<p>为了看清楚MyBatis的整个初始化过程，先创建一个简单的Java项目，目录结构如下图所示：</p>
+
+<p> </p>
+
+<p><img alt src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTk0NjA0LTk0Y2EzOTk4YmVlMGFiYjcucG5nP2ltYWdlTW9ncjIvYXV0by1vcmllbnQvc3RyaXB8aW1hZ2VWaWV3Mi8yL3cvMjk0L2Zvcm1hdC93ZWJw?x-oss-process=image/format,png"></p>
+
+<h2>1.1 Product 产品实体类</h2>
+
+<p> </p>
+
+<pre>
+<code>public class Product {
+    private long id;
+    private String productName;
+    private String productContent;
+    private String price;
+    private int sort;
+    private int falseSales;
+    private long category_id;
+    private byte type;
+    private byte state;
+    // PS：省略setter、getter函数
+}
+</code></pre>
+
+<h2>1.2 ProductMapper 产品持久化接口</h2>
+
+<p> </p>
+
+<pre>
+<code>public interface ProductMapper {
+    /**
+     * 查询所有的产品
+     * @return
+     */
+    List&lt;Product&gt; selectProductList();
+}
+</code></pre>
+
+<h2>1.3 ProductMapper.xml 产品映射文件</h2>
+
+<p> </p>
+
+<pre>
+<code>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" &gt;
+
+&lt;mapper namespace="team.njupt.mapper.ProductMapper"&gt;
+    &lt;select id="selectProductList" resultType="team.njupt.entity.Product"&gt;
+        select * from product
+    &lt;/select&gt;
+&lt;/mapper&gt;
+</code></pre>
+
+<h2>1.4 db.properties 数据库配置文件</h2>
+
+<p> </p>
+
+<pre>
+<code>driver=com.mysql.jdbc.Driver
+url=jdbc:mysql://127.0.0.1:3306/waimai?useUnicode=true&amp;characterEncoding=utf8
+username=root
+password=xxxxxx
+</code></pre>
+
+<h2>1.5 mybatis.xml MyBatis的配置文件</h2>
+
+<p> </p>
+
+<pre>
+<code>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd"&gt;
+&lt;configuration&gt;
+    &lt;properties resource="db.properties"&gt;
+        &lt;!--&lt;property name="username" value="dev_user"/&gt;--&gt;
+        &lt;!--&lt;property name="password" value="F2Fa3!33TYyg"/&gt;--&gt;
+    &lt;/properties&gt;
+
+    &lt;environments default="development"&gt;
+        &lt;environment id="development"&gt;
+            &lt;transactionManager type="JDBC"/&gt;
+            &lt;dataSource type="POOLED"&gt;
+                &lt;property name="driver" value="${driver}"/&gt;
+                &lt;property name="url" value="${url}"/&gt;
+                &lt;property name="username" value="${username}"/&gt;
+                &lt;property name="password" value="${password}"/&gt;
+            &lt;/dataSource&gt;
+        &lt;/environment&gt;
+    &lt;/environments&gt;
+    &lt;mappers&gt;
+        &lt;mapper resource="team/njupt/mapper/ProductMapper.xml"/&gt;
+    &lt;/mappers&gt;
+&lt;/configuration&gt;
+</code></pre>
+
+<h2>1.6 Main 主函数</h2>
+
+<p> </p>
+
+<pre>
+<code>public class Main {
+    public static void main(String[] args) throws IOException {
+
+        String resource = "mybatis.xml";
+        InputStream inputStream = Resources.getResourceAsStream(resource);
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            ProductMapper productMapper = sqlSession.getMapper(ProductMapper.class);
+            List&lt;Product&gt; productList = productMapper.selectProductList();
+            for (Product product : productList) {
+                System.out.printf(product.toString());
+            }
+        } finally {
+            sqlSession.close();
+        }
+    }
+}
+</code></pre>
+
+<hr><h1>2. MyBatis初始化过程</h1>
+
+<h2>2.1 获取配置文件</h2>
+
+<p>当系统初始化时，首先会读取配置文件，并将其解析成InputStream</p>
+
+<p> </p>
+
+<pre>
+<code>String resource = "mybatis.xml";
+InputStream inputStream = Resources.getResourceAsStream(resource);
+</code></pre>
+
+<h2>2.2 创建SqlSessionFactoryBuilder对象</h2>
+
+<p>从<code>SqlSessionFactoryBuilder</code>的名字中可以看出，<code>SqlSessionFactoryBuilder</code>是用来创建<code>SqlSessionFactory</code>对象的。<br>
+来看一下SqlSessionFactoryBuilder源码：</p>
+
+<p><img alt src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTk0NjA0LWIwZjNlOTk1YWM1NmYyMGEucG5nP2ltYWdlTW9ncjIvYXV0by1vcmllbnQvc3RyaXB8aW1hZ2VWaWV3Mi8yL3cvMzQ5L2Zvcm1hdC93ZWJw?x-oss-process=image/format,png"></p>
+
+<p><br>
+SqlSessionFactoryBuilder中只有一些重载的build函数，这些build函数的入参都是MyBatis配置文件的输入流，返回值都是SqlSessionFactory；由此可见，SqlSessionFactoryBuilder的作用很纯粹，就是用来通过配置文件创建SqlSessionFactory对象的。</p>
+
+<p> </p>
+
+<h2>2.3 SqlSessionFactory创建过程</h2>
+
+<p>下面具体来看一下，build函数是如何创建SqlSessionFactory对象的。</p>
+
+<p> </p>
+
+<pre>
+<code>public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
+  try {
+    XMLConfigBuilder parser = new XMLConfigBuilder(inputStream, environment, properties);
+    return build(parser.parse());
+  } catch (Exception e) {
+    throw ExceptionFactory.wrapException("Error building SqlSession.", e);
+  } finally {
+    ErrorContext.instance().reset();
+    try {
+      inputStream.close();
+    } catch (IOException e) {
+      // Intentionally ignore. Prefer previous error.
+    }
+  }
+}
+</code></pre>
+
+<p>2.3.1 构造XMLConfigBuilder对象</p>
+
+<p>build函数首先会构造一个<code>XMLConfigBuilder</code>对象，从名字上大致可以猜到，该对象是用来解析XML配置文件的。下面来看一下<code>XMLConfigBuilder</code>的体系结构。</p>
+
+<p><img alt src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTk0NjA0LTM5OThmOTcyYTZhNGUyNTEucG5nP2ltYWdlTW9ncjIvYXV0by1vcmllbnQvc3RyaXB8aW1hZ2VWaWV3Mi8yL3cvNzQ4L2Zvcm1hdC93ZWJw?x-oss-process=image/format,png"></p>
+
+<p> </p>
+
+<ul><li>
+    <p><code>XMLxxxBuilder</code>是用来解析XML配置文件的，不同类型<code>XMLxxxBuilder</code>用来解析MyBatis配置文件的不同部位。比如：<code>XMLConfigBuilder</code>用来解析MyBatis的配置文件，<code>XMLMapperBuilder</code>用来解析MyBatis中的映射文件（如上文提到的<code>ProductMapper.xml</code>），<code>XMLStatementBuilder</code>用来解析映射文件中的SQL语句。</p>
+    </li>
+    <li>
+    <p>这些<code>XMLxxxBuilder</code>都有一个共同的父类——<code>BaseBuilder</code>。这个父类维护了一个全局的<code>Configuration</code>对象，MyBatis的配置文件解析后就以<code>Configuration</code>对象的形式存储。</p>
+    </li>
+    <li>
+    <p>当创建<code>XMLConfigBuilder</code>对象时，就会初始化<code>Configuration</code>对象，并且在初始化<code>Configuration</code>对象的时候，一些别名会被注册到<code>Configuration</code>的<code>typeAliasRegistry</code>容器中。</p>
+
+<pre><code>&lt;pre&gt;</code></pre><p><code>private XMLConfigBuilder(XPathParser parser, String environment, Properties props) {<br>super(new Configuration());<br>ErrorContext.instance().resource("SQL Mapper Configuration");<br>this.configuration.setVariables(props);<br>this.parsed = false;<br>this.environment = environment;<br>this.parser = parser;<br>}<br></code></p>
+<pre><code>&lt;pre&gt;</code></pre><p><code>public Configuration() {<br>typeAliasRegistry.registerAlias("JDBC", JdbcTransactionFactory.class);<br>typeAliasRegistry.registerAlias("MANAGED", ManagedTransactionFactory.class);</code></p>
+<p>typeAliasRegistry.registerAlias("JNDI", JndiDataSourceFactory.class);<br>typeAliasRegistry.registerAlias("POOLED", PooledDataSourceFactory.class);<br>typeAliasRegistry.registerAlias("UNPOOLED", UnpooledDataSourceFactory.class);</p>
+<p>typeAliasRegistry.registerAlias("PERPETUAL", PerpetualCache.class);<br>typeAliasRegistry.registerAlias("FIFO", FifoCache.class);<br>typeAliasRegistry.registerAlias("LRU", LruCache.class);<br>typeAliasRegistry.registerAlias("SOFT", SoftCache.class);<br>typeAliasRegistry.registerAlias("WEAK", WeakCache.class);<br>……<br>}<br><br>    </p></li><p></p>
+</ul><h3>2.3.2 解析配置文件</h3>
+
+<p>当有了<code>XMLConfigBuilder</code>对象之后，接下来就可以用它来解析配置文件了。</p>
+
+<p> </p>
+
+<pre>
+<code>  private void parseConfiguration(XNode root) {
+  try {
+    // 解析&lt;properties&gt;节点
+    propertiesElement(root.evalNode("properties"));
+    // 解析&lt;settings&gt;节点
+    Properties settings = settingsAsProperties(root.evalNode("settings"));
+    loadCustomVfs(settings);
+    // 解析&lt;typeAliases&gt;节点
+    typeAliasesElement(root.evalNode("typeAliases"));
+    // 解析&lt;plugins&gt;节点
+    pluginElement(root.evalNode("plugins"));
+    // 解析&lt;objectFactory&gt;节点
+    objectFactoryElement(root.evalNode("objectFactory"));
+    objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
+    // 解析&lt;reflectorFactory&gt;节点
+    reflectorFactoryElement(root.evalNode("reflectorFactory"));
+    settingsElement(settings);
+    // 解析&lt;environments&gt;节点
+    environmentsElement(root.evalNode("environments"));
+    databaseIdProviderElement(root.evalNode("databaseIdProvider"));
+    typeHandlerElement(root.evalNode("typeHandlers"));
+    // 解析&lt;mappers&gt;节点
+    mapperElement(root.evalNode("mappers"));
+  } catch (Exception e) {
+    throw new BuilderException("Error parsing SQL Mapper Configuration. Cause: " + e, e);
+  }
+}
+</code></pre>
+
+<p>从上述代码中可以看到，<code>XMLConfigBuilder</code>会依次解析配置文件中的<code>&lt;properties&gt;</code>、<code>&lt; settings &gt;</code>、<code>&lt; environments&gt;</code>、<code>&lt; typeAliases &gt;</code>、<code>&lt; plugins &gt;</code>、<code>&lt; mappers &gt;</code>等属性。下面介绍下几个重要属性的解析过程。</p>
+
+<p>2.3.2.1 &lt;properties&gt;节点的解析过程</p>
+
+<ul><li>
+    <p>&lt;properties&gt;节点的定义如下：</p>
+
+<pre><code>&lt;pre&gt;</code></pre><p><code class="language-java">&lt;properties resource="org/mybatis/example/config.properties"&gt;<br>  &lt;property name="username" value="dev_user"/&gt;<br>  &lt;property name="password" value="F2Fa3!33TYyg"/&gt;<br>&lt;/properties&gt;<br></code><br>    </p></li><p></p>
+</ul><p> </p>
+
+<ul><li>
+    <p>&lt;properties&gt;节点的解析过程：</p>
+
+<pre><code>&lt;pre&gt;</code></pre><p><code>/**</code></p>
+<ul>
+<li><p>@Param context &lt;properties&gt;节点</p>
+</li>
+<li><p>/<br>private void propertiesElement(XNode context) throws Exception {<br>if (context != null) {<br> // 获取&lt;properties&gt;节点的所有子节点<br> Properties defaults = context.getChildrenAsProperties();<br> // 获取&lt;properties&gt;节点上的resource属性<br> String resource = context.getStringAttribute("resource");<br> // 获取&lt;properties&gt;节点上的url属性<br> String url = context.getStringAttribute("url");<br> // resource和url不能同时存在<br> if (resource != null &amp;&amp; url != null) {<br>   throw new BuilderException("The properties element cannot specify both a URL and a resource based property file reference.  Please specify one or the other.");<br> }<br> if (resource != null) {<br>   // 获取resource属性值对应的properties文件中的键值对，并添加至defaults容器中<br>   defaults.putAll(Resources.getResourceAsProperties(resource));<br> } else if (url != null) {<br>   // 获取url属性值对应的properties文件中的键值对，并添加至defaults容器中<br>   defaults.putAll(Resources.getUrlAsProperties(url));<br> }<br> // 获取configuration中原本的属性，并添加至defaults容器中<br> Properties vars = configuration.getVariables();<br> if (vars != null) {<br>   defaults.putAll(vars);<br> }<br> parser.setVariables(defaults);<br> // 将defaults容器添加至configuration中<br> configuration.setVariables(defaults);<br>}<br>}<br></p>
+ <p>如果属性在不只一个地方进行了配置，那么 MyBatis 将按照下面的顺序来加载：</p>
+ </li>
+ <li>在 properties 元素体内指定的属性首先被读取。</li>
+ <li>然后根据 properties 元素中的 resource 属性读取类路径下属性文件或根据 url 属性指定的路径读取属性文件，并覆盖已读取的同名属性。</li>
+</ul><p>因此，通过方法参数传递的属性具有最高优先级，resource/url 属性中指定的配置文件次之，最低优先级的是 properties 属性中指定的属性。</p>
+
+</li>
+</ul>
+<ul><li>最终，携带所有属性的<code>Properties</code>对象会被存储在<code>Configuration</code>对象中。</li>
+</ul><p>2.3.2.2 &lt;settings&gt;节点的解析过程</p>
+
+<ul><li>&lt;settings&gt;节点的定义如下：
+    <pre>
+<code>&lt;settings&gt;
+  &lt;setting name="cacheEnabled" value="true"/&gt;
+  &lt;setting name="lazyLoadingEnabled" value="true"/&gt;
+  &lt;setting name="multipleResultSetsEnabled" value="true"/&gt;
+&lt;/settings&gt;
+</code></pre>
+    </li>
+    <li>&lt;settings&gt;节点的解析过程：<br><code>&lt;settings&gt;</code>属性的解析过程和 <code>&lt;properties&gt;</code>属性的解析过程极为类似，这里不再赘述。最终，所有的setting属性都被存储在<code>Configuration</code>对象中。</li>
+</ul><p>2.3.2.3 &lt;typeAliases&gt;属性的解析过程</p>
+
+<p><code>&lt;typeAliases&gt;</code>属性的定义方式有如下两种：</p>
+
+<ul><li>方式1：
+    <pre>
+<code>&lt;typeAliases&gt;
+  &lt;typeAlias alias="Author" type="domain.blog.Author"/&gt;
+  &lt;typeAlias alias="Blog" type="domain.blog.Blog"/&gt;
+&lt;/typeAliases&gt;
+</code></pre>
+    </li>
+    <li>方式2：
+    <pre>
+<code>&lt;typeAliases&gt;
+  &lt;package name="domain.blog"/&gt;
+&lt;/typeAliases&gt;
+</code></pre>
+    采用这种方式时，MyBatis会为指定包下的所有类起一个别名，该别名为首字母小写的类名。</li>
+</ul><p><code>&lt;typeAliases&gt;</code>节点的解析过程如下：</p>
+
+<p> </p>
+
+<pre>
+<code>  private void typeAliasesElement(XNode parent) {
+  if (parent != null) {
+    // 遍历&lt;typeAliases&gt;下的所有子节点
+    for (XNode child : parent.getChildren()) {
+      // 若当前结点为&lt;package&gt;
+      if ("package".equals(child.getName())) {
+        // 获取&lt;package&gt;上的name属性（包名）
+        String typeAliasPackage = child.getStringAttribute("name");
+        // 为该包下的所有类起个别名，并注册进configuration的typeAliasRegistry中          
+        configuration.getTypeAliasRegistry().registerAliases(typeAliasPackage);
+      } 
+      // 如果当前结点为&lt; typeAlias &gt;
+      else {
+        // 获取alias和type属性
+        String alias = child.getStringAttribute("alias");
+        String type = child.getStringAttribute("type");
+        // 注册进configuration的typeAliasRegistry中
+        try {
+          Class&lt;?&gt; clazz = Resources.classForName(type);
+          if (alias == null) {
+            typeAliasRegistry.registerAlias(clazz);
+          } else {
+            typeAliasRegistry.registerAlias(alias, clazz);
+          }
+        } catch (ClassNotFoundException e) {
+          throw new BuilderException("Error registering typeAlias for '" + alias + "'. Cause: " + e, e);
+        }
+      }
+    }
+  }
+}
+</code></pre>
+
+<ul><li>如果<code>&lt;typeAliases&gt;</code>节点下定义了<code>&lt;package&gt;</code>节点，那么MyBatis会给该包下的所有类起一个别名（以类名首字母小写作为别名）</li>
+    <li>如果<code>&lt;typeAliases&gt;</code>节点下定义了<code>&lt;typeAlias&gt;</code>节点，那么MyBatis就会给指定的类起指定的别名。</li>
+    <li>这些别名都会被存入<code>configuration</code>的<code>typeAliasRegistry</code>容器中。</li>
+</ul><p>2.3.2.4 &lt;mappers&gt;节点的解析过程</p>
+
+<p><code>&lt;mappers&gt;</code>节点的定义方式有如下四种：</p>
+
+<ul><li>方式1：</li>
+</ul><p> </p>
+
+<pre>
+<code>&lt;mappers&gt;
+  &lt;package name="org.mybatis.builder"/&gt;
+&lt;/mappers&gt;
+</code></pre>
+
+<ul><li>方式2：</li>
+</ul><p> </p>
+
+<pre>
+<code>&lt;mappers&gt;
+  &lt;mapper resource="org/mybatis/builder/AuthorMapper.xml"/&gt;
+&lt;/mappers&gt;
+</code></pre>
+
+<ul><li>方式3：</li>
+</ul><p> </p>
+
+<pre>
+<code>&lt;mappers&gt;
+  &lt;mapper url="file:///var/mappers/AuthorMapper.xml"/&gt;
+&lt;/mappers&gt;
+</code></pre>
+
+<ul><li>方式4：</li>
+</ul><p> </p>
+
+<pre>
+<code>&lt;mappers&gt;
+  &lt;mapper class="org.mybatis.builder.AuthorMapper"/&gt;
+&lt;/mappers&gt;
+</code></pre>
+
+<p><code>&lt;mappers&gt;</code>节点的解析过程如下：</p>
+
+<p> </p>
+
+<pre>
+<code>  private void mapperElement(XNode parent) throws Exception {
+  if (parent != null) {
+    // 遍历&lt;mappers&gt;下所有子节点
+    for (XNode child : parent.getChildren()) {
+      // 如果当前节点为&lt;package&gt;
+      if ("package".equals(child.getName())) {
+        // 获取&lt;package&gt;的name属性（该属性值为mapper class所在的包名）
+        String mapperPackage = child.getStringAttribute("name");
+        // 将该包下的所有Mapper Class注册到configuration的mapperRegistry容器中
+        configuration.addMappers(mapperPackage);
+      } 
+      // 如果当前节点为&lt;mapper&gt;
+      else {
+        // 依次获取resource、url、class属性
+        String resource = child.getStringAttribute("resource");
+        String url = child.getStringAttribute("url");
+        String mapperClass = child.getStringAttribute("class");
+        // 解析resource属性（Mapper.xml文件的路径）
+        if (resource != null &amp;&amp; url == null &amp;&amp; mapperClass == null) {
+          ErrorContext.instance().resource(resource);
+          // 将Mapper.xml文件解析成输入流
+          InputStream inputStream = Resources.getResourceAsStream(resource);
+          // 使用XMLMapperBuilder解析Mapper.xml，并将Mapper Class注册进configuration对象的mapperRegistry容器中
+          XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
+          mapperParser.parse();
+        } 
+        // 解析url属性（Mapper.xml文件的路径）
+        else if (resource == null &amp;&amp; url != null &amp;&amp; mapperClass == null) {
+          ErrorContext.instance().resource(url);
+          InputStream inputStream = Resources.getUrlAsStream(url);
+          XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, url, configuration.getSqlFragments());
+          mapperParser.parse();
+        } 
+        // 解析class属性（Mapper Class的全限定名）
+        else if (resource == null &amp;&amp; url == null &amp;&amp; mapperClass != null) {
+          // 将Mapper Class的权限定名转化成Class对象
+          Class&lt;?&gt; mapperInterface = Resources.classForName(mapperClass);
+          // 注册进configuration对象的mapperRegistry容器中
+          configuration.addMapper(mapperInterface);
+        } else {
+          throw new BuilderException("A mapper element may only specify a url, resource or class, but not more than one.");
+        }
+      }
+    }
+  }
+}
+</code></pre>
+
+<ul><li>MyBatis会遍历<code>&lt;mappers&gt;</code>下所有的子节点，如果当前遍历到的节点是<code>&lt;package&gt;</code>，则MyBatis会将该包下的所有Mapper Class注册到<code>configuration</code>的<code>mapperRegistry</code>容器中。</li>
+    <li>如果当前节点为<code>&lt;mapper&gt;</code>，则会依次获取resource、url、class属性，解析映射文件，并将映射文件对应的Mapper Class注册到<code>configuration</code>的<code>mapperRegistry</code>容器中。</li>
+</ul><p>其中，<code>&lt;mapper&gt;</code>节点的解析过程如下：</p>
+
+<p> </p>
+
+<pre>
+<code>XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
+mapperParser.parse();
+</code></pre>
+
+<ul><li>
+    <p>在解析前，首先需要创建<code>XMLMapperBuilder</code>，创建过程如下：</p>
+
+<pre><code>&lt;pre&gt;</code></pre><p><code>private XMLMapperBuilder(XPathParser parser, Configuration configuration, String resource, Map&lt;String, XNode&gt; sqlFragments) {<br>  // 将configuration赋给BaseBuilder<br>  super(configuration);<br>  // 创建MapperBuilderAssistant对象（该对象为MapperBuilder的协助者）<br>  this.builderAssistant = new  MapperBuilderAssistant(configuration, resource);<br>  this.parser = parser;<br>  this.sqlFragments = sqlFragments;<br>  this.resource = resource;<br>}<br></code></p>
+<pre><code>&lt;ul&gt;&lt;li&gt;首先会初始化父类&lt;code&gt;BaseBuilder&lt;/code&gt;，并将&lt;code&gt;configuration&lt;/code&gt;赋给BaseBuilder；&lt;/li&gt;
+    &lt;li&gt;然后创建&lt;code&gt;MapperBuilderAssistant&lt;/code&gt;对象，该对象为&lt;code&gt;XMLMapperBuilder&lt;/code&gt;的协助者，用来协助&lt;code&gt;XMLMapperBuilder&lt;/code&gt;完成一些解析映射文件的动作。&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;当有了&lt;code&gt;XMLMapperBuilder&lt;/code&gt;后，便可进入解析&lt;code&gt;&amp;lt;mapper&amp;gt;&lt;/code&gt;的过程：&lt;/p&gt;
+
+&lt;pre&gt;</code></pre><p><code>public void parse() {<br>  // 若当前的Mapper.xml尚未被解析，则开始解析<br>  // PS：若&lt;mappers&gt;节点下有相同的&lt;mapper&gt;节点，那么就无需再次解析了<br>  if (!configuration.isResourceLoaded(resource)) {<br>    // 解析&lt;mapper&gt;节点<br>    configurationElement(parser.evalNode("/mapper"));<br>    // 将该Mapper.xml添加至configuration的LoadedResource容器中，下回无需再解析<br>    configuration.addLoadedResource(resource);<br>    // 将该Mapper.xml对应的Mapper Class注册进configuration的mapperRegistry容器中<br>    bindMapperForNamespace();<br>  }</code></p>
+<p>  parsePendingResultMaps();<br>  parsePendingCacheRefs();<br>  parsePendingStatements();<br>}<br><br>    </p></li><br>    <li><br>    <p><code>configurationElement</code>函数</p><p></p>
+<pre><code>&lt;pre&gt;</code></pre><p><code>private void configurationElement(XNode context) {<br>try {<br>  // 获取&lt;mapper&gt;节点上的namespace属性，该属性必须存在，表示当前映射文件对应的Mapper Class是谁<br>  String namespace = context.getStringAttribute("namespace");<br>  if (namespace == null || namespace.equals("")) {<br>    throw new BuilderException("Mapper's namespace cannot be empty");<br>  }<br>  // 将namespace属性值赋给builderAssistant<br>  builderAssistant.setCurrentNamespace(namespace);<br>  // 解析&lt;cache-ref&gt;节点<br>  cacheRefElement(context.evalNode("cache-ref"));<br>  // 解析&lt;cache&gt;节点<br>  cacheElement(context.evalNode("cache"));<br>  // 解析&lt;parameterMap&gt;节点<br>  parameterMapElement(context.evalNodes("/mapper/parameterMap"));<br>  // 解析&lt;resultMap&gt;节点<br>  resultMapElements(context.evalNodes("/mapper/resultMap"));<br>  // 解析&lt;sql&gt;节点<br>  sqlElement(context.evalNodes("/mapper/sql"));<br>  // 解析sql语句<br>  buildStatementFromContext(context.evalNodes("select|insert|update|delete"));<br>} catch (Exception e) {<br>  throw new BuilderException("Error parsing Mapper XML. Cause: " + e, e);<br>}<br>}<br></code><br>    </p></li><br>    <li><br>    <p><code>resultMapElements</code>函数<br><br>    该函数用于解析映射文件中所有的<code>&lt;resultMap&gt;</code>节点，这些节点会被解析成<code>ResultMap</code>对象，存储在<code>Configuration</code>对象的<code>resultMaps</code>容器中。</p><p></p>
+<pre><code>&lt;ul&gt;&lt;li&gt;&lt;code&gt;&amp;lt;resultMap&amp;gt;&lt;/code&gt;节点定义如下：&lt;/li&gt;
+&lt;/ul&gt;&lt;pre&gt;</code></pre><p><code> &lt;resultMap id="userResultMap" type="User"&gt;<br>  &lt;constructor&gt;<br>     &lt;idArg column="id" javaType="int"/&gt;<br>     &lt;arg column="username" javaType="String"/&gt;<br>  &lt;/constructor&gt;<br>  &lt;result property="username" column="user_name"/&gt;<br>  &lt;result property="password" column="hashed_password"/&gt;<br>&lt;/resultMap&gt;<br></code></p>
+<pre><code>&lt;ul&gt;&lt;li&gt;&lt;code&gt;&amp;lt;resultMap&amp;gt;&lt;/code&gt;节点的解析过程：&lt;/li&gt;
+&lt;/ul&gt;&lt;pre&gt;</code></pre><p><code>private ResultMap resultMapElement(XNode resultMapNode, List&lt;ResultMapping&gt; additionalResultMappings) throws Exception {<br>  ErrorContext.instance().activity("processing " + resultMapNode.getValueBasedIdentifier());<br>  // 获取&lt;ResultMap&gt;上的id属性<br>  String id = resultMapNode.getStringAttribute("id",<br>    resultMapNode.getValueBasedIdentifier());<br>  // 获取&lt;ResultMap&gt;上的type属性（即resultMap的返回值类型）<br>  String type = resultMapNode.getStringAttribute("type",<br>    resultMapNode.getStringAttribute("ofType",<br>        resultMapNode.getStringAttribute("resultType",<br>            resultMapNode.getStringAttribute("javaType"))));<br>  // 获取extends属性<br>  String extend = resultMapNode.getStringAttribute("extends");<br>  // 获取autoMapping属性<br>  Boolean autoMapping = resultMapNode.getBooleanAttribute("autoMapping");<br>  // 将resultMap的返回值类型转换成Class对象<br>  Class&lt;?&gt; typeClass = resolveClass(type);<br>  Discriminator discriminator = null;<br>  // resultMappings用于存储&lt;resultMap&gt;下所有的子节点<br>  List&lt;ResultMapping&gt; resultMappings = new ArrayList&lt;ResultMapping&gt;();<br>  resultMappings.addAll(additionalResultMappings);<br>  // 获取并遍历&lt;resultMap&gt;下所有的子节点<br>  List&lt;XNode&gt; resultChildren = resultMapNode.getChildren();<br>  for (XNode resultChild : resultChildren) {<br>    // 若当前节点为&lt;constructor&gt;，则将它的子节点们添加到resultMappings中去<br>    if ("constructor".equals(resultChild.getName())) {<br>      processConstructorElement(resultChild, typeClass, resultMappings);<br>    }<br>    // 若当前节点为&lt;discriminator&gt;，则进行条件判断，并将命中的子节点添加到resultMappings中去<br>    else if ("discriminator".equals(resultChild.getName())) {<br>      discriminator = processDiscriminatorElement(resultChild, typeClass, resultMappings);<br>    }<br>    // 若当前节点为&lt;result&gt;、&lt;association&gt;、&lt;collection&gt;，则将其添加到resultMappings中去<br>    else {<br>      // PS:flags仅用于区分当前节点是否是&lt;id&gt;或&lt;idArg&gt;，因为这两个节点的属性名为name，而其他节点的属性名为property<br>      List&lt;ResultFlag&gt; flags = new ArrayList&lt;ResultFlag&gt;();<br>      if ("id".equals(resultChild.getName())) {<br>        flags.add(ResultFlag.ID);<br>      }<br>      resultMappings.add(buildResultMappingFromContext(resultChild, typeClass, flags));<br>    }<br>  }<br>  // ResultMapResolver的作用是生成ResultMap对象，并将其加入到Configuration对象的resultMaps容器中（具体过程见下）<br>  ResultMapResolver resultMapResolver = new ResultMapResolver(builderAssistant, id, typeClass, extend, discriminator, resultMappings, autoMapping);<br>  try {<br>    return resultMapResolver.resolve();<br>  } catch (IncompleteElementException  e) {<br>    configuration.addIncompleteResultMap(resultMapResolver);<br>    throw e;<br>  }<br>}<br></code></p>
+<pre><code>&lt;p&gt;&lt;code&gt;ResultMapResolver&lt;/code&gt;这个类很纯粹，有且仅有一个函数&lt;code&gt;resolve&lt;/code&gt;，用于构造&lt;code&gt;ResultMap&lt;/code&gt;对象，并将其存入Configuration对象的resultMaps容器中；而这个过程是借助于&lt;code&gt;MapperBuilderAssistant.addResultMap&lt;/code&gt;完成的。&lt;/p&gt;
+
+&lt;pre&gt;</code></pre><p><code>public ResultMap resolve() {<br>  return assistant.addResultMap(this.id, this.type, this.extend,  this.discriminator, this.resultMappings, this.autoMapping);<br>}<br></code><br>    </p></li><br>    <li><br>    <p><code>sqlElement</code>函数<br><br>    该函数用于解析映射文件中所有的<code>&lt;sql&gt;</code>节点，并将这些节点存储在当前映射文件所对应的XMLMapperBuilder对象的sqlFragments容器中，供解析sql语句时使用。</p><p></p>
+<pre><code>&lt;pre&gt;</code></pre><p><code>&lt;sql id="userColumns"&gt; ${alias}.id,${alias}.username,${alias}.password &lt;/sql&gt;<br></code><br>    </p></li><p></p>
+</ul><ul><li><code>buildStatementFromContext</code>函数<br>
+    该函数会将映射文件中的sql语句解析成<code>MappedStatement</code>对象，并存在<code>configuration</code>的<code>mappedStatements</code>。</li>
+</ul><h3>2.3.3 创建SqlSessionFactory对象</h3>
+
+<p> </p>
+
+<pre>
+<code>public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
+  try {
+    XMLConfigBuilder parser = new XMLConfigBuilder(inputStream, environment, properties);
+    return build(parser.parse());
+  } catch (Exception e) {
+    throw ExceptionFactory.wrapException("Error building SqlSession.", e);
+  } finally {
+    ErrorContext.instance().reset();
+    try {
+      inputStream.close();
+    } catch (IOException e) {
+      // Intentionally ignore. Prefer previous error.
+    }
+  }
+}
+</code></pre>
+
+<p>回过头来再看一下<code>SqlSessionFactory</code>的<code>build</code>函数，刚才说了半天，介绍了<code>XMLConfigBuilder</code>解析映射文件的过程，解析完成之后<code>parser.parse()</code>函数会返回一个包含了映射文件解析结果的<code>configuration</code>对象，紧接着，这个对象将作为参数传递给另一个build函数，如下：</p>
+
+<p> </p>
+
+<pre>
+<code>  public SqlSessionFactory build(Configuration config) {
+    return new DefaultSqlSessionFactory(config);
+  }
+</code></pre>
+
+<p>这个函数将<code>configuration</code>作为参数，创建了<code>DefaultSqlSessionFactory</code>对象。<br><code>DefaultSqlSessionFactory</code>是接口<code>SqlSessionFactory</code>的一个实现类，<code>SqlSessionFactory</code>的体系结构如下图所示：</p>
+
+<p><img alt src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy8yOTk0NjA0LWRhMmRiZDhmMWYyYWM4NDQucG5nP2ltYWdlTW9ncjIvYXV0by1vcmllbnQvc3RyaXB8aW1hZ2VWaWV3Mi8yL3cvNDM2L2Zvcm1hdC93ZWJw?x-oss-process=image/format,png"></p>
+
+<p> </p>
+
+<p>此时，<code>SqlSessionFactory</code>创建完毕！</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2019/12/08/Nginx%E7%9A%84%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E5%92%8C%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/12/08/Nginx%E7%9A%84%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E5%92%8C%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="post-title-link" itemprop="url">Nginx的反向代理和负载均衡</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-08 19:01:57" itemprop="dateCreated datePublished" datetime="2019-12-08T19:01:57+08:00">2019-12-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:44:24" itemprop="dateModified" datetime="2020-05-01T19:44:24+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+
+<h2>一、Nginx配置虚拟主机</h2>
+
+<ul><li>什么是虚拟主机？ </li>
+</ul><p>       虚拟主机是一种特殊的软硬件技术，它可以将网络上的每一台计算机分成多个虚拟主机，每个虚拟主机可以独立对外提供www服务，这样就可以实现一台主机对外提供多个web服务，每个虚拟主机之间是独立的，互不影响的。 </p>
+
+<p>     通过nginx可以实现虚拟主机的配置，nginx支持三种类型的虚拟主机配置，1、基于ip的虚拟主机， 2、基于域名的虚拟主机 3、基于端口的虚拟主机。</p>
+
+<h3><strong>1.1  基于ip的虚拟主机配置</strong></h3>
+
+<p>      Linux操作系统允许添加IP别名，IP别名就是在一块物理网卡上绑定多个lP地址。这样就能够在使用单一网卡的同一个服务器上运行多个基于IP的虚拟主机。</p>
+
+<p>一台nginx服务器绑定两个ip：192.168.101.3、192.168.101.103   </p>
+
+<p>访问不同的ip请求不同的html目录，即：</p>
+
+<p style="margin-left:0cm;">访问http://192.168.101.3将访问“html3”目录下的html网页</p>
+
+<p>访问http://192.168.101.103将访问“html103”目录下的html网页</p>
+
+<p><strong>1.1.1 创建html文件夹</strong></p>
+
+<p>将原来nginx的html目录拷贝两个目录 “html3”和“html103”，为了方便测试需要修改每个目录下的index.html内容使之个性化。</p>
+
+<p><strong>1.1.2 绑定多ip：</strong></p>
+
+<p style="margin-left:0cm;">1、将/etc/sysconfig/network-scripts/ifcfg-eth0文件复制一份，命名为ifcfg-eth0:1</p>
+
+<p style="margin-left:0cm;">修改其中内容：</p>
+
+<p style="margin-left:0cm;">DEVICE=eth0:1</p>
+
+<p style="margin-left:0cm;">IPADDR=192.168.25.103</p>
+
+<p style="margin-left:0cm;">其他项不用修改</p>
+
+<p style="margin-left:0cm;">2、重启系统</p>
+
+<p style="margin-left:0cm;"><strong>1.1.3 配置虚拟主机</strong></p>
+
+<p style="margin-left:0cm;">修改/usr/local/nginx/conf/nginx.conf文件，添加两个虚拟主机，如下：</p>
+
+<pre class="has">
+<code class="language-bash">#user  nobody;
+worker_processes  1;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+
+    keepalive_timeout  65;
+    #配置虚拟主机192.168.101.3
+    server {
+    #监听的ip和端口，配置192.168.101.3:80
+        listen       80;
+    #虚拟主机名称这里配置ip地址
+        server_name  192.168.101.3;
+    #所有的请求都以/开始，所有的请求都可以匹配此location
+        location / {
+        #使用root指令指定虚拟主机目录即网页存放目录
+        #比如访问http://ip/test.html将找到/usr/local/html3/test.html
+        #比如访问http://ip/item/test.html将找到/usr/local/html3/item/test.html
+
+            root   /usr/local/nginx/html3;
+        #指定欢迎页面，按从左到右顺序查找
+            index  index.html index.htm;
+        }
+
+    }
+    #配置虚拟主机192.168.101.103
+    server {
+        listen       80;
+        server_name  192.168.101.103;
+
+        location / {
+            root   /usr/local/nginx/html103;
+            index  index.html index.htm;
+        }
+
+    }
+
+}
+</code></pre>
+
+<h3>1.2 基于端口的虚拟主机 </h3>
+
+<p style="margin-left:0cm;">nginx对外提供80和8080两个端口监听服务。</p>
+
+<p style="margin-left:0cm;">请求80端口则请求html80目录下的html</p>
+
+<p style="margin-left:0cm;">请求8080端口则请求html8080目录下的html</p>
+
+<p style="margin-left:0cm;"><strong>1.2.1 创建html目录</strong></p>
+
+<p style="margin-left:0cm;">将原来nginx的html目录拷贝两个目录 “html80”和“html8080”，为了方便测试需要修改每个目录下的index.html内容使之个性化。</p>
+
+<p style="margin-left:0cm;"><strong>1.2.2 配置虚拟主机</strong></p>
+
+<p style="margin-left:0cm;">修改/usr/local/nginx/conf/nginx.conf文件，添加两个虚拟主机，如下：</p>
+
+<pre class="has">
+<code class="language-bash">#user  nobody;
+worker_processes  1;
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+
+    keepalive_timeout  65;
+    #配置虚拟主机
+    server {
+    #监听的ip和端口，配置80
+        listen       80;
+    #虚拟主机名称这里配置ip地址
+        server_name  192.168.101.3;
+    #所有的请求都以/开始，所有的请求都可以匹配此location
+        location / {
+        #使用root指令指定虚拟主机目录即网页存放目录
+        #比如访问http://ip/test.html将找到/usr/local/html3/test.html
+        #比如访问http://ip/item/test.html将找到/usr/local/html3/item/test.html
+
+            root   /usr/local/nginx/html80;
+        #指定欢迎页面，按从左到右顺序查找
+            index  index.html index.htm;
+        }
+
+    }
+    #配置虚拟主机
+    server {
+        listen       8080;
+        server_name  192.168.101.3;
+
+        location / {
+            root   /usr/local/nginx/html8080;
+            index  index.html index.htm;
+        }
+
+    }
+
+}
+</code></pre>
+
+<h3>1.3 基于域名的虚拟主机</h3>
+
+<p style="margin-left:0cm;">两个域名指向同一台nginx服务器，用户访问不同的域名显示不同的网页内容。</p>
+
+<p style="margin-left:0cm;">两个域名是aaa.test.com和bbb.test.com</p>
+
+<p style="margin-left:0cm;">nginx服务器使用虚拟机192.168.101.3</p>
+
+<p style="margin-left:0cm;"><strong>1.3.1 创建html目录</strong></p>
+
+<p style="margin-left:0cm;">在192.168.101.3上创建/usr/local/aaa_html，此目录为aaa.test.com域名访问的目录</p>
+
+<p style="margin-left:0cm;">在192.168.101.3上创建/usr/local/bbb_html，此目录为bbb.test.com域名访问的目录</p>
+
+<p style="margin-left:0cm;">目录中的内容使用nginx自带的html文件，将/usr/local/nginx/html中的内容拷贝分别拷贝到上边两个目录中，并且将aaa_html目录中的index.html内容改为：“Welcome to aaa nginx!”</p>
+
+<p style="margin-left:0cm;">将bbb_html目录中的index.html内容改为“Welcome to bbb nginx!”</p>
+
+<p style="margin-left:0cm;"><strong>1.3.2 配置虚拟主机</strong></p>
+
+<p style="margin-left:0cm;">修改/usr/local/nginx/conf/nginx.conf文件，添加两个虚拟主机，如下： </p>
+
+<pre class="has">
+<code>#配置虚拟主机aaa.test.com 
+server {
+        #监听的ip和端口，配置本机ip和端口
+        listen 192.168.101.3:80;        
+        #虚拟主机名称是aaa.test.com，请求域名aaa.test.com的url将由此server配置解析
+        server_name aaa.test.com;     
+        #所有的请求都以/开始，所有的请求都可以匹配此location
+        location / {
+        #使用root指令指定虚拟主机目录即网页存放目录
+        #比如访问http://ip/test.html将找到/usr/local/aaa_html/test.html
+        #比如访问http://ip/item/test.html将找到/usr/local/aaa_html/item/test.html
+                root /usr/local/aaa_html;    
+                #指定欢迎页面，按从左到右顺序查找
+                index index.html index.htm;    
+        }
+    }
+
+#配置虚拟主机bbb.test.com
+    server {
+        listen 192.168.101.3:80;
+        server_name bbb.test.com;
+        location / {
+                root /usr/local/bbb_html;
+                index index.html index.htm;
+        }
+    }
+
+</code></pre>
+
+<p style="margin-left:0cm;"> </p>
+
+<h2 style="margin-left:0cm;">二 、Nginx反向代理</h2>
+
+<ol><li style="margin-left:0cm;">什么是反向代理？</li>
+</ol><p style="margin-left:0cm;">      通常的代理服务器，只用于代理内部网络对Internet的连接请求，客户机必须指定代理服务器,并将本来要直接发送到Web服务器上的http请求发送到代理服务器中由代理服务器向Internet上的web服务器发起请求，最终达到客户机上网的目的。</p>
+
+<p style="margin-left:0cm;">      而反向代理（Reverse Proxy）方式是指以代理服务器来接受internet上的连接请求，然后将请求转发给内部网络上的服务器，并将从服务器上得到的结果返回给internet上请求连接的客户端，此时代理服务器对外就表现为一个反向代理服务器。</p>
+
+<p style="margin-left:0cm;">两个tomcat服务通过nginx反向代理，本例子使用三台虚拟机进行测试，</p>
+
+<p style="margin-left:0cm;">         nginx服务器：192.168.101.3</p>
+
+<p style="margin-left:0cm;">         tomcat1服务器：192.168.101.5</p>
+
+<p style="margin-left:0cm;">         tomcat2服务器：192.168.101.6</p>
+
+<p style="margin-left:0cm;"><strong>Nginx反向代理配置</strong></p>
+
+<p style="margin-left:0cm;">根据上边的需求在nginx.conf文件中配置反向代理，如下：</p>
+
+<pre class="has">
+<code>#配置一个代理即tomcat1服务器
+upstream tomcat_server1 {
+            server 192.168.101.5:8080;
+        }
+#配置一个代理即tomcat2服务器
+    upstream tomcat_server2 {
+            server 192.168.101.6:8080;
+        }
+
+#配置一个虚拟主机
+    server {
+        listen 80;
+        server_name aaa.test.com;
+        location / {
+                #域名aaa.test.com的请求全部转发到tomcat_server1即tomcat1服务上
+                proxy_pass http://tomcat_server1;
+                #欢迎页面，按照从左到右的顺序查找页面
+                index index.jsp index.html index.htm;
+        }
+
+    }
+
+    server {
+        listen 80;
+        server_name bbb.test.com;
+
+        location / {
+                 #域名bbb.test.com的请求全部转发到tomcat_server2即tomcat2服务上
+                  proxy_pass http://tomcat_server2;
+                  index index.jsp index.html index.htm;
+        }
+    }
+</code></pre>
+
+<p style="margin-left:0cm;">如果在同一个域名下有多台服务器提供服务，此时需要nginx负载均衡。</p>
+
+<h2 style="margin-left:0cm;">三、Nginx负载均衡</h2>
+
+<ol><li>什么是负载均衡？</li>
+</ol><p style="margin-left:0cm;">       负载均衡 建立在现有网络结构之上，它提供了一种廉价有效透明的方法扩展网络设备和服务器的带宽、增加吞吐量、加强网络数据处理能力、提高网络的灵活性和可用性。</p>
+
+<p style="margin-left:0cm;">       负载均衡，英文名称为Load Balance，其意思就是分摊到多个操作单元上进行执行，例如Web服务器、FTP服务器、企业关键应用服务器和其它关键任务服务器等，从而共同完成工作任务。</p>
+
+<p style="margin-left:0cm;">nginx作为负载均衡服务器，用户请求先到达nginx，再由nginx根据负载配置将请求转发至 tomcat服务器。</p>
+
+<p style="margin-left:0cm;">         nginx负载均衡服务器：192.168.101.3</p>
+
+<p style="margin-left:0cm;">         tomcat1服务器：192.168.101.5</p>
+
+<p style="margin-left:0cm;">         tomcat2服务器：192.168.101.6</p>
+
+<p style="margin-left:0cm;"><strong>Nginx负载均衡配置</strong></p>
+
+<p style="margin-left:0cm;">根据上边的需求在nginx.conf文件中配置负载均衡，如下：</p>
+
+<pre class="has">
+<code>upstream tomcat_server_pool{
+        server 192.168.101.5:8080 weight=10;
+        server 192.168.101.6:8080 weight=10;
+        }
+
+    server {
+        listen 80;
+        server_name aaa.test.com;
+        location / {
+                 proxy_pass http://tomcat_server_pool;
+                 index index.jsp index.html index.htm;
+        }
+    }
+</code></pre>
+
+<pre class="has">
+<code>节点说明：
+在http节点里添加:
+
+#定义负载均衡设备的 Ip及设备状态 
+upstream myServer {   
+
+    server 127.0.0.1:9090 down; 
+    server 127.0.0.1:8080 weight=2; 
+    server 127.0.0.1:6060; 
+    server 127.0.0.1:7070 backup; 
+}
+
+在需要使用负载的Server节点下添加
+
+proxy_pass http://myServer;
+
+upstream 每个设备的状态:
+
+down 表示单前的server暂时不参与负载 
+weight  默认为1.weight越大，负载的权重就越大。 
+max_fails ：允许请求失败的次数默认为1.当超过最大次数时，返回proxy_next_upstream 模块定义的错误 
+fail_timeout:max_fails 次失败后，暂停的时间。 
+backup： 其它所有的非backup机器down或者忙的时候，请求backup机器。所以这台机器压力会最轻。
+</code></pre>
+
+<p style="margin-left:0cm;">解决高可用的方案就是添加冗余。</p>
+
+<p style="margin-left:0cm;"> </p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2019/11/05/Java%E9%80%9A%E8%BF%87%E5%BA%8F%E5%88%97%E5%8C%96%E5%AE%9E%E7%8E%B0%E6%B7%B1%E5%BA%A6%E5%A4%8D%E5%88%B6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1563,7 +2535,7 @@ Master接到命令启动后台的存盘进程，同时收集所有接收到的�
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-count">26</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
