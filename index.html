@@ -308,7 +308,7 @@ JDK动态代理Porxy  InvocationHandler  接口、实现类、代理类    代�
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-25 19:09:47" itemprop="dateModified" datetime="2022-06-25T19:09:47+08:00">2022-06-25</time>
+                <time title="修改时间：2022-06-25 19:26:19" itemprop="dateModified" datetime="2022-06-25T19:26:19+08:00">2022-06-25</time>
               </span>
 
           
@@ -322,28 +322,28 @@ JDK动态代理Porxy  InvocationHandler  接口、实现类、代理类    代�
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>Zookeeper=�ļ�ϵͳ+����֪ͨ����</p>
-<p>�ļ�ϵͳ�� �ڵ���Դ洢����  1M<br>����֪ͨ���ƣ� �ͻ���ע������ڵ㣬�ڵ㷢���仯���ڵ����ݸı䡢��ɾ������Ŀ¼�ڵ����Ӻ�ɾ����ʱ��Zookeeper��֪ͨ�ͻ���</p>
-<p>zookeeper�������ݽڵ�</p>
-<p>persistent–�־û��ڵ�<br>  �ͻ�����zookeeper�Ͽ����Ӻ� �ýڵ���Ȼ����<br>persitent_sequential �־�����ڵ�<br>  �ͻ�����zookeeper�Ͽ����Ӻ󣬸ýڵ����ɴ��ڣ�ֻ��zookeeper���ýڵ����ƽ���˳����<br>ephemeral–��ʱ�ڵ�<br>  �ͻ�����zookeeper�Ͽ����Ӻ� �ýڵ㱻ɾ��<br>ephemeral_sequential ��ʱ����ڵ�<br>  �ͻ�����zookeeper�Ͽ����Ӻ� �ýڵ㱻ɾ�� ֻ��zookeeper���ýڵ����ƽ���˳����</p>
-<p>������ʱ�ڵ㼴��ʵ�ֲַ�ʽ��   ��ռ��<br>��ʼ–&gt;������ʱ�ڵ�/lock –&gt; ����ʧ�������/lock�ڵ㲢�ȴ�;�����ɹ����ȡ����ִ�����߼�Ȼ��ɾ��/lock���ͷ��������¼��ͻᱻ���������ٴγ��Դ�����ʱ�ڵ�;<br>����Ĳ���ɾ���ڵ��ͬʱ��֪ͨ���пͻ���<br>��ʹ����ʱ����ڵ��Ż���   ʱ����<br>��ʼ–&gt;��/locks�´�����ʱ����ڵ�–&gt;��ȡ/locks�������ӽڵ�–&gt;���ӽڵ㰴����С��������–&gt;��ǰ�ڵ�����Ƿ���С��<br>�������������������Լ����С1�Ľڵ��ɾ���¼�;�����ȡ����ִ�����߼���ɾ���ڵ��ͷ��������¼��ͻᱻ���������ظ�����ȡ/locks�������ӽڵ㡣��������ϵ�в�����</p>
-<p>zookeeper��Ϊ�ֲ�ʽ������ȱ�㣺<br>  �ŵ㣺��������ʱʱ���ͷ������ɿ��Ը�<br>  ȱ�㣺�����Ե�  ��ΪҪƵ������ɾ���ڵ�</p>
-<h5 id="Zookeeperѡ��ͶƱ����"><a href="#Zookeeperѡ��ͶƱ����" class="headerlink" title="Zookeeperѡ��ͶƱ����"></a>Zookeeperѡ��ͶƱ����</h5><ol>
-<li>ֻ�������˵�zk�ڵ���ܲ���ͶƱ</li>
-<li>ÿ��zk��������ʱ������һ�ֶ��Լ���ͶƱ</li>
-<li>leader��ɫ�����������������������������ͶƱ������zk��Ⱥ�ڵ������һ�룬���̱�Ϊleader</li>
-<li>ͶƱ������Ҫ������myid���-Ȩ��</li>
+          <p>Zookeeper=文件系统+监听通知机制</p>
+<p>文件系统： 节点可以存储数据  1M<br>监听通知机制： 客户端注册监听节点，节点发生变化（节点数据改变、被删除、子目录节点增加和删除）时，Zookeeper会通知客户端</p>
+<p>zookeeper四种数据节点</p>
+<p>persistent–持久化节点<br>  客户端与zookeeper断开连接后 该节点依然存在<br>persitent_sequential 持久有序节点<br>  客户端与zookeeper断开连接后，该节点依旧存在，只是zookeeper给该节点名称进行顺序编号<br>ephemeral–临时节点<br>  客户端与zookeeper断开连接后 该节点被删除<br>ephemeral_sequential 临时有序节点<br>  客户端与zookeeper断开连接后 该节点被删除 只是zookeeper给该节点名称进行顺序编号</p>
+<p>利用临时节点即可实现分布式锁   独占锁<br>开始–&gt;创建临时节点/lock –&gt; 创建失败则监听/lock节点并等待;创建成功则获取锁，执行完逻辑然后删除/lock，释放锁，此事件就会被监听到并再次尝试创建临时节点;<br>上面的操作删除节点的同时会通知所有客户端<br>可使用临时有序节点优化：   时序锁<br>开始–&gt;在/locks下创建临时有序节点–&gt;获取/locks下所有子节点–&gt;将子节点按序由小到大排序–&gt;当前节点序号是否最小？<br>不是则阻塞，监听比自己序号小1的节点的删除事件;是则获取锁，执行完逻辑后删除节点释放锁，此事件就会被监听到并重复“获取/locks下所有子节点。。。”等系列操作；</p>
+<p>zookeeper作为分布式锁的优缺点：<br>  优点：不依靠超时时间释放锁，可靠性高<br>  缺点：性能略低  因为要频繁创建删除节点</p>
+<h5 id="Zookeeper选举投票机制"><a href="#Zookeeper选举投票机制" class="headerlink" title="Zookeeper选举投票机制"></a>Zookeeper选举投票机制</h5><ol>
+<li>只有启动了的zk节点才能参与投票</li>
+<li>每个zk服务启动时，接受一轮对自己的投票</li>
+<li>leader角色决策条件，当启动后，如果自身接受投票数超过zk集群节点个数的一半，立刻变为leader</li>
+<li>投票操作需要竞争，myid编号-权重</li>
 </ol>
-<p>���̣�</p>
+<p>流程：</p>
 <ol>
-<li>����zk21������ͶƱ����Ⱥ��ֻ��zk21����1ƱͶ���Լ�</li>
-<li>����zk22������ͶƱ���Լ�Ͷ���Լ���zk21Ͷ���Լ���ͨ��myid������1Ʊ����2Ʊ</li>
-<li>����zk23���Լ�Ͷ�Լ���ͨ��myid���� zk21��zk22Ͷ��zk23����3Ʊ��Ʊ���������Ϊleader</li>
-<li>����zk24���Ѵ���leader ֻ��Ϊfollower</li>
-<li>����zk25���Ѵ���leader ֻ��Ϊfollower</li>
+<li>启动zk21：接受投票，集群中只有zk21，有1票投给自己</li>
+<li>启动zk22：接受投票，自己投给自己，zk21投给自己，通过myid竞争得1票，共2票</li>
+<li>启动zk23：自己投自己，通过myid竞争 zk21，zk22投给zk23，共3票，票数过半晋升为leader</li>
+<li>启动zk24：已存在leader 只能为follower</li>
+<li>启动zk25：已存在leader 只能为follower</li>
 </ol>
-<p>��������leader���أ� myidȨ�� + ����˳��</p>
-<p>����ѡ�٣��ȱȽ�zxid������ID���ٱȽ�myid��Ʊ�����뼰����Ϊleader</p>
+<p>决定最终leader因素： myid权重 + 启动顺序</p>
+<p>重新选举：先比较zxid（事务ID）再比较myid，票数过半及晋升为leader</p>
 
       
     </div>
@@ -394,7 +394,7 @@ JDK动态代理Porxy  InvocationHandler  接口、实现类、代理类    代�
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-06-25 19:09:59" itemprop="dateModified" datetime="2022-06-25T19:09:59+08:00">2022-06-25</time>
+                <time title="修改时间：2022-06-25 19:27:13" itemprop="dateModified" datetime="2022-06-25T19:27:13+08:00">2022-06-25</time>
               </span>
 
           
@@ -408,24 +408,24 @@ JDK动态代理Porxy  InvocationHandler  接口、实现类、代理类    代�
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>ԭ����ʱ����������ȱ�ݣ�<br> 1����֧�ַ�Ƭ���񣺴�����������ʱ���������Ƭִ����������ͬ����<br> 2����֧����������ͳһ��������������������¹رա���������<br> 3����֧�ּ�Ⱥ�����������ظ�ִ������<br> 4����֧��ʧ�����ԣ������쳣�������սᡢ���ܸ�������״̬������������ִ��<br> 5����֧�ֶ�̬�����������������������޸��������<br> 6���ޱ������ƣ�����ʧ�ܺ�û�б�������<br> 7����������ͳ������ͳ�ƣ�������������ʱ����������ִ������޷���Ч��ͳ��ִ�����</p>
-<p>xxl-job<br>   ����������������ͨѶ<br>   ִ������ͨѶ</p>
-<p>����ģʽһ��ѡbeanģʽ  ����GLUE��ֱ��ʹ�õ�ǰ��������Ϊִ�������������Դ����ȥִ��</p>
-<p>��Ƭ����<br>   ·�ɲ���ѡ��Ƭ�㲥����������������ȡ����ʶ���Լ�Ҫ����ִ��</p>
-<p>ִ�����Զ�ע�������������ֶ�¼�벻�������������ˣ��ֶ�¼��Ҫ����ѡ��·�ɲ��ԣ�����·�ɲ���Ϊ ��һ�� ʱ���ֶ�¼��ĵ�һ̨�������������ִ��ʧ��</p>
-<p>appName��ͬΪͬһ��ִ������</p>
-<p>Ϊ������������ͬʱ��������ͨ��mysql������ʵ�ֲַ�ʽ����for update��䣩<br>admin������<br>    ��ѯ�Զ�ע���ִ�������Ƴ�90s��ûע��ģ�ÿ30s���һ��<br>    ʧ�������⣬���ݶ�Ӧ���ý��и澯�����Բ���</p>
-<p>XxljobDynamicScheduler��ʼ��ʱ��<br>  JobRegistryMonitor.getInstance.start();//��������ע���ػ��߳�  ά�ֺ�ִ�����������<br>  JobFaileMonitorHelper.getInstance.start();//����ʧ�ܴ������ػ��߳�<br>  NetComServerFactory.putService(Admin.class,XxljobDynamicScheduler.adminBiz);//��ʼ�����ص������ķ���<br>  NetComServerFactory.setAccessToken(accessToken);<br>  initI18n();//���ʻ�</p>
-<p>1��JobRegistryMonitor.getInstance.start();<br>   ����һ�������̣߳�ÿ30s��ѵ���ݿ⣬���ĳ��ִ������ע���ź��ڽ�90sû��д�����ݿ��xxl_job_qrtz_trigger_registry����ô����������Ϊ��ִ����������<br>��������ݿ��xxl_job_qrtz_trigger_group��ʹÿ��ִ������ֻ�������ŵ�ִ�����������ִ�������������������ֵġ�ÿ��ִ�����鶼��һ��Ψһ��appName��<br>ִ�������������ע��ʱ����ͨ�����appName��־�����������ĸ�ִ������</p>
-<p>2��JobFaileMonitorHelper.getInstance.start();<br>   ÿ��10sִ��һ���߼������ݿ��xxl_job_qrtz_trigger_log�����ÿ������ÿ�ε�ִ�м�¼���������¼������ִ��״̬����ĳ������״̬��Ϊ500��<br>��ô����ִ�м�¼����ʧ�ܸ��յġ���ôʧ���ػ��߳̾ͻ������������executorFailRetryCount��ʧ�����Դ�����ǰ����������ʱ���ã��Ƿ����0��������0��<br>�᳢����ִ����������񣬲���Ӧ�������ݿ����ִ����־��executorFailRetryCountֵ��һ����󷢳�ʧ�ܸ澯��</p>
-<p>3����ʼ�����ص������ĵķ���Mapһ��accessTokenֵ����������ʵ����HashMap�������������<br>4�����ʻ���֧����Ӣ��</p>
-<p>��δ�����<br>timewheelʱ���� ������Map&lt;Integer,List&gt;<br>�����㷨��<br>JobScheduleHelper<br> scheduleThread��ѭ�� ��������for update���л�ȡ������ʸ����� ���õ���now 5s�ڵ������б����ݣ�scheduleList ���������������<br> forѭ������scheduleList����<br> 1����ǰ���񴥷�ʱ�䳬ʱ5s���ϣ�������һ�δ���ʱ��+5s &lt; now����ֱ��������ִ�У�����trigger_next_time<br> 2����������һ�δ���ʱ��&lt; now &lt;= ��һ�δ���ʱ��+5s�����߳�ִ�д����߼�����������һ�δ���ʱ����5s�ڣ�<br> ��ŵ�ʱ�����ڣ�Map&lt;Integer,List&gt;����(0-59)=&gt;����id�б�����������trigger_next_time<br> 3����now &lt;= ������һ�δ���ʱ�䣩���Դ���ʱ����������60ȡģֱ�ӷŵ�ʱ�����ڣ�����trigger_next_time</p>
-<p> ringData�Ĵ����߼��ڵڶ����ػ��߳�ringThread��<br>  ringThread��ѭ�� ȡ��ǰ�����̶Ⱥ�ǰһ���̶ȣ���ringData�л�ȡҪִ�е�����</p>
-<p>������scheduleThread����ringThread��������������ȵĶ���JobTriggerPoolHelper�������������̳߳�fastTriggerPool��slowTriggerPool<br>�����̳߳ظ��룬���Ϊfast��slow��1���Ӵ������������ʱ��500ms����10�Σ��ô��������ж�Ϊ�������������Զ���������slow�̳߳أ�����ľ������̣߳����ϵͳ�ȶ���<br>triggerPool.execute{<br>  …<br>  XxlJobTrigger.trigger —-&gt; processTrigger—&gt; runExecutor –&gt; XxljobScheduler.getExecutorBiz�����executorBiz��XxlRpcReference.getObject()��ȡ���Ĵ�����<br>  executorBiz.run �˴�ִ�еľ���XxlRpcReference��invoke���� ����Զ�̵���<br>  …<br>  }</p>
-<p>ִ������<br>    XxlJobExecutorApplication –&gt; XxlJobSpringExecutor(����adminAddressΪ�������ĵ�ַ) ʵ����ApplicationContextAware������������Ϣ–&gt; start<br>–&gt; ���ñ���˽�з���ȡ��JobHandlerʵ���࣬�ٵ���registJobHandler(name,handler)����ע��  ά����һ��Map –&gt;���ø���start���� �󲿷�ҵ���߼��ڴ˴���<br>–&gt; ��־��������ʼ������adminBizList�ֶ��з���XxlRpcReferenceBean���صĴ����ࡢ������־������������ص������̡߳�����XxlRpcProviderFactory</p>
-<p>XxlRpcProviderFactory ���Է���Rpc���÷����ṩ�˵Ĺ����࣬������һ����netty��ΪͨѶģ�ͣ�hessian��Ϊ���л���ʽ�ģ�ExecutorServiceRegistry��Ϊע���߼�<br>ʵ����ķ����ṩ�ˣ�����������������һ������ExecutorBiz�����������ʵ����ΪExecutorBizImpl ����start���ִ�����˵ķ���¶�� ExecutorServiceRegistry<br>������start ��30s�ļ���͵������Ľ�������֪ͨ��Ȼ�����server��start���� ��ʱserverΪNettyHttpServer<br>��������ṹ������netty�����˸����� ChannelHandler��NettyHttpServerHandler ����˽�з���process ���������xxlRpcProviderFactory��invokeService�������<br>����ʵ�ֵķ������</p>
-<p>ExecutorBizImpl<br>XxlJobExecutor�ڲ����и���jobIdΪkey��ִ�����������߳�Ϊvalue���ֶ�jobThreadRepository����������ȥ���Ի�ȡ��ǰ����ִ�����������̣߳�<br>����о͸����������õ�����ģʽ���д��������û������ִ�д�������̣߳��͵���XxlJobExecutor.registJobThread����һ���̣߳���������������͸��������<br>�Ǵ�jobThreadRepository��ȡ����Ҳ�������´������߳�  JobThread��run�������triggerQueue��poll������Ȼ����֮ǰ���õ�handler����execute�������ò�����<br>idleTimes�ֶν����������ת�Ĵ������ƣ�����ִ�����������������¶ExecutorBiz���񣬽��������������TriggerParam����JobThread�߳�������������õ�ҵ��<br>handler��ִ��</p>
-<p>��ѯ�����ܰ��������ܳ��������Դ<br>Ȩ�أ��ɰ��������ܷ�������<br>һ����hash�������ռ䰴˳ʱ�뷽����֯��Բ���ϵĵ��0��2��32�η���������������ʹ��hash���й�ϣ�������ѡ������IP����������ȷ���������ڹ�ϣ����λ�ã���<br>����keyʹ����ͬ��hash�������ϣֵ���Ӵ�λ��˳ʱ���һ̨�����ķ�����������ö�λ���ķ�������ʹ������ڵ����������б���⡣<br>ʵ��Ӧ��ͨ��������ڵ�����Ϊ32��������  TreeMap<br>LRU���������ʹ�ã���̭�ʱ��δ��ʹ�õ�    �����һ�α�ʹ�õ��������ȵ�ʱ�䳤��<br>LFU�����ٷ����㷨����̭һ��ʱ���ڷ��ʴ������ٵ�  ��һ��ʱ����ڱ�ʹ�õ�Ƶ��</p>
+          <p>原生定时任务框架先天缺陷：<br> 1、不支持分片任务：处理有序数据时，多机器分片执行任务处理不同数据<br> 2、不支持生命周期统一管理：不重启服务情况下关闭、启动任务<br> 3、不支持集群：存在任务重复执行问题<br> 4、不支持失败重试：出现异常后任务终结、不能根据任务状态控制任务重新执行<br> 5、不支持动态调整：不重启服务的情况下修改任务参数<br> 6、无报警机制：任务失败后没有报警机制<br> 7、任务数据统计难以统计：任务数据量大时，对于任务执行情况无法高效的统计执行情况</p>
+<p>xxl-job<br>   调度器、触发器、通讯<br>   执行器、通讯</p>
+<p>运行模式一般选bean模式  其他GLUE是直接使用当前调度器作为执行器解析输入的源代码去执行</p>
+<p>分片任务：<br>   路由策略选分片广播，输入参数，代码获取参数识别自己要从哪执行</p>
+<p>执行器自动注册会有心跳保活，手动录入不会有心跳保活了；手动录入要慎重选择路由策略，例如路由策略为 第一个 时，手动录入的第一台机器挂了任务会执行失败</p>
+<p>appName相同为同一个执行器组</p>
+<p>为避免多个服务器同时调度任务，通过mysql悲观锁实现分布式锁（for update语句）<br>admin启动：<br>    查询自动注册的执行器，移除90s内没注册的，每30s检查一次<br>    失败任务监测，根据对应设置进行告警、重试操作</p>
+<p>XxljobDynamicScheduler初始化时：<br>  JobRegistryMonitor.getInstance.start();//调度中心注册守护线程  维持和执行器间的心跳<br>  JobFaileMonitorHelper.getInstance.start();//任务失败处理的守护线程<br>  NetComServerFactory.putService(Admin.class,XxljobDynamicScheduler.adminBiz);//初始化本地调度中心服务<br>  NetComServerFactory.setAccessToken(accessToken);<br>  initI18n();//国际化</p>
+<p>1、JobRegistryMonitor.getInstance.start();<br>   开启一个单独线程，每30s轮训数据库，如果某个执行器的注册信号在近90s没有写入数据库表xxl_job_qrtz_trigger_registry，那么调度中心认为该执行器已死，<br>会更新数据库表xxl_job_qrtz_trigger_group，使每个执行器组只保留活着的执行器，这里的执行器按调度中心来区分的。每个执行器组都有一个唯一的appName，<br>执行器向调度中心注册时就是通过这个appName标志来区分属于哪个执行器组</p>
+<p>2、JobFaileMonitorHelper.getInstance.start();<br>   每隔10s执行一下逻辑。数据库表xxl_job_qrtz_trigger_log里存着每个任务每次的执行记录，这里面记录着任务执行状态，若某条任务状态码为500，<br>那么这条执行记录是以失败告终的。那么失败守护线程就会根据这个任务的executorFailRetryCount（失败重试次数，前端新增任务时配置）是否大于0，若大于0，<br>会尝试再执行下这个任务，并相应的在数据库该条执行日志将executorFailRetryCount值减一，最后发出失败告警。</p>
+<p>3、初始化本地调度中心的服务Map一级accessToken值，调度中心实例用HashMap对象存了起来。<br>4、国际化，支持中英文</p>
+<p>如何触发：<br>timewheel时间轮 本质是Map&lt;Integer,List&gt;<br>触发算法：<br>JobScheduleHelper<br> scheduleThread死循环 首先利用for update进行获取任务的资格锁定 再拿到距now 5s内的任务列表数据：scheduleList 分三中情况处理：<br> for循环遍历scheduleList集合<br> 1、当前任务触发时间超时5s以上（任务下一次触发时间+5s &lt; now）：直接跳过不执行，重置trigger_next_time<br> 2、（任务下一次触发时间&lt; now &lt;= 下一次触发时间+5s）：线程执行触发逻辑，若任务下一次触发时间在5s内，<br> 则放到时间轮内（Map&lt;Integer,List&gt;秒数(0-59)=&gt;任务id列表），再重置trigger_next_time<br> 3、（now &lt;= 任务下一次触发时间）：对触发时间秒数进行60取模直接放到时间轮内，重置trigger_next_time</p>
+<p> ringData的处理逻辑在第二个守护线程ringThread中<br>  ringThread死循环 取当前秒数刻度和前一个刻度，在ringData中获取要执行的任务</p>
+<p>不管是scheduleThread还是ringThread，最后完成任务调度的都是JobTriggerPoolHelper，此类有两个线程池fastTriggerPool和slowTriggerPool<br>调度线程池隔离，拆分为fast和slow，1分钟窗口期内任务耗时达500ms超过10次，该窗口期内判定为慢任务，慢任务自动降级进入slow线程池，避免耗尽调度线程，提高系统稳定性<br>triggerPool.execute{<br>  …<br>  XxlJobTrigger.trigger —-&gt; processTrigger—&gt; runExecutor –&gt; XxljobScheduler.getExecutorBiz这里的executorBiz是XxlRpcReference.getObject()获取到的代理类<br>  executorBiz.run 此处执行的就是XxlRpcReference的invoke方法 发起远程调用<br>  …<br>  }</p>
+<p>执行器：<br>    XxlJobExecutorApplication –&gt; XxlJobSpringExecutor(其中adminAddress为调度中心地址) 实现了ApplicationContextAware保存上下文信息–&gt; start<br>–&gt; 调用本类私有方法取出JobHandler实现类，再调用registJobHandler(name,handler)进行注册  维护了一个Map –&gt;调用父类start方法 大部分业务逻辑在此处理<br>–&gt; 日志处理器初始化、向adminBizList字段中放入XxlRpcReferenceBean返回的代理类、任务日志清除、任务结果回调处理线程、启动XxlRpcProviderFactory</p>
+<p>XxlRpcProviderFactory 可以返回Rpc调用服务提供端的工厂类，启动了一个以netty作为通讯模型，hessian作为序列化方式的，ExecutorServiceRegistry作为注册逻辑<br>实现类的服务提供端，接着我们向其添加一个服务ExecutorBiz，处理请求的实现类为ExecutorBizImpl 调用start完成执行器端的服务暴露， ExecutorServiceRegistry<br>调用其start 以30s的间隔和调度中心进行心跳通知，然后调用server的start方法 此时server为NettyHttpServer<br>整个代码结构就是用netty启动了个服务， ChannelHandler，NettyHttpServerHandler 调用私有方法process 这里调用了xxlRpcProviderFactory的invokeService方法完成<br>服务实现的反射调用</p>
+<p>ExecutorBizImpl<br>XxlJobExecutor内部会有个以jobId为key，执行这个任务的线程为value的字段jobThreadRepository，我们首先去尝试获取当前正在执行这个任务的线程，<br>如果有就根据任务设置的运行模式进行处理，如果没有正在执行此任务的线程，就调用XxlJobExecutor.registJobThread启动一个线程，最后将任务数据推送给这个可能<br>是从jobThreadRepository获取到的也可能是新创建的线程  JobThread的run方法会从triggerQueue里poll出任务，然后用之前设置的handler进行execute方法调用并利用<br>idleTimes字段进行无任务空转的次数控制，至此执行器完成了启动，暴露ExecutorBiz服务，接收任务调度数据TriggerParam并在JobThread线程中完成任务配置的业务<br>handler的执行</p>
+<p>轮询：不能按机器性能充分利用资源<br>权重：可按机器性能分配任务<br>一致性hash：整个空间按顺时针方向组织，圆环上的点从0到2的32次方，将各个服务器使用hash进行哈希，具体可选服务器IP或主机名，确定服务器在哈希环的位置，将<br>数据key使用相同的hash计算出哈希值，从此位置顺时针第一台遇到的服务器就是其该定位到的服务器。使用虚拟节点避免数据倾斜问题。<br>实际应用通常将虚拟节点数设为32甚至更大。  TreeMap<br>LRU：最近最少使用，淘汰最长时间未被使用的    看最后一次被使用到发生调度的时间长短<br>LFU：最少访问算法，淘汰一定时间内访问次数最少的  看一定时间段内被使用的频率</p>
 
       
     </div>
