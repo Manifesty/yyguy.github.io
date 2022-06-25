@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="folyjzSrNTxM-gzANuN149Z3GWMMc4Go2VluVGIRh48">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yyguy123.github.io","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Redis：    数据结构：        String:            set k1 qwer ,   get k1            del k1            append k1 123 (qwer123)            incr&#x2F;decr&#x2F;incrby&#x2F;decrby  必须是数字            getrange&#x2F;setrange   getrange">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis">
+<meta property="og:url" content="http://yyguy123.github.io/2022/06/25/Redis/index.html">
+<meta property="og:site_name" content="yyguy123的个人博客">
+<meta property="og:description" content="Redis：    数据结构：        String:            set k1 qwer ,   get k1            del k1            append k1 123 (qwer123)            incr&#x2F;decr&#x2F;incrby&#x2F;decrby  必须是数字            getrange&#x2F;setrange   getrange">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-06-25T10:33:33.683Z">
+<meta property="article:modified_time" content="2020-12-21T03:21:56.258Z">
+<meta property="article:author" content="yyguy123">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yyguy123.github.io/2022/06/25/Redis/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Redis | yyguy123的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">yyguy123的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">若无闲事挂心头，便是人间好时节</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2022/06/25/Redis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-25 18:33:33" itemprop="dateCreated datePublished" datetime="2022-06-25T18:33:33+08:00">2022-06-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-21 11:21:56" itemprop="dateModified" datetime="2020-12-21T11:21:56+08:00">2020-12-21</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Redis：<br>    数据结构：<br>        String:<br>            set k1 qwer ,   get k1<br>            del k1<br>            append k1 123 (qwer123)<br>            incr/decr/incrby/decrby  必须是数字<br>            getrange/setrange   getrange k1 0 2 (qwe)<br>            setex 设置过期时间 setex k2 10 v2<br>            setnx    不存在就set成功，存在就返回0<br>            mset/mget/msetnx</p>
+<pre><code>    List:
+        rpush mylist 1 2 3 4 5          rpush list 1 2 3
+        lpush rpush lpop rpop
+        lrem key n val 删除n个val
+        ltrim key start end 截取指定范围值赋给key
+        rpoplpush mylist list   (5123)
+        lset key index value  
+        linsert key before/after v1 v2 在v1前/后 插入v2
+
+    Set：
+        sadd、smembers、sismember
+        scard 获取元素个数
+        srem key val 
+        srandmember key n 随机列出n个元素
+        spop key 随机出栈
+        smove k1 k2 v1 将k1的值v1给k2
+        sdiff k1 k2 在k1不在k2的元素
+        sinter k1 k2 : k1 k2的交集
+        sunion k1 k2 : 并集
+
+    Hash：
+        kv模式不变 v为键值对
+        hmset customer id 1 name zz age 20、 hmget customer id name age
+        hgetall customer
+        hdel 
+        hlen
+        hexists customer id
+        hkeys、hvals
+        hsetnx
+
+    Zset
+        zadd zset01 60 v1 70 v2 80 v3
+        zscore key val 
+        zrank key val
+        zrevrank key val
+
+
+Maxmemory-policy：
+    volatile-lru：使用LRU算法移除key 只对设置了过期时间的key
+    allkeys-lru：使用LRU算法移除key
+    volatile-random：在过期集合中移除随机的key
+    allkeys-random：移除随机的key
+    volatile-ttl：移除ttl值最小的key，即最近要过期的key
+    noeviction：不进行移除，针对写操作，只返回错误信息
+
+
+持久化机制：
+    RDB：
+        手动触发：    
+            save:阻塞当前redis服务器直到RDB过程完成，线上环境一般不使用
+            bgsave：redis进程执行fork操作创建子进程，持久化由子进程负责，阻塞只发生在fork阶段，一般使用bgsave
+        自动触发：
+            1、使用save相关配置   save m n 表示m秒内数据集存在n次修改时，自动触发bgsave
+            2、从节点执行全量复制操作时主节点自动执行bgsave生成RDB文件发送给从节点
+            3、执行debug reload重新加载redis时也会触发save操作
+            4、默认执行shutdown时，若没开启AOF则自动执行bgsave
+        优点：是一个紧凑的二进制文件，代表redis在某一个时间点上的数据快照，非常适合用于备份、全量复制等，redis加载RDB文件远远快于AOF方式
+        缺点：RDB没法做到秒级持久化，因为bgsave每次运行需要fork创建子进程，属于重量级操作；redis演进过程中有多个格式的RDB版本
+
+    AOF：
+        以独立日志的方式记录每次写命令，重启时再重新执行AOF文件中的命令；目前是redis主流持久化方式
+        开启AOF需设置 appendonly yes   默认不开启 AOF文件通过appendfilename配置设置  默认文件名为appendonly.aof 保存路径与RDB持久化方式一致 通过dir配置
+    流程：
+        1、命令写入缓冲区
+        2、缓冲区根据对应策略向硬盘做同步操作
+        3、随着AOF文件变大，需定期重写AOF文件  达到压缩的目的
+        4、当redis重启时 加载AOF文件恢复数据
+
+    为什么命令追加到缓冲区？
+    reids使用单线程响应，若每次写AOF文件命令都直接追加到硬盘，性能就取决于硬盘负载，先写入缓冲区，reids可提供多种缓冲区同步硬盘策略
+
+    随着命令不断写入，AOF文件越来越大，为解决这个问题redis引入AOF重写机制压缩文件
+    1、进程内已超时的文件不会再写文件
+    2、旧的AOF文件包含无效命令，如del k1 ,set a 111 ,set a 222等
+    3、多条命令合并  如 lpush list a,lpush list b,  lpush list a b
+
+    AOF持久化开启且存在AOF文件时优先加载AOF，否则加载RDB；加载完成后redis启动成功，AOF/RDB存在错误 redis启动失败
+
+Redis事务：
+    可一次执行多个命令，本质是一组命令的集合，一个事务中命令被序列化
+    multi：开启事务
+    exec：执行
+    discard：放弃事务
+    watch：监视一个或多个key  此key被改动事务被打断   （类似乐观锁）
+    unwatch：取消watch对所有key的监控
+
+    redis的事务是部分支持；出现set key这样严重错误时会直接报error但还是可以继续往队列添加命令，只是所有命令都不会成功执行，但是出现incr key（其中key所对应value不为数字时），不会报错，执行时只有这条命令不会成功执行
+
+
+Redis主从复制：
+    1、配从不配主
+    2、从库配置：slaveof 主库ip 主库端口  每次与master断开连接后都需重新连接，除非配置进redis.conf文件
+
+    常用：
+        一主二仆：一个master两个slave  slave只要一连接就会把master所有数据都记录
+                读写分离：只有master能读写，slave只能读不能写
+                master挂掉后slave保留之前数据，角色仍是slave，master重新连接后可继续正常工作
+                slave挂掉后重新连接后角色为master，也就没有之前的数据了，需重新连接，除非配置进redis.conf文件
+
+        薪火相传：上一个slave可以是下一个slave的master，slave同样可以接受其他slave的连接和同步请求，那么该slave作为链条中下一个的master可有效减轻master的压力；中途变更转向：会清除之前数据，重新拷贝最新的
+
+        反客为主：slaveof no one 使当前数据库停止与其他数据库的同步，角色转为master保留之前的数据
+
+
+    哨兵模式：
+        反客为主需手动将slave转为master  在 sentinel.conf添加 sentinel monitor redis-6379(自己起的数据库名) 127.0.0.1 6379 1
+        会监控6379端口的master，master挂了会在剩下slave自动选出一个转为master并将其他slave连接到新的master，若挂掉的master重新连接会被转为slave连接到新的master</code></pre><p>一些常见问题</p>
+<pre><code>缓存雪崩：高并发下某一时间同时生成很多缓存并且过期时间在同一时刻
+    解决：将缓存失效的时间分散开，在原有失效时间上增加随机值
+
+缓存穿透：查询一个一定不存在的数据导致一直请求DB
+    解决：1、若查询一个key不存在则以空结果进行缓存，设置过期时间短一点（几分钟）
+          2、布隆过滤器(可看成一个bit数组，映射一个值到布隆过滤器需要使用多个不同的hash函数生成多个hash值，检查某个值对应的多个bit位上的值均为1只能说明可能存在而不是一定存在)
+
+缓存击穿：一个存在的key在过期的同一刻有大量请求
+    解决：访问key之前采用setnx设置一个短期key锁住当前key的访问
+
+缓存并发：一个缓存若失效可能多个进程同时查DB同时设置缓存
+    解决：对缓存查询加锁，key不存在就加锁，然后查DB入缓存 解锁
+
+热点key：缓存中某些key存储在集群中同一台机器，所有流量涌向同一台机器
+    解决：将热点key缓存到本地并设置失效时间，每次请求先检查key是否在本地，不存在再访问缓存机器
+
+Redis是单线程还是多线程？
+    Redis中IO多路复用器模块是单线程执行，时间处理器也是单线程执行，两个线程不一样，依靠队列保证顺序；不会上下文切换
+    单线程只是针对redis中的模块来说，比如接收请求和响应是单线程，处理事件也是单线程，但是不是同一个。</code></pre>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>坚持技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="yyguy123 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="yyguy123 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/25/Python/" rel="prev" title="Python">
+      <i class="fa fa-chevron-left"></i> Python
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/25/Sharding-Sphere/" rel="next" title="Sharding-Sphere">
+      Sharding-Sphere <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="yyguy123" src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">yyguy123</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yyguy123" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yyguy123" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yyguy123@gmail.com" title="E-Mail → mailto:yyguy123@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">yyguy123</span>
+</div>
+  
+  <div>
+      <span>版权声明：本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="external nofollow noopener noreferrer">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</span>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '2274aa537532ecf3cabe',
+      clientSecret: '45c6c0de0d52ec8e9523cfaca4ce3c88923f4a3f',
+      repo        : 'yyguy123.github.io',
+      owner       : 'yyguy123',
+      admin       : ['yyguy123'],
+      id          : 'b768564e6f9d362abbb9d07b6e405b66',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

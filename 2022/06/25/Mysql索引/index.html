@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="folyjzSrNTxM-gzANuN149Z3GWMMc4Go2VluVGIRh48">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yyguy123.github.io","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="磁盘存取原理：    寻道时间（速度慢、费时）    旋转时间（速度较快）不使用索引效率低下 索引结构    二叉树：极端情况下（索引列递增）效率跟顺序查无差别    红黑树：不会出现二叉树那种极端情况，但数据量大时深度也很深，效率也会降低    HASH：无法范围查询BTree：    节点既存key也存data    度&#x2F;阶（Degree）-节点的数据存储个数    叶节点具有相同的深度">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql索引">
+<meta property="og:url" content="http://yyguy123.github.io/2022/06/25/Mysql%E7%B4%A2%E5%BC%95/index.html">
+<meta property="og:site_name" content="yyguy123的个人博客">
+<meta property="og:description" content="磁盘存取原理：    寻道时间（速度慢、费时）    旋转时间（速度较快）不使用索引效率低下 索引结构    二叉树：极端情况下（索引列递增）效率跟顺序查无差别    红黑树：不会出现二叉树那种极端情况，但数据量大时深度也很深，效率也会降低    HASH：无法范围查询BTree：    节点既存key也存data    度&#x2F;阶（Degree）-节点的数据存储个数    叶节点具有相同的深度">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-06-25T10:33:33.677Z">
+<meta property="article:modified_time" content="2021-01-04T06:59:18.260Z">
+<meta property="article:author" content="yyguy123">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yyguy123.github.io/2022/06/25/Mysql%E7%B4%A2%E5%BC%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Mysql索引 | yyguy123的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">yyguy123的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">若无闲事挂心头，便是人间好时节</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2022/06/25/Mysql%E7%B4%A2%E5%BC%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Mysql索引
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-25 18:33:33" itemprop="dateCreated datePublished" datetime="2022-06-25T18:33:33+08:00">2022-06-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-04 14:59:18" itemprop="dateModified" datetime="2021-01-04T14:59:18+08:00">2021-01-04</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>磁盘存取原理：<br>    寻道时间（速度慢、费时）<br>    旋转时间（速度较快）<br>不使用索引效率低下</p>
+<p>索引结构<br>    二叉树：极端情况下（索引列递增）效率跟顺序查无差别<br>    红黑树：不会出现二叉树那种极端情况，但数据量大时深度也很深，效率也会降低<br>    HASH：无法范围查询<br>BTree：<br>    节点既存key也存data<br>    度/阶（Degree）-节点的数据存储个数<br>    叶节点具有相同的深度<br>    叶节点的指针为空<br>    节点中的数据key从左到右递增排列<br>硬盘和内存交互以页为单位，1页大约16K，内存读取硬盘数据每次N页，若Degree设的很大，数据放在一层，仍然会导致多次IO（数据大小/N）。</p>
+<p>B+Tree（Mysql使用的索引结构）：<br>    非叶子节点不存储data，只存储key，可以增大度<br>    叶子节点不存储指针<br>    顺序访问指针，提高区间访问的性能</p>
+<p>B+Tree索引性能分析<br>    一般使用磁盘IO次数评价索引结构优劣<br>    预读：磁盘一般会顺序向后读取一定长度的数据（页的整数倍）放入内存<br>    局部性原理：当一个数据被使用到时，其附近的数据也通常会马上被使用<br>    B+Tree节点的大小设为等于一个页，每次新建节点直接申请一个页的空间，这样就保证一个节点物理上也存储在一个页里，就实现了一个节点的载入只需一次IO<br>    B+Tree的度d一般会超过100，因此h非常小（一般在3到5之间）</p>
+<p>Mysql存储引擎是表级别的（MyISAM 非聚集索引，InnoDB 聚集索引）<br>    MyISAM索引文件和数据文件是分离的，data存的是数据指针（地址）<br>    主键索引和非主键索引实现相同</p>
+<pre><code>InnoDB索引实现
+    数据文件本身就是索引文件
+    表数据文件本身就是按B+Tree组织的一个索引结构文件
+    聚集索引-叶节点包含了完整的数据记录
+    主键索引叶子节点存储索引和数据，非主键索引叶子节点存储主键的值
+
+为什么InnoDB表必须有主键，并且推荐使用整型自增主键？
+    因为InnoDB查询都是根据主键查的，非主键索引都会查到主键然后根据主键去查数据；
+    若没有主键，InnoDB会默认选择一列(无重复数据)作为主键，若无满足条件的列则会自己生成主键
+    假设使用UUID作为主键，与自增整型主键比，会浪费一些存储空间，UUID用ASCII值比较不如整型的比较大小效率高
+    使用UUID主键不连续，插入时可能会导致已有节点分裂和移动，影响性能
+为什么非主键叶子节点存储的是主键值？（一致性和节省空间，若增加数据，不用维护多份索引）</code></pre><p>MyISAM和InnoDB<br>    InnoDB支持事务，MyISAM不支持<br>    InnoDB支持外键，MyISAM不支持<br>    都是B+Tree索引结构，InnoDB是聚集索引，数据和索引在一起，MyISAM数据和索引分开<br>    InnoDB必须有主键，MyISAM可以没有<br>    InnoDB不保存表的具体行数（因为事务特性，同一时刻表中行数对不同事务而言是不一样的），MyISAM用变量保存了表的行数<br>    InnoDB支持表/行级锁，MyISAM支持表级锁<br>    InnoDN存储文件frm,ibd  MyISAM存储文件frm,MYD,MYI<br>    frm是表定义文件，ibd是数据文件；myd是数据文件，myi是索引文件</p>
+<p>explain extended <sql> 会在explain的基础上额外提供一些查询优化信息，紧随其后使用show warnings可得到优化后的查询语句<br>explain中每个列的信息：<br>    id列：select的序列号，id的顺序按select出现的顺序增长，id越大执行优先级越高，id相同则从上往下执行，id为null最后执行<br>    select type列：表示查询类型<br>        simple：简单查询，查询不包含子查询和union<br>        primary：复杂查询中最外层的select<br>        subquery：包含在select中的子查询<br>        derived：包含在from子句中的子查询<br>        union：在union中第二个和紧随其后的select<br>        union result：从union临时表检索的select<br>    table列：表示explain的一行正在访问哪个表<br>        当from子句中有子查询时，table列是<derivedn>格式，表示当前查询依赖id=N的查询，于是先执行id=N的查询<br>        当有union时，union result的table值为&lt;union 1,2&gt; 1和2表示参与union的select行id<br>    type列：表示关联类型或访问类型，即Mysql如何查找表中的行<br>            依次从最优到最差：system &gt; const &gt; eq_ref &gt; ref &gt; range &gt; index &gt; ALL<br>            一般来说得保证查询达到range级别，最好达到ref<br>        NULL：mysql能在优化阶段分解查询语句，执行阶段用不着再访问表或索引，例如在索引列选取最小值<br>        const，system：mysql能对查询的某部分进行优化并将其转化为一个常量，system是const的一个特例，表里只有一条元素匹配时为system<br>        eq_ref：primary key或unique key索引的所有部分被连接使用，最多返回一条符条件的记录。<br>        ref：相比eq_ref，不使用唯一索引，而是使用普通索引或唯一索引的部分前缀，可能会找到多个符合条件的行<br>        range：范围扫描通常出现在in(),between,&gt;,&lt;,&gt;=等操作中，使用一个索引来检索给定范围的行<br>        index：扫描全表索引，通常比ALL快一些（index从索引读取，ALL从硬盘读取）<br>        ALL：全表扫描，意味着mysql需要从头到尾查所需要的行。<br>    possible keys列：可能使用哪些索引来查找；<br>        可能出现possible keys有值，key列为NULL的情况，这是因为表中数据不多，mysql认为索引对查询帮助不大，选择全表查询<br>        若这列为空，则没有相关索引<br>    key列：mysql实际采用哪个索引来优化对该表的访问，若想强制mysql使用possible keys中的索引，查询中使用force index<br>    key_len列：显示mysql在索引中使用的字节数，通过这个值可算出具体使用索引中哪些列<br>        计算规则：<br>            字符串：<br>                char(n)：n字节长度<br>                varchar(n):2字节存储字符串长度，如果是utf-8，则长度3n+2<br>            数值类型：<br>                tinyint：1字节<br>                smallint：2字节<br>                int：4字节<br>                bigint：8字节<br>            时间类型：<br>                date：3字节<br>                timestamp：4字节<br>                datetime：8字节<br>            如果字段允许为空，需要1字节记录是否为NULL<br>            索引最大长度768字节，当字符串过长，mysql会做一个类似左前缀索引的处理，将前半部分的字符提取出来做索引<br>    ref列：这一列显示key列记录的索引中，表查找值所用到的列或常量<br>    rows列：这一列是mysql估计要读取并检测的行数，注意这个不是结果集里的行数<br>    Extra列：<br>        Using index：查询的列被索引覆盖（索引包含查询的列），并且where筛选条件是索引的前导列，是性能高的表现<br>        Using where：查询的列未被索引覆盖，where筛选条件非索引的前导列<br>        Using where Using index：查询的列被索引覆盖，且where筛选条件是索引列之一但是不是索引的前导列<br>        NULL：查询的列未被索引覆盖，并且where筛选条件是索引的前导列，意味着用到了索引但部分字段未被索引覆盖，必须通过‘回表’来实现<br>        Using index condition：与Using where类似，查询的列不完全被索引覆盖，where条件中是一个前导列的范围<br>        Using temporary：mysql创建一张临时表来处理查询，出现这种情况一般要通过索引来优化<br>        Using filesort：mysql会对结果进行一个外部索引排序，而不是按索引次序从表里读取，这种情况也要用索引来优化</derivedn></sql></p>
+<p>索引的最佳实践<br>    1、全值匹配:条件字段中用到联合索引字段时最好按索引定义的顺序全部用到（若全部使用到但是未按顺序排，mysql会自动优化）。<br>    2、最左前缀法则：如果是联合索引，查询从最左前列开始并且不跳过联合索引中的列<br>        如果最左前列（带头大哥）的索引失效（不是使用‘=’而是用‘&gt;’等范围），则（联合索引中）后面的索引都失效<br>    3、不在索引列上做任何操作（计算、函数、自动or手动类型转换），会导致索引失效而全表扫描<br>    4、存储引擎不能使用索引中范围条件右边的列<br>        explain select * from employees where name=’Rose’ and age=22 and position=’manager’;（name、age、position为联合索引） 走联合索引<br>        explain select * from employees where name=’Rose’ and age&gt;22 and position=’manager’;  position字段不走索引<br>    5、尽量使用覆盖索引（索引列包含查询列），减少select *语句<br>    6、mysql在使用（!=或&lt;&gt;）的时候无法使用索引导致全表扫描<br>    7、is null,is not null也不会使用索引<br>    8、like以通配符开头‘%xxx’ mysql索引会失效导致全表扫描<br>        解决like ‘%字符串%’不被使用的方法：<br>            a.使用覆盖索引，查询字段必须是建立覆盖索引字段<br>            b.当覆盖索引指向的字段时varchar(380)及380以上的字段时，覆盖索引会失效<br>    9、字符串不加单引号索引会失效<br>    10、少用or或in，非主键字段的索引会失效，主键索引是否生效与数据量有关，得看mysql查询优化结果<br>    11、使用join时应该小表在前，大表在后（小表驱动大表），左连接建右表索引，因为左表所有数据都要用到，右表中查找匹配左表的数据</p>
+<p>Mysql的锁与事务隔离级别<br>锁的分类：<br>    从性能上分为乐观锁（用版本对比来实现）和悲观锁<br>    从对数据库操作的类型分，分为读锁和写锁（都属于悲观锁）<br>        读锁（共享锁）：针对同一份数据，多个读操作可以同时进行而不会互相影响<br>        写锁（排他锁）：当前写操作没完成前，它会阻断其他读锁和写锁<br>    从对数据操作粒度分，分为表锁和行锁</p>
+<p>表锁<br>表锁（偏读），偏向MyISAM存储引擎，开销小，加锁快，无死锁，锁粒度大，发生锁冲突的概率最高，并发度最低<br>MyISAM在执行查询语句前，会自动给涉及的所有表加读锁，在执行增删改操作前，会自动给涉及的表加写锁<br>1、对MyISAM表的读操作（加读锁），不会阻塞其他进程对同一张表的读请求，但会阻塞同一表的写请求（自己当前session也不能写），只有当读锁释放后，才会执行其它进程的写操作<br>2、对MyISAM表的写操作（加写锁），会阻塞其他进程对同一张表的读和写操作，只有当写锁释放后，才会执行其它进程的读写操作<br>简而言之就是  读锁会阻塞写，但是不会阻塞读，而写锁则会把读和写都阻塞</p>
+<p>行锁<br>行锁偏向InnoDB存储引擎，开销大，加锁慢，会出现死锁，锁定粒度小，发生锁冲突概率最低，并发度也最高<br>事务是由一组SQL组成的逻辑处理单元<br>Atomicity：事务是一个原子操作单元，其对数据的修改，要么全都执行，要么全都不执行<br>Consistent：在事务开始和完成时，数据都必须保持一致状态<br>Isolation：数据库系统提供一定的隔离机制，保证事务在不受外部并发操作影响的‘独立’环境执行。意味着事务处理过程中的中间状态对外部不可见，反之亦然<br>Durable：事务完成之后，它对数据的修改是永久性的，即使出现系统故障也能保持。</p>
+<p>并发事务处理带来的问题<br>更新丢失：当两个或多个事务选择同一行进行更新，最后的事务更新覆盖了之前事务的更新操作 （可用乐观锁解决）<br>脏读：一个事务读取到另一个事务修改了但未提交的数据  （解决：事务隔离级别设为已提交读）<br>不可重复读：事务A中两次执行同一条查询sql结果不一致（数据被其他事务修改）  （解决：事务隔离级别设为可重复读）<br>幻读：事务A读到了事务B提交的新增数据</p>
+<p>查看当前数据库事务隔离级别： show variables like ‘tx_isolation’;<br>设置事务隔离级别： set tx_isolation=‘REPEATABLE-READ’；<br>可重复读   MVCC机制：select操作不会更新版本号，是快照读，增删改会更新版本号，是当前版本。</p>
+<p>Oracle默认隔离级别为已提交读，Mysql默认隔离级别为可重复读<br>Spring设置的隔离级别与数据库默认级别不一致，以Spring为准，若Spring设置的隔离级别数据库本身不支持，则以数据库为准<br>Oracle支持两种：已提交读和串行化<br>Mysql四种都支持</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>坚持技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="yyguy123 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="yyguy123 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/25/Kafka/" rel="prev" title="Kafka">
+      <i class="fa fa-chevron-left"></i> Kafka
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/25/Nacos/" rel="next" title="Nacos">
+      Nacos <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="yyguy123" src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">yyguy123</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yyguy123" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yyguy123" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yyguy123@gmail.com" title="E-Mail → mailto:yyguy123@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">yyguy123</span>
+</div>
+  
+  <div>
+      <span>版权声明：本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="external nofollow noopener noreferrer">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</span>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '2274aa537532ecf3cabe',
+      clientSecret: '45c6c0de0d52ec8e9523cfaca4ce3c88923f4a3f',
+      repo        : 'yyguy123.github.io',
+      owner       : 'yyguy123',
+      admin       : ['yyguy123'],
+      id          : '42f35a6dcea2ab5fb84d6e9408dbf5ff',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

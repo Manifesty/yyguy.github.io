@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="folyjzSrNTxM-gzANuN149Z3GWMMc4Go2VluVGIRh48">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yyguy123.github.io","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Nacos：针对微服务架构中服务发现、配置管理、服务治理的综合型解决方案配置中心配置中心：在微服务架构中，当系统从一个单体应用，被拆分成分布式系统上一个个服务节点后，配置文件也必须跟着迁移（分割），这样配置就分散了，不仅如此，分散中还包含着冗余。配置中心将配置从各应用中剥离出来，对配置进行统一管理。  在配置中心发布&#x2F;修改配置 配置中心将配置更新通知到各客户端 客户端从配置中心获取最新配置  主流">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nacos">
+<meta property="og:url" content="http://yyguy123.github.io/2022/06/25/Nacos/index.html">
+<meta property="og:site_name" content="yyguy123的个人博客">
+<meta property="og:description" content="Nacos：针对微服务架构中服务发现、配置管理、服务治理的综合型解决方案配置中心配置中心：在微服务架构中，当系统从一个单体应用，被拆分成分布式系统上一个个服务节点后，配置文件也必须跟着迁移（分割），这样配置就分散了，不仅如此，分散中还包含着冗余。配置中心将配置从各应用中剥离出来，对配置进行统一管理。  在配置中心发布&#x2F;修改配置 配置中心将配置更新通知到各客户端 客户端从配置中心获取最新配置  主流">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-06-25T10:33:33.679Z">
+<meta property="article:modified_time" content="2021-08-26T11:28:16.775Z">
+<meta property="article:author" content="yyguy123">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yyguy123.github.io/2022/06/25/Nacos/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Nacos | yyguy123的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">yyguy123的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">若无闲事挂心头，便是人间好时节</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2022/06/25/Nacos/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Nacos
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-25 18:33:33" itemprop="dateCreated datePublished" datetime="2022-06-25T18:33:33+08:00">2022-06-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-26 19:28:16" itemprop="dateModified" datetime="2021-08-26T19:28:16+08:00">2021-08-26</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Nacos：针对微服务架构中服务发现、配置管理、服务治理的综合型解决方案"><a href="#Nacos：针对微服务架构中服务发现、配置管理、服务治理的综合型解决方案" class="headerlink" title="Nacos：针对微服务架构中服务发现、配置管理、服务治理的综合型解决方案"></a>Nacos：针对微服务架构中服务发现、配置管理、服务治理的综合型解决方案</h1><h2 id="配置中心"><a href="#配置中心" class="headerlink" title="配置中心"></a>配置中心</h2><p>配置中心：在微服务架构中，当系统从一个单体应用，被拆分成分布式系统上一个个服务节点后，配置文件也必须跟着迁移（分割），这样配置就分散了，不仅如此，分散中还包含着冗余。配置中心将配置从各应用中剥离出来，对配置进行统一管理。</p>
+<ol>
+<li>在配置中心发布/修改配置</li>
+<li>配置中心将配置更新通知到各客户端</li>
+<li>客户端从配置中心获取最新配置</li>
+</ol>
+<p>主流配置中心对比：从配置中心角度看，性能方面Nacos读写性能最高，Apollo次之，SpringCloud Config依赖git场景不适合开放大规模自动化运维API，功能方面Apollo最为完善，Nacos具有Apollo大部分配置管理功能（Nacos不支持灰度发布和权限管理），而SpringCloud Config不带运维管理界面。Nacos一大优势是整合了注册中心、配置中心功能，部署和操作相比Apollo都要直观简单。</p>
+<h2 id="Nacos特性"><a href="#Nacos特性" class="headerlink" title="Nacos特性"></a>Nacos特性</h2><p>Nacos主要提供以下四大功能：</p>
+<ol>
+<li><p>服务发现与服务健康检查</p>
+<p>Nacos使服务更容易注册，并通过DNS或Http接口发现其他服务，Nacos还提供服务的实时健康检查，以防止向不健康的主机或服务实例发送请求 </p>
+</li>
+<li><p>动态配置管理</p>
+<p>动态配置服务允许在所有环境中以集中和动态的方式管理所有服务的配置，Nacos消除了在更新配置时重新部署应用程序，这使配置的更改更加高效和灵活</p>
+</li>
+<li><p>动态DNS服务</p>
+<p>Nacos提供基于DNS协议的服务发现能力，旨在支持异构语言的服务发现，支持将注册在Nacos上的服务以域名的方式暴露端点，让三方应用方便的查阅及发现</p>
+</li>
+<li><p>服务和元数据管理</p>
+<p>Nacos从微服务平台建设的视角管理数据中心的所有服务及元数据，包括管理服务的描述，生命周期，服务的静态依赖分析，服务的健康状态，服务的流量管理、路由及安全策略。</p>
+</li>
+</ol>
+<p>单机模式时Nacos默认使用嵌入式数据库实现数据的存储，若想使用外部mysql存储Nacos数据：</p>
+<ol>
+<li>安装数据库 5.6.5+  mysql8以下</li>
+<li>初始化mysql数据库，新建数据库nacos_config，数据库初始化文件：${nacoshome}/conf/nacos-mysql.sql</li>
+<li>修改${nacoshome}/conf/application.properties文件，增加mysql数据源配置</li>
+</ol>
+<h5 id="Nacos配置"><a href="#Nacos配置" class="headerlink" title="Nacos配置"></a>Nacos配置</h5><p>​    发布配置： dataId、group、配置格式（text/json/xml/yaml/html/properties）、配置内容</p>
+<h5 id="Nacos客户端获取配置"><a href="#Nacos客户端获取配置" class="headerlink" title="Nacos客户端获取配置"></a>Nacos客户端获取配置</h5><p>​    通过Nacos服务地址端口及dataId和group可通过Nacos的API获取配置<code>NacosFactory.createConfigService(properties).getConfig(dataId,group,5000);</code><br>​    监听配置<br><code>NacosFactory.createConfigService(properties).addListener(dataId,group,new Listener(){</code><br>​    <code>public Executor getExecutor(){</code><br>​          <code>return null;    
+​    }</code><br>​    <code>public void receiveConfigInfo(String s){</code><br>​         <code>System.out.println(s);</code><br>​    <code>}</code><br><code>});</code></p>
+<p>})</p>
+<h4 id="Nacos配置管理模型"><a href="#Nacos配置管理模型" class="headerlink" title="Nacos配置管理模型"></a>Nacos配置管理模型</h4><p>​    通过Namespace、group、Data ID能够定位到一个配置集</p>
+<h6 id="配置集（Data-ID）"><a href="#配置集（Data-ID）" class="headerlink" title="配置集（Data ID）"></a>配置集（Data ID）</h6><p>​    在系统中，一个配置文件通常就是一个配置集，一个配置集可以包含系统的各种配置信息，例如一个配置集可能包含了数据源、线程池、日志级别等配置项，每个配置集都可以定义一个有意义的名称，就是配置集的ID即Data ID。</p>
+<h6 id="配置项"><a href="#配置项" class="headerlink" title="配置项"></a>配置项</h6><p>​    配置集中包含的一个个配置内容即配置项，代表一个具体的可配置的参数与其值域，通常以key=value的形式存在</p>
+<h6 id="配置分组（group）"><a href="#配置分组（group）" class="headerlink" title="配置分组（group）"></a>配置分组（group）</h6><p>​    对配置集进行分组，通过一个有意义的字符串来表示，不同配置费分组下可以有相同配置集。默认采用DEFAULT_GROUP。常用来区分不同的项目或应用</p>
+<h6 id="命名空间（Namespace）"><a href="#命名空间（Namespace）" class="headerlink" title="命名空间（Namespace）"></a>命名空间（Namespace）</h6><p>​    可用于进行不同环境的配置隔离，例如可以隔开开发环境、测试环境和生产环境，或者隔离不同用户，不同开发人员使用同一nacos管理各自配置，通过namespace隔离，不同namespace下可存在相同名称的配置分组或配置集。默认有一个public命名空间。</p>
+<h6 id="最佳实践"><a href="#最佳实践" class="headerlink" title="最佳实践"></a>最佳实践</h6><p>Namespace：代表不同环境<br>Group：代表不同项目<br>Data ID：每个项目下往往有若干工程，每个配置集（Data ID）是一个工程的主配置文件</p>
+<p>支持配置的动态刷新：<br>    客户端配置nacos配置中心的地址后，直接使用@value注解获取配置文件的配置，但无法动态刷新，需注入配置文件上下文<br><code>@Autowired</code><br><code>private ConfigurableApplicationContext applicationContext；</code><br><code>applicationContext.getEnvironment().getProperty(&quot;xxx.xx&quot;);</code><br>类上加@RefreshScope注解时使用@Value也可动态刷新</p>
+<p>Nacos客户端resources下新建bootstrap.yaml，<font color="red">dataId的名称就是application的name + file-extension</font></p>
+<h6 id="自定义扩展dataId"><a href="#自定义扩展dataId" class="headerlink" title="自定义扩展dataId"></a>自定义扩展dataId</h6><p>对于一个项目需多个配置文件的情况可自定义扩展dataId<br><code>ext-config[0]:</code><br>    <code>data-id: test1.properties  (默认DEFAULT_GROUP，namespace即当前配置文件中的namespace)</code><br><code>ext-config[1]:</code><br>    <code>data-id: test2.properties</code><br>    <code>group: group2</code><br><code>ext-config[2]:</code><br>    <code>data-id: test3.properties</code><br>    <code>group: group3</code><br>    <code>refresh: true  (上面两种都不支持动态刷新)</code></p>
+<p>或者使用以下方式更为方便：但是此种方法只认DEFAULT_GROUP的dataid</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">	cloud:</span><br><span class="line">		nacos:</span><br><span class="line">			config:</span><br><span class="line">				shared-dataids: test1.properties,test2.properties,test3.properties</span><br><span class="line">				refreshable-dataids: test3.properties</span><br></pre></td></tr></table></figure>
+
+<p>配置的优先级： C&gt;B&gt;A<br>A：通过<code>spring.cloud.nacos.config.shared-dataids</code>支持多个共享Dataid的配置<br>B：通过<code>spring.cloud.nacos.config.ext-config[n].data-id</code>方式支持多个扩展data id，多个Data Id同时配置时，config[n]的n越大，优先级越高<br>C：通过内部相关规则（应用名+扩展名）自动获取相关的Data Id配置</p>
+<h6 id="完全关闭配置"><a href="#完全关闭配置" class="headerlink" title="完全关闭配置"></a>完全关闭配置</h6><p>通过设置<code>spring.cloud.nacos.config.enabled=false</code>来完全关闭Nacos Config</p>
+<h4 id="Nacos集群部署"><a href="#Nacos集群部署" class="headerlink" title="Nacos集群部署"></a>Nacos集群部署</h4><pre><code>1. 安装3个以上的Nacos服务
+ 2. 在所有Nacos目录的conf目录下，将文件cluster.conf.example重命名为cluster.conf，将所有机器以ip：port格式配置进去
+ 3. 所有客户端分别指定nacos集群中的若干节点
+ spring.cloud.nacos.config.server-addr: xx.xx.xx.xx:8848,xx.xx.xx.xx:8849,xx.xx.xx.xx:8850</code></pre><p>生产环境部署建议：<br>      通过域名+VIP（虚拟IP）模式来实现，一个域名对应一个VIP，一个VIP对应多个Nacos节点。当Nacos集群迁移时，客户端无需修改。数据库，生产环境下建议至少主备模式，通过修改${nacoshome}/conf/application.properties文件，使nacos拥有多个数据源。</p>
+<h2 id="服务发现"><a href="#服务发现" class="headerlink" title="服务发现"></a>服务发现</h2><p>微服务架构中，通过服务间的协作来实现业务目标，代码中免不了远程调用。服务消费方获取服务提供方的地址及端口就是服务发现。</p>
+<p>Ribbon：客户端负载均衡<br>Feign：远程调用<br>客户端启动类添加@EnableDiscoveryClient、@EnableFeignClients</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">	application:</span><br><span class="line">		name: xxx</span><br><span class="line">	cloud:</span><br><span class="line">		nacos:</span><br><span class="line">			discovery:</span><br><span class="line">				server-addr: xx.xx.xx.xx:8848</span><br><span class="line">				namespace: dev_test</span><br><span class="line">				cluster-name: DEFAULT</span><br></pre></td></tr></table></figure>
+
+<p>Provider实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProviderController</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOG = LoggerFactory.getLogger(ProviderController.calss);</span><br><span class="line">    <span class="meta">@Getmapping</span>(<span class="string">"/service"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">service</span><span class="params">()</span></span>&#123;</span><br><span class="line">        LOG.info(<span class="string">"provider invoke"</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"provider invoke"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Consumer实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FeignClient</span>(value=<span class="string">"xxx"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ServiceAgent</span></span>&#123;</span><br><span class="line">    <span class="meta">@Getmapping</span>(value=<span class="string">"/service"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">service</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConsumerController</span></span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span>  ServiceAgent serviceAgent;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/service"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">service</span><span class="params">()</span></span>&#123;</span><br><span class="line">        String result = serviceAgent.service();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>服务根据name分组，同一服务可有多个实例，即集群</p>
+<h2 id="Nacos原理"><a href="#Nacos原理" class="headerlink" title="Nacos原理"></a>Nacos原理</h2><h4 id="Nacos配置中心原理"><a href="#Nacos配置中心原理" class="headerlink" title="Nacos配置中心原理"></a>Nacos配置中心原理</h4><p>Nacos通过推+拉的方式解决长轮询时间间隔问题。</p>
+<p>拉的优势：如果用推的方式，服务端需维持与客户端的长连接，需消耗大量资源，还要考虑连接的有效性。例如需心跳保活，而用拉的方式客户端只需通过一个无状态的http请求即可获取到服务端的数据。</p>
+<p>在长轮询任务中，当服务端配置信息发生变更时，客户端将最新数据拉取下来后保存在CacheData中，同时更新了该CacheData的md5值，当下次触发checkListenerMd5方法时，会发现当前listener所持有的md5值和CacheData的md5值不一样了，即意味着服务端配置发生变更，这时就需将最新数据通知给Listener的持有者。</p>
+<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><p>Nacos服务端创建了相关配置项后，客户端就可以进行监听了，客户端是通过一个定时任务来检查自己监听的配置项数据的，一旦服务端数据发生变化时，客户端将会获取最新的数据，并将最新的数据保存在一个CacheData对象中，然后重新计算CacheData中的md5属性值，此时就会对该CacheData所绑定的Listener触发receiveConfigInfo回调。</p>
+<p>1、先从本地磁盘加载配置，因为应用启动时会加载远程配置到本地，如果本地文件的内容不为空，直接返回；<br>2、如果本地文件内容为空，则调用worker.getServiceConfig加载远程配置<br>3、如果出现异常，则调用本地快照文件加载配置</p>
+<p>客户端长轮询主要做两件事：</p>
+<ol>
+<li><p>检查本地配置checkLocalConfig<br>a. 如果isUseLocalConfigInfo为false，但本地缓存路径的文件是存在的，则将           isUseLocalConfigInfo设为true，并更新cacheData的内容及文件的更新时间</p>
+<p>b. 如果isUseLocalConfigInfo为true，但本地缓存文件不存在则设为false，不通知监听器<br>c. 如果isUseLocalConfigInfo为true，本地缓存文件也存在，但是缓存时间与文件更新时间不一致，则更新cacheData中的内容，isUseLocalConfigInfo设为true。<br>若isUseLocalConfigInfo为true，则检查本地文件缓存的md5与cacheData的md5是否一致，不一致则会触发safeNotifyListener回调方法，listener.receiveConfigInfo(contentTmp)  listener的使用者就能接收到最新的配置信息了。</p>
+<ol start="2">
+<li>检查服务端配置checkUpdateDataIds:获取远程服务器上数据变更的dataId，遍历变化的集合，通过getServerConfig从远程服务器获取相应内容，更新本地cache为服务器端返回的内容，最后遍历cacheDatas，找到变化的数据进行通知。</li>
+</ol>
+</li>
+</ol>
+<p>服务端：</p>
+<p>客户端发起长轮询请求，服务端收到请求后，先比较客户端请求过来的md5和服务端是否一致，如果不同则直接返回，如果相同则通过schedule延迟29.5s后再比较，为了保证服务端在29.5s内数据变化能及时通知客户端，服务端采用事件订阅的方式来监听服务端本地数据变化的事件，一旦收到事件，则触发DataChangeTask的通知，并遍历allSubs队列中的ClientLongPolling(客户端的长轮询任务)，将结果写回客户端，就完成了一次数据的推送。如果DataChangeTask完成数据“推送”后，ClientLongPolling中的调度任务又开始执行了怎么办？在”推送“前将原等待执行的调度任务取消就可以了，所以在ClientLongPolling方法中最开始的一个步骤就是删除订阅事件。</p>
+<h4 id="选举机制"><a href="#选举机制" class="headerlink" title="选举机制"></a>选举机制</h4><p>角色：</p>
+<pre><code>1. leader：所有请求处理者，leader副本接受client的更新请求，本地处理后再同步至其他多个副本
+ 2. follower：请求的被动更新者，从leader接受更新请求，然后写入本地日志文件
+ 3. candidate：如果follower副本在一段时间内没有收到leader副本的心跳，则判断leader副本可能已经故障，此时启动选举过程，此时副本会变为candidate状态，直到选举结束
+ 4. term：每一届新的履职期称之为一届任期</code></pre><p>每隔500ms发起一次选举任务和心跳任务</p>
+<p>选举过程：</p>
+<pre><code>1. 系统刚启动，所有节点任期为0，大家的role都为follower
+ 2. 一个启动的节点第一个触发未检测到心跳超时，自增任期为1，并且重新计时，给自己投一票，然后向所有其他节点发起投票
+ 3. 其他节点当前任期为0，收到candidate的投票选举，清零自己的心跳空白等待时间，未超时前不会发起投票，从而避免多重投票导致无效投票的可能性。
+ 4. 第一个发起投票的节点收到半数投票，成为leader</code></pre><ol>
+<li>每次follower收到leader的一次heartbeat，都会清零自己的心跳计时，如果当前心跳计时超时了，仍未收到leader心跳，就会从follower变成candidate</li>
+<li>自增当前任期且开始计时，向其它节点发起投票</li>
+<li>其它节点会比较任期和日志的序号，至少不能比自己的数据旧才会投票给第一个发起投票的节点</li>
+<li>超过半数节点投票成功才会成为leader，否则等待选举超时，再发起第二轮投票</li>
+</ol>
+<p>在leaderDue内自己是不会发起选举的，只有到期后才会重置leaderDue和heartbeatDue,然后发送投票。每个节点的leaderDusMs设的是随机值，即每个节点的leader任期不一样，从而避免大家同时发起投票，提高选举成功率。某个节点leaderDusMs先减为0, 先自增term，然后发起投票，该节点term+1比其它节点term大，从而成功成为leader。</p>
+<p>发起投票的过程为投票发起方向不包含自己的其它节点发起投票请求，其它节点收到请求后，看term是否比自己term大，大则投给他，然后将自己term设为投票发起方的term，重置leaderDueMs（避免自己再发起一轮投票），最后将投票结果返回投票发起方，根据结果有半数投票的leader成为真正的leader。</p>
+<p>心跳过程：</p>
+<p>​    和选举类似，只有heartBeatDueMs到期后才会发起心跳处理，这里心跳周期远远小于选举的term周期，而且在心跳处理过程中心跳发起方和接收方都会重置选举时间，通过时间的延长阻止各节点发起投票请求。某一节点成为leader后，通过心跳的方式将leader信息传给其他节点。</p>
+<p>follower超时：<br>    自身会重新发起选举，如果与其它节点不通，会一直处于选举状态，如果超时一段时间后恢复，会通过选举成为新的leader或者成为原leader的follower（发选举请求前收到了心跳消息），此时有两个leader，但由于旧leader的term较小，最终被新leader同步为follower（为分析结果，待验证）</p>
+<p>leader超时：<br>    leader超时重新选举，产生新leader，旧leader恢复后会通过心跳被同步为follower</p>
+<h4 id="服务发现-1"><a href="#服务发现-1" class="headerlink" title="服务发现"></a>服务发现</h4><p>​    服务注册：服务提供者会通过轮询配置的注册中心集群地址进行服务的注册，失败则请求下一个节点；nacos client这边在spring容器启动后执行一个服务订阅操作的延时任务，这个任务执行时先拉取nacos server最新的服务列表，然后与本地缓存的服务列表进行比较，取消订阅下线的服务，然后向nacos server发起订阅操作，订阅所有服务。</p>
+<p>服务消费者订阅后会执行一个轮训任务（每10s一次）用来拉取最新的服务提供者信息并实时更新，服务提供者注册时nacos服务端也会有一个相应的心跳检测，当心跳检测超时也就是未及时收到服务提供者的心跳包，nacos server判定该服务状态异常，随后通过UDP推送服务信息来告知对应的服务消费者，服务消费者通过PushReceiver来处理udp协议，HostReactor.processServiceJson(String json)来更新本地服务列表。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>坚持技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="yyguy123 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="yyguy123 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/25/Mysql%E7%B4%A2%E5%BC%95/" rel="prev" title="Mysql索引">
+      <i class="fa fa-chevron-left"></i> Mysql索引
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/25/Nginx/" rel="next" title="Nginx">
+      Nginx <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Nacos：针对微服务架构中服务发现、配置管理、服务治理的综合型解决方案"><span class="nav-number">1.</span> <span class="nav-text">Nacos：针对微服务架构中服务发现、配置管理、服务治理的综合型解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置中心"><span class="nav-number">1.1.</span> <span class="nav-text">配置中心</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nacos特性"><span class="nav-number">1.2.</span> <span class="nav-text">Nacos特性</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Nacos配置"><span class="nav-number">1.2.0.0.1.</span> <span class="nav-text">Nacos配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Nacos客户端获取配置"><span class="nav-number">1.2.0.0.2.</span> <span class="nav-text">Nacos客户端获取配置</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Nacos配置管理模型"><span class="nav-number">1.2.0.1.</span> <span class="nav-text">Nacos配置管理模型</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#配置集（Data-ID）"><span class="nav-number">1.2.0.1.0.1.</span> <span class="nav-text">配置集（Data ID）</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#配置项"><span class="nav-number">1.2.0.1.0.2.</span> <span class="nav-text">配置项</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#配置分组（group）"><span class="nav-number">1.2.0.1.0.3.</span> <span class="nav-text">配置分组（group）</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#命名空间（Namespace）"><span class="nav-number">1.2.0.1.0.4.</span> <span class="nav-text">命名空间（Namespace）</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#最佳实践"><span class="nav-number">1.2.0.1.0.5.</span> <span class="nav-text">最佳实践</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#自定义扩展dataId"><span class="nav-number">1.2.0.1.0.6.</span> <span class="nav-text">自定义扩展dataId</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#完全关闭配置"><span class="nav-number">1.2.0.1.0.7.</span> <span class="nav-text">完全关闭配置</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Nacos集群部署"><span class="nav-number">1.2.0.2.</span> <span class="nav-text">Nacos集群部署</span></a></li></ol><li class="nav-item nav-level-2"><a class="nav-link" href="#服务发现"><span class="nav-number">1.3.</span> <span class="nav-text">服务发现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nacos原理"><span class="nav-number">1.4.</span> <span class="nav-text">Nacos原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Nacos配置中心原理"><span class="nav-number">1.4.0.1.</span> <span class="nav-text">Nacos配置中心原理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#总结"><span class="nav-number">1.4.0.1.1.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#选举机制"><span class="nav-number">1.4.0.2.</span> <span class="nav-text">选举机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#服务发现-1"><span class="nav-number">1.4.0.3.</span> <span class="nav-text">服务发现</span></a></li></ol></li></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="yyguy123" src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">yyguy123</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yyguy123" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yyguy123" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yyguy123@gmail.com" title="E-Mail → mailto:yyguy123@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">yyguy123</span>
+</div>
+  
+  <div>
+      <span>版权声明：本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="external nofollow noopener noreferrer">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</span>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '2274aa537532ecf3cabe',
+      clientSecret: '45c6c0de0d52ec8e9523cfaca4ce3c88923f4a3f',
+      repo        : 'yyguy123.github.io',
+      owner       : 'yyguy123',
+      admin       : ['yyguy123'],
+      id          : 'f7d8909902a22dce9f491bb88c7464a8',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

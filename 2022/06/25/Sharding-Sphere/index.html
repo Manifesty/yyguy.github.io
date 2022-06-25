@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="folyjzSrNTxM-gzANuN149Z3GWMMc4Go2VluVGIRh48">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-flash.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yyguy123.github.io","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="为什么要分库分表：    业务越开越大，单表数据超出数据库支持的容量；持久化磁盘IO，传统的数据库性能瓶颈    1、换数据库（缓存）    2、Sql、索引、字段优化    3、读写分离（业务有关优化）    4、分库分表（业务）    5、分区读写分离：我们应用程序访问数据库无非是CRUD   分开 –&gt;分库  前提条件： master -&gt;slave 主从同步架构  一般用于读多">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sharding-Sphere">
+<meta property="og:url" content="http://yyguy123.github.io/2022/06/25/Sharding-Sphere/index.html">
+<meta property="og:site_name" content="yyguy123的个人博客">
+<meta property="og:description" content="为什么要分库分表：    业务越开越大，单表数据超出数据库支持的容量；持久化磁盘IO，传统的数据库性能瓶颈    1、换数据库（缓存）    2、Sql、索引、字段优化    3、读写分离（业务有关优化）    4、分库分表（业务）    5、分区读写分离：我们应用程序访问数据库无非是CRUD   分开 –&gt;分库  前提条件： master -&gt;slave 主从同步架构  一般用于读多">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-06-25T10:33:33.685Z">
+<meta property="article:modified_time" content="2021-01-01T09:44:19.898Z">
+<meta property="article:author" content="yyguy123">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yyguy123.github.io/2022/06/25/Sharding-Sphere/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Sharding-Sphere | yyguy123的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">yyguy123的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">若无闲事挂心头，便是人间好时节</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="搜索..." spellcheck="false" type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2022/06/25/Sharding-Sphere/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Sharding-Sphere
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-25 18:33:33" itemprop="dateCreated datePublished" datetime="2022-06-25T18:33:33+08:00">2022-06-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-01 17:44:19" itemprop="dateModified" datetime="2021-01-01T17:44:19+08:00">2021-01-01</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>为什么要分库分表：<br>    业务越开越大，单表数据超出数据库支持的容量；持久化磁盘IO，传统的数据库性能瓶颈<br>    1、换数据库（缓存）<br>    2、Sql、索引、字段优化<br>    3、读写分离（业务有关优化）<br>    4、分库分表（业务）<br>    5、分区<br>读写分离：我们应用程序访问数据库无非是CRUD   分开 –&gt;分库  前提条件： master -&gt;slave 主从同步架构  一般用于读多写少</p>
+<p>分库分表方式： 垂直/水平<br>垂直：<br>    通俗说法叫大表拆小表，拆分是基于关系型数据库中的列（字段）进行的<br>    特点：1、每个库（表）的结构都不一样<br>          2、每个库（表）的数据至少有一列一样<br>          3、每个库（表）的并集是全量数据<br>    优点：拆分后业务逻辑清晰（专库专用按业务拆分）<br>          实现动静分离、冷热数据分离设计体现  冷库：发布说说信息  热库：说说点赞和评论信息<br>          数据维护简单，按业务不同业务放到不同机器<br>    缺点：如果单表数据量大，读写压力大<br>          受某种业务来决定或限制，一个业务往往会影响到数据库瓶颈<br>          部分业务无法关联join，只能通过java程序，提高了开发复杂度</p>
+<p>水平：<br>    以某个字段按照一定规律（取模）将一个表的数据分到多个库中<br>    特点：1、每个库（表）的结构都一样<br>          2、每个库（表）的数据都不一样<br>          3、每个库（表）的并集是全量数据<br>    优点：单库（表）的数据保持在一定量，有助于性能提高<br>          提高了系统的稳定性和负载能力<br>          切分的表的结构相同，程序改造较少<br>    缺点：数据的扩容很有难度维护量大<br>          拆分规则很难抽象出来<br>          分片事务的一致性问题部分业务无法关联join，只能通过java程序</p>
+<p>读写分离：主从同步、数据一致性、网络延迟的问题<br>分库分表：增加维护成本、分布式事务（跨库事务）、跨库join、分布式全局唯一id等问题</p>
+<p>分库分表算法：<br>    取模（Hash）：通过userid进行123%3=xxx 数据分散均衡 但是扩容时间复杂度为O(N)<br>            一致性Hash：假设某个哈希函数H的值空间为0-2^32 -1，整个空间按顺时针方向组织，0和2^32 -1在零点方向重合，下一步将各个服务器使用Hash，具体可<br>            选择服务器ip或主机名，确定其在哈希环上的位置，将数据key使用相同的函数hash计算出哈希值，从此位置顺时针行走，第一台遇到的服务器就是其应该<br>            定位到的服务器。<br>            一致性哈希算法对于节点的增减都只需重定位环空间中一小部分数据，具有较好的容错性和扩展性。<br>            另外，一致性哈希算法在节点过少时，容易因节点分布不均导致数据倾斜问题，为解决这种问题，一致性哈希算法引入虚拟节点机制，对每一个节点计算多<br>            个hash，每个计算结果位置都放置一个此服务节点。 实际应用中通常将虚拟节点数设为32甚至更大。<br>    范围区分（range）：例如 按月、按省     会有热点数据问题<br>    预定义（list）：预计数据量，先设计好分多少库  （100W-1亿数据  10库）</p>
+<p>常见中间件：sharding-sphere、atlas<br>Proxy代理：mycat（重）、mysql-proxy、atlas、sharding-proxy（sharding-sphere）<br>        连接请求发给代理，由代理选择连接数据库<br>JDBC直连：TDDL（淘宝  半开源）、sharding-jdbc（sharding-sphere）<br>        在应用层选择连接的数据库</p>
+<p>Sharding-Sphere：<br>    LogicTable逻辑表：数据分片的逻辑表，对于水平拆分的数据（库）表，同一类表的总称  例如t_order_0、t_order_1逻辑表为t_order<br>    ActualTable真实表：在分片的数据库中真实存在的物理表，如t_order_0、t_order_1<br>    DataNode数据节点表：数据分片的最小单元，由数据源名称和数据表组成。例：ds_1.t_order_0，配置时默认各个分片数据库的表结构均相同，<br>        直接配置逻辑表和真实表对应关系即可，如果各数据库表结构不同，可使用ds.actual_table配置<br>    BindingTable绑定表：指在任何场景下分片规则均一致的主表和字表。例如订单表和订单项表。BindingTable关系的多表关联查询不会出现笛卡尔积关联，<br>        关联查询效率大大提升<br>    ShardingColumn分片字段：用于将数据库（表）水平拆分的关键字段，例如订单表订单ID取模分片，则订单ID为分片字段，SQL中若无分片字段将执行全路由，性能较差<br>        Sharding-JDBC支持多分片字段<br>    BroadcastTable广播表：指所有分片数据源中都存在的表，表结构和表中数据在每个数据库中完全一致，适用于数据量不大但需要与海量数据表关联查询的场景，<br>        例如字典表<br>    LogicIndex逻辑索引：某些数据库（如PostgreSQL）不允许同一个库存在名称相同的索引，某些数据库（如Mysql）则允许只要同一个表中不存在名称相同的索引即可。<br>        逻辑索引用于同一个库不允许出现相同索引名称的分表场景，需要将同库不同表的索引名称改写为索引名+表名，改写之前的索引名称为逻辑索引</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>坚持技术分享，您的支持将鼓励我继续创作！</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="yyguy123 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="yyguy123 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/25/Redis/" rel="prev" title="Redis">
+      <i class="fa fa-chevron-left"></i> Redis
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/25/Sql%E4%BC%98%E5%8C%96/" rel="next" title="Sql优化">
+      Sql优化 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="yyguy123" src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">yyguy123</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yyguy123" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yyguy123" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yyguy123@gmail.com" title="E-Mail → mailto:yyguy123@gmail.com" rel="external nofollow noopener noreferrer" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">yyguy123</span>
+</div>
+  
+  <div>
+      <span>版权声明：本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="external nofollow noopener noreferrer">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</span>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '2274aa537532ecf3cabe',
+      clientSecret: '45c6c0de0d52ec8e9523cfaca4ce3c88923f4a3f',
+      repo        : 'yyguy123.github.io',
+      owner       : 'yyguy123',
+      admin       : ['yyguy123'],
+      id          : 'd3eb1e0edf2cbe4298f4b921397e4126',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
