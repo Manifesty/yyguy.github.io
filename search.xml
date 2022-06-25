@@ -1,6 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Docker</title>
+    <url>/2022/06/25/Docker/</url>
+    <content><![CDATA[<h1 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h1><h2 id="Docker概述"><a href="#Docker概述" class="headerlink" title="Docker概述"></a>Docker概述</h2><h3 id="基本概述"><a href="#基本概述" class="headerlink" title="基本概述"></a>基本概述</h3><p>Docker是一个开源应用容器引擎，基于Go语言并遵从Apache2.0协议开源。可以让开发者打包他们的应用以及依赖包到一个轻量级、可移植的容器中，然后发布到任何流行的linux机器上，也可以实现虚拟化。</p>
+<h3 id="虚拟化技术和容器技术"><a href="#虚拟化技术和容器技术" class="headerlink" title="虚拟化技术和容器技术"></a>虚拟化技术和容器技术</h3><p>虚拟化技术特点：1、资源占用多 2、冗余步骤多 3、启动慢<br>容器化技术：容器化技术不是模拟的一个完整的操作系统<br>比较Docker和虚拟机的不同：</p>
+<ol>
+<li><p>传统虚拟机，虚拟出硬件，运行一个完整的操作系统，然后在这个系统上安装和运行软件</p>
+</li>
+<li><p>Docker容器内的应用直接运行在宿主机的内容，容器是没有自己的内核的，也没有虚拟硬件。</p>
+</li>
+<li><p>每个容器都是互相隔离的，每个容器都有属于自己的文件系统，互不影响。</p>
+<p>Docker比虚拟机更少的抽象层，docker利用宿主机的内核，VM需要的是GuestOS，Docker新建一个容器的时候不需要像虚拟机一样重新加载一个操作系统内核。</p>
+</li>
+</ol>
+<h3 id="Docker的基本组成"><a href="#Docker的基本组成" class="headerlink" title="Docker的基本组成"></a>Docker的基本组成</h3><h5 id="镜像"><a href="#镜像" class="headerlink" title="镜像"></a>镜像</h5><p>docker镜像好比是一个模板，可以通过这个模板创建容器服务，tomcat镜像 ==&gt;run ==&gt; tomcat01容器（提供服务），通过这个镜像可创建多个容器。</p>
+<h5 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h5><p>Docker利用容器技术，独立运行一个或者一组应用，通过镜像来创建，目前可以将容器视为一个简单的linux系统</p>
+<h5 id="仓库"><a href="#仓库" class="headerlink" title="仓库"></a>仓库</h5><p>仓库就是存放镜像的地方，分为公有仓库和私有仓库。</p>
+<h3 id="Docker容器运行流程"><a href="#Docker容器运行流程" class="headerlink" title="Docker容器运行流程"></a>Docker容器运行流程</h3><p>启动一个容器，run 运行流程：Docker会首先在本地寻找镜像，判断本机是否有这个镜像，有就用这个镜像运行，没有就去DockerHub下载；如果DockerHub找不到此镜像会返回错误，若DockerHub有此镜像就会下载到本地运行。</p>
+<p>Docker是一个Client-Server结构的系统，Docker守护进程运行在主机，通过Socker从客户端访问，Docker Server接收到Docker client指令就会执行这个命令。</p>
+<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><p>docker images  查看本地主机所有镜像</p>
+<p>docker search 搜索镜像</p>
+<p>docker pull 镜像名[:tag] 下载镜像</p>
+<p>docker rmi -f 镜像id    删除镜像</p>
+<p>docker rmi -f $(docker images -aq)</p>
+<h4 id="容器命令"><a href="#容器命令" class="headerlink" title="容器命令"></a>容器命令</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run [可选参数] image</span><br><span class="line">--name="名字"    指定容器名字</span><br><span class="line">-d                        后台方式运行</span><br><span class="line">-it                        使用交互方式运行，进入容器内查看内容</span><br><span class="line">-p                        指定容器端口</span><br><span class="line">（-p ip:主机端口:容器端口 配置主机端口映射到容器端口</span><br><span class="line">   -p  主机端口:容器端口</span><br><span class="line">   -p   容器端口）</span><br><span class="line">-P                        随机指定端口</span><br><span class="line"><span class="meta">#</span><span class="bash">docker run -it centos /bin/bash  进入容器</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="built_in">exit</span> 停止并退出容器</span></span><br><span class="line"><span class="meta">#</span><span class="bash">Ctrl+P+Q   不停止容器退出</span></span><br><span class="line"><span class="meta">#</span><span class="bash">docker ps   列出运行过的容器</span></span><br><span class="line">删除容器</span><br><span class="line">docker rm  容器id</span><br><span class="line">docker rm  -f $(docker ps -aq)</span><br><span class="line">docker ps -aq | xargs docker rm</span><br><span class="line">启动和停止容器</span><br><span class="line">docker start 容器id</span><br><span class="line">docker restart 容器id</span><br><span class="line">docker stop  容器id</span><br><span class="line">docker kill 容器id</span><br><span class="line">查看日志</span><br><span class="line">docker logs -tf --tail 10 容器id</span><br><span class="line">docker top  容器id  查看容器中进程信息</span><br><span class="line">docker inspect 容器id 查看容器中元数据</span><br><span class="line">进入当前正在运行的容器</span><br><span class="line">docker exec -it 容器id /bin/bash  进入容器后会开启一个新的终端可以在里面操作</span><br><span class="line">docker attach 容器id           进入容器正在执行的终端，不会启动新进程</span><br><span class="line">拷贝操作</span><br><span class="line">docker cp 容器id:容器内部路径  目的主机路径</span><br><span class="line">docker cp  目的主机路径  容器id:容器内部路径</span><br><span class="line"></span><br><span class="line">Docker容器后台运行(后台运行必须有前台进程)</span><br><span class="line">docker run -dit --name mytomcat tomcat /bin/bash   （-t提供一个伪终端，类似前台进程）</span><br><span class="line"></span><br><span class="line">commit镜像</span><br><span class="line">docker commit -m="提交的描述信息" -a="作者" 容器id 目标镜像名:[tag]</span><br></pre></td></tr></table></figure>
+
+<h3 id="Docker镜像"><a href="#Docker镜像" class="headerlink" title="Docker镜像"></a>Docker镜像</h3><p>Docker镜像实际上由一层一层的文件系统组成，这种层级的文件系统是UnionFS联合文件系统。</p>
+<p>所有的Docker镜像都起始于一个基础镜像层，当进行修改或增加新内容时，就会在当前镜像层之上，创建新的镜像层。Docker镜像都是只读的，当容器启动时，一个新的可写层被加载到镜像的顶部，这一层就是容器层，容器层之下的都叫镜像层。</p>
+<h3 id="容器数据卷"><a href="#容器数据卷" class="headerlink" title="容器数据卷"></a>容器数据卷</h3><p>容器的持久化和同步操作及荣期间的数据共享。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run -it -v 主机目录:容器内目录</span><br></pre></td></tr></table></figure>
+
+<p>匿名挂载和具名挂载</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">-v 容器内路径    #匿名挂载</span><br><span class="line">-v 卷名：容器内路径  #具名挂载</span><br><span class="line">-v /宿主机路径：容器内路径  #指定路径挂载</span><br><span class="line"><span class="meta">#</span><span class="bash">匿名挂载</span></span><br><span class="line">docker run -d -P --name nginx01 -v /etc/nginx nginx</span><br><span class="line"><span class="meta">#</span><span class="bash">查看所有volume情况</span></span><br><span class="line">docker volume ls</span><br><span class="line"><span class="meta">#</span><span class="bash">具名挂载</span></span><br><span class="line">docker run -d -P --name nginx02 -v juming-nginx:/etc/nginx nginx</span><br><span class="line"><span class="meta">#</span><span class="bash">拓展  ro说明这个路径只能通过宿主机来操作，容器内无法操作   默认rw读写权限</span></span><br><span class="line">docker run -d -P --name nginx02 -v juming-nginx:/etc/nginx:ro nginx</span><br><span class="line"><span class="meta">#</span><span class="bash"> --volumes-from 共享数据卷  删除docker01容器不会影响docker02中的数据 （使用inspect查看就会发现文件挂载在宿主机，但是删除docker01数据卷中的文件，宿主机及docker02中都会删除）</span></span><br><span class="line">docker run -it --name docker02 --volumes-from docker01 centos</span><br></pre></td></tr></table></figure>
+
+<p>所有的docker容器内的卷，没有指定目录的情况下都是在/var/lib/docker/volumes/xxxx/_data<br>通过具名挂载可以方便的找到我们的卷，大多数情况使用具名挂载</p>
+<h3 id="DockerFile"><a href="#DockerFile" class="headerlink" title="DockerFile"></a>DockerFile</h3><p>DockerFile就是用来构建docker镜像的构建文件</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">FROM              #基础镜像 一切从这里开始构建</span><br><span class="line">MAINTAINER        #镜像是谁写的   姓名+邮箱</span><br><span class="line">RUN               #镜像构建时需要运行的命令</span><br><span class="line">ADD               #添加内容 COPY文件 例如添加tomcat压缩包，会自动解压</span><br><span class="line">WORKDIR           #镜像的工作目录</span><br><span class="line">VOLUME            #挂载的目录</span><br><span class="line">EXPOSE            #指定对外端口</span><br><span class="line">CMD               #指定容器启动的时候要运行的命令   只有最后一个会生效</span><br><span class="line">ENTRYPOINT        #指定容器启动的时候要运行的命令   可以追加命令</span><br><span class="line">ONBUILD           #是一个特殊的指令 它后面跟的是其它命令RUN、COPY等，这些指令在当前镜像被构建时并不会执行，只有以当前镜像为基础镜像去构建下一级镜像时才会被执行</span><br><span class="line">COPY              #类似ADD  将文件拷贝到镜像中</span><br><span class="line">ENV               #构建的时候配置环境变量</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">示例</span></span><br><span class="line">FROM centos</span><br><span class="line">MAINTAINER dh&lt;bean_d@126.com&gt;</span><br><span class="line">COPY readme.txt /usr/local/readme.txt</span><br><span class="line">ADD jdk-8u11-linux-x64.tar.gz /usr/local</span><br><span class="line">ADD apache-tomcat-9.0.22.tar.gz /usr/local</span><br><span class="line">ENV MYPATH /usr/local</span><br><span class="line">WORKDIR $MYPATH</span><br><span class="line">RUN yum -y install vim</span><br><span class="line">RUN yum -y install net-tools</span><br><span class="line">ENV JAVA_HOME /usr/local/jdk1.8.0_11</span><br><span class="line">ENV CLASSPATH $JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar</span><br><span class="line">ENV CATALINE_HOME /usr/local/apache-tomcat-9.0.22</span><br><span class="line">ENV CATALINE_BASE /usr/local/apache-tomcat-9.0.22</span><br><span class="line">ENV PATH $PATH:$JAVA_HOME/bin:$CATALINE_HOME/lib:$CATALINE_HOME/bin</span><br><span class="line">EXPOSE 8080</span><br><span class="line">CMD echo $MYPATH</span><br><span class="line">CMD echo "---end---"</span><br><span class="line">CMD /bin/bash    #最后一个CMD命令会覆盖之前的CMD</span><br><span class="line">CMD /usr/local/apache-tomcat-9.0.22/bin/startup.sh &amp;&amp; tail -f /usr/local/apache-tomcat-9.0.22/bin/logs/catalina.out</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">通过DockerFile构建镜像  -f指定dockerfile（若文件名为Dockerfile可不加-f指定） -t指定镜像名和标记  .表示根据当前目录下的dockerfile文件生成镜像 --rm表示构建成功后删除中间环节的容器</span></span><br><span class="line">docker build -t /test/demo:latest --rm .  </span><br><span class="line">docker build -f dockerfile文件路径 -t 镜像名:[tag] .</span><br><span class="line"><span class="meta">#</span><span class="bash">docker <span class="built_in">history</span> 镜像id  查看镜像生成过程命令</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">CMD和ENTRYPOINT区别</span></span><br><span class="line">FROM centos</span><br><span class="line">CMD ["ls","-a"]</span><br><span class="line"><span class="meta">#</span><span class="bash">docker run 镜像id -l  追加一个-l 命令会报错  CMD情况下-l替换了CMD [<span class="string">"ls"</span>,<span class="string">"-a"</span>]命令</span></span><br><span class="line">FROM centos</span><br><span class="line">ENTRYPOINT ["ls","-a"]</span><br><span class="line"><span class="meta">#</span><span class="bash">docker run 镜像id -l  追加一个-l  ENTRYPOINT情况下不会报错  相当于ls -al</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="发布镜像"><a href="#发布镜像" class="headerlink" title="发布镜像"></a>发布镜像</h5><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker login -u 用户名</span><br><span class="line">docker push mytomcat:1.0</span><br></pre></td></tr></table></figure>
+
+<h3 id="Docker网络"><a href="#Docker网络" class="headerlink" title="Docker网络"></a>Docker网络</h3><p>我们每启动一个docker容器，docker就会给docker容器分配一个ip，我们只要安装了docker，就会有一个网卡docekr0桥接模式，使用的技术是veth-pair技术。veth-pair就是一对的虚拟设备接口，他们都是成对出现的，一段连着协议，一段彼此相连，正因为有这个特性，veth-pair充当一个桥梁，连接各种虚拟设备。容器与容器间是可以互ping通的，所有容器间不指定网络的情况下，都是docker0路由的，docker会给我们的容器分配一个默认的可用IP。只要容器删除，对应网桥就没了。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">使tomcat03到tomcat02的网络连通（tomcat02到tomcat03是不通的）</span></span><br><span class="line">docker run -d -P --name tomcat03 --link tomcat02 tomcat</span><br><span class="line"><span class="meta">#</span><span class="bash">--link就是在hosts中添加了配置 现在已经不建议使用这种方式</span></span><br><span class="line"><span class="meta">#</span><span class="bash">docker0问题：不支持容器名连接访问</span></span><br></pre></td></tr></table></figure>
+
+<p>自定义网络</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">docker network ls   查看所有的docker网络</span></span><br><span class="line">网络模式</span><br><span class="line">bridge：桥接  docker默认</span><br><span class="line">none：不配置网络</span><br><span class="line">host：和宿主机共享网络</span><br><span class="line">container：容器网络连通（用的少）</span><br><span class="line"><span class="meta">#</span><span class="bash">docker run -d -P --name tomcat01 --net bridge tomcat</span></span><br><span class="line"><span class="meta">#</span><span class="bash">docker network create --driver bridge --subnet 192.168.0.0/16 --gateway 192.168.0.1 mynet           自定义网络</span></span><br><span class="line"><span class="meta">#</span><span class="bash">docker run -d -P --name tomcat-net-01 --net mynet tomcat</span></span><br><span class="line"><span class="meta">#</span><span class="bash">docker run -d -P --name tomcat-net-02 --net mynet tomcat</span></span><br><span class="line"><span class="meta">#</span><span class="bash">tomcat-net-01和tomcat-net-02之间可以用ip或容器名访问</span></span><br></pre></td></tr></table></figure>
+
+<p>网络连通</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">示例  打通tomcat01（默认docker0的网络） 到 mynet的网络 (tomcat02还是不通的)</span></span><br><span class="line"><span class="meta">#</span><span class="bash">docker network connect mynet tomcat01</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+]]></content>
+  </entry>
+  <entry>
     <title>Kubernetes</title>
     <url>/2022/06/25/Kubernetes/</url>
     <content><![CDATA[<h1 id="Kubernetes"><a href="#Kubernetes" class="headerlink" title="Kubernetes"></a>Kubernetes</h1><p>高可用集群副本数据最好是 &gt;=3 基数个  方便选举</p>

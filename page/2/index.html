@@ -188,6 +188,170 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2022/06/25/Nacos/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/25/Nacos/" class="post-title-link" itemprop="url">Nacos</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-25 18:33:33" itemprop="dateCreated datePublished" datetime="2022-06-25T18:33:33+08:00">2022-06-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-26 19:28:16" itemprop="dateModified" datetime="2021-08-26T19:28:16+08:00">2021-08-26</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Nacos：针对微服务架构中服务发现、配置管理、服务治理的综合型解决方案"><a href="#Nacos：针对微服务架构中服务发现、配置管理、服务治理的综合型解决方案" class="headerlink" title="Nacos：针对微服务架构中服务发现、配置管理、服务治理的综合型解决方案"></a>Nacos：针对微服务架构中服务发现、配置管理、服务治理的综合型解决方案</h1><h2 id="配置中心"><a href="#配置中心" class="headerlink" title="配置中心"></a>配置中心</h2><p>配置中心：在微服务架构中，当系统从一个单体应用，被拆分成分布式系统上一个个服务节点后，配置文件也必须跟着迁移（分割），这样配置就分散了，不仅如此，分散中还包含着冗余。配置中心将配置从各应用中剥离出来，对配置进行统一管理。</p>
+<ol>
+<li>在配置中心发布/修改配置</li>
+<li>配置中心将配置更新通知到各客户端</li>
+<li>客户端从配置中心获取最新配置</li>
+</ol>
+<p>主流配置中心对比：从配置中心角度看，性能方面Nacos读写性能最高，Apollo次之，SpringCloud Config依赖git场景不适合开放大规模自动化运维API，功能方面Apollo最为完善，Nacos具有Apollo大部分配置管理功能（Nacos不支持灰度发布和权限管理），而SpringCloud Config不带运维管理界面。Nacos一大优势是整合了注册中心、配置中心功能，部署和操作相比Apollo都要直观简单。</p>
+<h2 id="Nacos特性"><a href="#Nacos特性" class="headerlink" title="Nacos特性"></a>Nacos特性</h2><p>Nacos主要提供以下四大功能：</p>
+<ol>
+<li><p>服务发现与服务健康检查</p>
+<p>Nacos使服务更容易注册，并通过DNS或Http接口发现其他服务，Nacos还提供服务的实时健康检查，以防止向不健康的主机或服务实例发送请求 </p>
+</li>
+<li><p>动态配置管理</p>
+<p>动态配置服务允许在所有环境中以集中和动态的方式管理所有服务的配置，Nacos消除了在更新配置时重新部署应用程序，这使配置的更改更加高效和灵活</p>
+</li>
+<li><p>动态DNS服务</p>
+<p>Nacos提供基于DNS协议的服务发现能力，旨在支持异构语言的服务发现，支持将注册在Nacos上的服务以域名的方式暴露端点，让三方应用方便的查阅及发现</p>
+</li>
+<li><p>服务和元数据管理</p>
+<p>Nacos从微服务平台建设的视角管理数据中心的所有服务及元数据，包括管理服务的描述，生命周期，服务的静态依赖分析，服务的健康状态，服务的流量管理、路由及安全策略。</p>
+</li>
+</ol>
+<p>单机模式时Nacos默认使用嵌入式数据库实现数据的存储，若想使用外部mysql存储Nacos数据：</p>
+<ol>
+<li>安装数据库 5.6.5+  mysql8以下</li>
+<li>初始化mysql数据库，新建数据库nacos_config，数据库初始化文件：${nacoshome}/conf/nacos-mysql.sql</li>
+<li>修改${nacoshome}/conf/application.properties文件，增加mysql数据源配置</li>
+</ol>
+<h5 id="Nacos配置"><a href="#Nacos配置" class="headerlink" title="Nacos配置"></a>Nacos配置</h5><p>​    发布配置： dataId、group、配置格式（text/json/xml/yaml/html/properties）、配置内容</p>
+<h5 id="Nacos客户端获取配置"><a href="#Nacos客户端获取配置" class="headerlink" title="Nacos客户端获取配置"></a>Nacos客户端获取配置</h5><p>​    通过Nacos服务地址端口及dataId和group可通过Nacos的API获取配置<code>NacosFactory.createConfigService(properties).getConfig(dataId,group,5000);</code><br>​    监听配置<br><code>NacosFactory.createConfigService(properties).addListener(dataId,group,new Listener(){</code><br>​    <code>public Executor getExecutor(){</code><br>​          <code>return null;    
+​    }</code><br>​    <code>public void receiveConfigInfo(String s){</code><br>​         <code>System.out.println(s);</code><br>​    <code>}</code><br><code>});</code></p>
+<p>})</p>
+<h4 id="Nacos配置管理模型"><a href="#Nacos配置管理模型" class="headerlink" title="Nacos配置管理模型"></a>Nacos配置管理模型</h4><p>​    通过Namespace、group、Data ID能够定位到一个配置集</p>
+<h6 id="配置集（Data-ID）"><a href="#配置集（Data-ID）" class="headerlink" title="配置集（Data ID）"></a>配置集（Data ID）</h6><p>​    在系统中，一个配置文件通常就是一个配置集，一个配置集可以包含系统的各种配置信息，例如一个配置集可能包含了数据源、线程池、日志级别等配置项，每个配置集都可以定义一个有意义的名称，就是配置集的ID即Data ID。</p>
+<h6 id="配置项"><a href="#配置项" class="headerlink" title="配置项"></a>配置项</h6><p>​    配置集中包含的一个个配置内容即配置项，代表一个具体的可配置的参数与其值域，通常以key=value的形式存在</p>
+<h6 id="配置分组（group）"><a href="#配置分组（group）" class="headerlink" title="配置分组（group）"></a>配置分组（group）</h6><p>​    对配置集进行分组，通过一个有意义的字符串来表示，不同配置费分组下可以有相同配置集。默认采用DEFAULT_GROUP。常用来区分不同的项目或应用</p>
+<h6 id="命名空间（Namespace）"><a href="#命名空间（Namespace）" class="headerlink" title="命名空间（Namespace）"></a>命名空间（Namespace）</h6><p>​    可用于进行不同环境的配置隔离，例如可以隔开开发环境、测试环境和生产环境，或者隔离不同用户，不同开发人员使用同一nacos管理各自配置，通过namespace隔离，不同namespace下可存在相同名称的配置分组或配置集。默认有一个public命名空间。</p>
+<h6 id="最佳实践"><a href="#最佳实践" class="headerlink" title="最佳实践"></a>最佳实践</h6><p>Namespace：代表不同环境<br>Group：代表不同项目<br>Data ID：每个项目下往往有若干工程，每个配置集（Data ID）是一个工程的主配置文件</p>
+<p>支持配置的动态刷新：<br>    客户端配置nacos配置中心的地址后，直接使用@value注解获取配置文件的配置，但无法动态刷新，需注入配置文件上下文<br><code>@Autowired</code><br><code>private ConfigurableApplicationContext applicationContext；</code><br><code>applicationContext.getEnvironment().getProperty(&quot;xxx.xx&quot;);</code><br>类上加@RefreshScope注解时使用@Value也可动态刷新</p>
+<p>Nacos客户端resources下新建bootstrap.yaml，<font color="red">dataId的名称就是application的name + file-extension</font></p>
+<h6 id="自定义扩展dataId"><a href="#自定义扩展dataId" class="headerlink" title="自定义扩展dataId"></a>自定义扩展dataId</h6><p>对于一个项目需多个配置文件的情况可自定义扩展dataId<br><code>ext-config[0]:</code><br>    <code>data-id: test1.properties  (默认DEFAULT_GROUP，namespace即当前配置文件中的namespace)</code><br><code>ext-config[1]:</code><br>    <code>data-id: test2.properties</code><br>    <code>group: group2</code><br><code>ext-config[2]:</code><br>    <code>data-id: test3.properties</code><br>    <code>group: group3</code><br>    <code>refresh: true  (上面两种都不支持动态刷新)</code></p>
+<p>或者使用以下方式更为方便：但是此种方法只认DEFAULT_GROUP的dataid</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">	cloud:</span><br><span class="line">		nacos:</span><br><span class="line">			config:</span><br><span class="line">				shared-dataids: test1.properties,test2.properties,test3.properties</span><br><span class="line">				refreshable-dataids: test3.properties</span><br></pre></td></tr></table></figure>
+
+<p>配置的优先级： C&gt;B&gt;A<br>A：通过<code>spring.cloud.nacos.config.shared-dataids</code>支持多个共享Dataid的配置<br>B：通过<code>spring.cloud.nacos.config.ext-config[n].data-id</code>方式支持多个扩展data id，多个Data Id同时配置时，config[n]的n越大，优先级越高<br>C：通过内部相关规则（应用名+扩展名）自动获取相关的Data Id配置</p>
+<h6 id="完全关闭配置"><a href="#完全关闭配置" class="headerlink" title="完全关闭配置"></a>完全关闭配置</h6><p>通过设置<code>spring.cloud.nacos.config.enabled=false</code>来完全关闭Nacos Config</p>
+<h4 id="Nacos集群部署"><a href="#Nacos集群部署" class="headerlink" title="Nacos集群部署"></a>Nacos集群部署</h4><pre><code>1. 安装3个以上的Nacos服务
+ 2. 在所有Nacos目录的conf目录下，将文件cluster.conf.example重命名为cluster.conf，将所有机器以ip：port格式配置进去
+ 3. 所有客户端分别指定nacos集群中的若干节点
+ spring.cloud.nacos.config.server-addr: xx.xx.xx.xx:8848,xx.xx.xx.xx:8849,xx.xx.xx.xx:8850</code></pre><p>生产环境部署建议：<br>      通过域名+VIP（虚拟IP）模式来实现，一个域名对应一个VIP，一个VIP对应多个Nacos节点。当Nacos集群迁移时，客户端无需修改。数据库，生产环境下建议至少主备模式，通过修改${nacoshome}/conf/application.properties文件，使nacos拥有多个数据源。</p>
+<h2 id="服务发现"><a href="#服务发现" class="headerlink" title="服务发现"></a>服务发现</h2><p>微服务架构中，通过服务间的协作来实现业务目标，代码中免不了远程调用。服务消费方获取服务提供方的地址及端口就是服务发现。</p>
+<p>Ribbon：客户端负载均衡<br>Feign：远程调用<br>客户端启动类添加@EnableDiscoveryClient、@EnableFeignClients</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">	application:</span><br><span class="line">		name: xxx</span><br><span class="line">	cloud:</span><br><span class="line">		nacos:</span><br><span class="line">			discovery:</span><br><span class="line">				server-addr: xx.xx.xx.xx:8848</span><br><span class="line">				namespace: dev_test</span><br><span class="line">				cluster-name: DEFAULT</span><br></pre></td></tr></table></figure>
+
+<p>Provider实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProviderController</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOG = LoggerFactory.getLogger(ProviderController.calss);</span><br><span class="line">    <span class="meta">@Getmapping</span>(<span class="string">"/service"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">service</span><span class="params">()</span></span>&#123;</span><br><span class="line">        LOG.info(<span class="string">"provider invoke"</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"provider invoke"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Consumer实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FeignClient</span>(value=<span class="string">"xxx"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ServiceAgent</span></span>&#123;</span><br><span class="line">    <span class="meta">@Getmapping</span>(value=<span class="string">"/service"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">service</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConsumerController</span></span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span>  ServiceAgent serviceAgent;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/service"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">service</span><span class="params">()</span></span>&#123;</span><br><span class="line">        String result = serviceAgent.service();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>服务根据name分组，同一服务可有多个实例，即集群</p>
+<h2 id="Nacos原理"><a href="#Nacos原理" class="headerlink" title="Nacos原理"></a>Nacos原理</h2><h4 id="Nacos配置中心原理"><a href="#Nacos配置中心原理" class="headerlink" title="Nacos配置中心原理"></a>Nacos配置中心原理</h4><p>Nacos通过推+拉的方式解决长轮询时间间隔问题。</p>
+<p>拉的优势：如果用推的方式，服务端需维持与客户端的长连接，需消耗大量资源，还要考虑连接的有效性。例如需心跳保活，而用拉的方式客户端只需通过一个无状态的http请求即可获取到服务端的数据。</p>
+<p>在长轮询任务中，当服务端配置信息发生变更时，客户端将最新数据拉取下来后保存在CacheData中，同时更新了该CacheData的md5值，当下次触发checkListenerMd5方法时，会发现当前listener所持有的md5值和CacheData的md5值不一样了，即意味着服务端配置发生变更，这时就需将最新数据通知给Listener的持有者。</p>
+<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><p>Nacos服务端创建了相关配置项后，客户端就可以进行监听了，客户端是通过一个定时任务来检查自己监听的配置项数据的，一旦服务端数据发生变化时，客户端将会获取最新的数据，并将最新的数据保存在一个CacheData对象中，然后重新计算CacheData中的md5属性值，此时就会对该CacheData所绑定的Listener触发receiveConfigInfo回调。</p>
+<p>1、先从本地磁盘加载配置，因为应用启动时会加载远程配置到本地，如果本地文件的内容不为空，直接返回；<br>2、如果本地文件内容为空，则调用worker.getServiceConfig加载远程配置<br>3、如果出现异常，则调用本地快照文件加载配置</p>
+<p>客户端长轮询主要做两件事：</p>
+<ol>
+<li><p>检查本地配置checkLocalConfig<br>a. 如果isUseLocalConfigInfo为false，但本地缓存路径的文件是存在的，则将           isUseLocalConfigInfo设为true，并更新cacheData的内容及文件的更新时间</p>
+<p>b. 如果isUseLocalConfigInfo为true，但本地缓存文件不存在则设为false，不通知监听器<br>c. 如果isUseLocalConfigInfo为true，本地缓存文件也存在，但是缓存时间与文件更新时间不一致，则更新cacheData中的内容，isUseLocalConfigInfo设为true。<br>若isUseLocalConfigInfo为true，则检查本地文件缓存的md5与cacheData的md5是否一致，不一致则会触发safeNotifyListener回调方法，listener.receiveConfigInfo(contentTmp)  listener的使用者就能接收到最新的配置信息了。</p>
+<ol start="2">
+<li>检查服务端配置checkUpdateDataIds:获取远程服务器上数据变更的dataId，遍历变化的集合，通过getServerConfig从远程服务器获取相应内容，更新本地cache为服务器端返回的内容，最后遍历cacheDatas，找到变化的数据进行通知。</li>
+</ol>
+</li>
+</ol>
+<p>服务端：</p>
+<p>客户端发起长轮询请求，服务端收到请求后，先比较客户端请求过来的md5和服务端是否一致，如果不同则直接返回，如果相同则通过schedule延迟29.5s后再比较，为了保证服务端在29.5s内数据变化能及时通知客户端，服务端采用事件订阅的方式来监听服务端本地数据变化的事件，一旦收到事件，则触发DataChangeTask的通知，并遍历allSubs队列中的ClientLongPolling(客户端的长轮询任务)，将结果写回客户端，就完成了一次数据的推送。如果DataChangeTask完成数据“推送”后，ClientLongPolling中的调度任务又开始执行了怎么办？在”推送“前将原等待执行的调度任务取消就可以了，所以在ClientLongPolling方法中最开始的一个步骤就是删除订阅事件。</p>
+<h4 id="选举机制"><a href="#选举机制" class="headerlink" title="选举机制"></a>选举机制</h4><p>角色：</p>
+<pre><code>1. leader：所有请求处理者，leader副本接受client的更新请求，本地处理后再同步至其他多个副本
+ 2. follower：请求的被动更新者，从leader接受更新请求，然后写入本地日志文件
+ 3. candidate：如果follower副本在一段时间内没有收到leader副本的心跳，则判断leader副本可能已经故障，此时启动选举过程，此时副本会变为candidate状态，直到选举结束
+ 4. term：每一届新的履职期称之为一届任期</code></pre><p>每隔500ms发起一次选举任务和心跳任务</p>
+<p>选举过程：</p>
+<pre><code>1. 系统刚启动，所有节点任期为0，大家的role都为follower
+ 2. 一个启动的节点第一个触发未检测到心跳超时，自增任期为1，并且重新计时，给自己投一票，然后向所有其他节点发起投票
+ 3. 其他节点当前任期为0，收到candidate的投票选举，清零自己的心跳空白等待时间，未超时前不会发起投票，从而避免多重投票导致无效投票的可能性。
+ 4. 第一个发起投票的节点收到半数投票，成为leader</code></pre><ol>
+<li>每次follower收到leader的一次heartbeat，都会清零自己的心跳计时，如果当前心跳计时超时了，仍未收到leader心跳，就会从follower变成candidate</li>
+<li>自增当前任期且开始计时，向其它节点发起投票</li>
+<li>其它节点会比较任期和日志的序号，至少不能比自己的数据旧才会投票给第一个发起投票的节点</li>
+<li>超过半数节点投票成功才会成为leader，否则等待选举超时，再发起第二轮投票</li>
+</ol>
+<p>在leaderDue内自己是不会发起选举的，只有到期后才会重置leaderDue和heartbeatDue,然后发送投票。每个节点的leaderDusMs设的是随机值，即每个节点的leader任期不一样，从而避免大家同时发起投票，提高选举成功率。某个节点leaderDusMs先减为0, 先自增term，然后发起投票，该节点term+1比其它节点term大，从而成功成为leader。</p>
+<p>发起投票的过程为投票发起方向不包含自己的其它节点发起投票请求，其它节点收到请求后，看term是否比自己term大，大则投给他，然后将自己term设为投票发起方的term，重置leaderDueMs（避免自己再发起一轮投票），最后将投票结果返回投票发起方，根据结果有半数投票的leader成为真正的leader。</p>
+<p>心跳过程：</p>
+<p>​    和选举类似，只有heartBeatDueMs到期后才会发起心跳处理，这里心跳周期远远小于选举的term周期，而且在心跳处理过程中心跳发起方和接收方都会重置选举时间，通过时间的延长阻止各节点发起投票请求。某一节点成为leader后，通过心跳的方式将leader信息传给其他节点。</p>
+<p>follower超时：<br>    自身会重新发起选举，如果与其它节点不通，会一直处于选举状态，如果超时一段时间后恢复，会通过选举成为新的leader或者成为原leader的follower（发选举请求前收到了心跳消息），此时有两个leader，但由于旧leader的term较小，最终被新leader同步为follower（为分析结果，待验证）</p>
+<p>leader超时：<br>    leader超时重新选举，产生新leader，旧leader恢复后会通过心跳被同步为follower</p>
+<h4 id="服务发现-1"><a href="#服务发现-1" class="headerlink" title="服务发现"></a>服务发现</h4><p>​    服务注册：服务提供者会通过轮询配置的注册中心集群地址进行服务的注册，失败则请求下一个节点；nacos client这边在spring容器启动后执行一个服务订阅操作的延时任务，这个任务执行时先拉取nacos server最新的服务列表，然后与本地缓存的服务列表进行比较，取消订阅下线的服务，然后向nacos server发起订阅操作，订阅所有服务。</p>
+<p>服务消费者订阅后会执行一个轮训任务（每10s一次）用来拉取最新的服务提供者信息并实时更新，服务提供者注册时nacos服务端也会有一个相应的心跳检测，当心跳检测超时也就是未及时收到服务提供者的心跳包，nacos server判定该服务状态异常，随后通过UDP推送服务信息来告知对应的服务消费者，服务消费者通过PushReceiver来处理udp协议，HostReactor.processServiceJson(String json)来更新本地服务列表。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2022/06/25/Mysql%E7%B4%A2%E5%BC%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1757,636 +1921,6 @@ end time -----&gt; 1534836443786<br>
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2020/03/01/MyBatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%BA%8C)%E2%80%94%E2%80%94%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E5%AE%9E%E7%8E%B0%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/uploads/avatar.png">
-      <meta itemprop="name" content="yyguy123">
-      <meta itemprop="description" content>
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="yyguy123的个人博客">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/03/01/MyBatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%BA%8C)%E2%80%94%E2%80%94%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E5%AE%9E%E7%8E%B0%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8/" class="post-title-link" itemprop="url">MyBatis源码解析(二)——动态代理实现函数调用</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-03-01 15:04:38" itemprop="dateCreated datePublished" datetime="2020-03-01T15:04:38+08:00">2020-03-01</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-01 19:03:21" itemprop="dateModified" datetime="2020-05-01T19:03:21+08:00">2020-05-01</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Mybatis/" itemprop="url" rel="index"><span itemprop="name">Mybatis</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <a id="more"></a>
-
-<p>如果我们要使用MyBatis进行数据库操作的话，大致要做两件事情：</p>
-
-<ol><li>定义DAO接口<br>
-    在DAO接口中定义需要进行的数据库操作。</li>
-    <li>创建映射文件<br>
-    当有了DAO接口后，还需要为该接口创建映射文件。映射文件中定义了一系列SQL语句，这些SQL语句和DAO接口一一对应。</li>
-</ol><p>MyBatis在初始化的时候会将映射文件与DAO接口一一对应，并根据映射文件的内容为每个函数创建相应的数据库操作能力。而我们作为MyBatis使用者，只需将DAO接口注入给Service层使用即可。<br>
-那么MyBatis是如何根据映射文件为每个DAO接口创建具体实现的？答案是——动态代理。<br>
-下面进入正题。</p>
-
-<hr><p>首先来回顾一项MyBatis在初始化过程中所做的事情。<br>
-MyBatis在初始化过程中，首先会读取我们的配置文件流程，并使用<code>XMLConfigBuilder</code>来解析配置文件。<code>XMLConfigBuilder</code>会依次解析配置文件中的各个子节点，如：<code>&lt;settings&gt;</code>、<code>&lt;typeAliases&gt;</code>、<code>&lt;mappers&gt;</code>等。这些子节点在解析完成后都会被注册进<code>configuration</code>对象。然后<code>configuration</code>对象将作为参数，创建<code>SqlSessionFactory</code>对象。至此，初始化过程完毕！<br>
-下面我们重点分析<code>&lt;mapper&gt;</code>节点解析的过程。</p>
-
-<p>PS：MyBatis详细的初始化过程请移步至：<a href="https://www.jianshu.com/p/7bc6d3b7fb45" target="_blank" rel="external nofollow noopener noreferrer">MyBatis源码解析(一)——MyBatis初始化过程解析</a></p>
-
-<hr><h1>&lt;mapper&gt;节点解析过程</h1>
-
-<p> </p>
-
-<pre>
-<code>XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
-mapperParser.parse();
-</code></pre>
-
-<p>由上述代码可知，解析mapper节点的解析是由<code>XMLMapperBuilder</code>类的<code>parse()</code>函数来完成的，下面我们就详细看一下<code>parse()</code>函数。</p>
-
-<p> </p>
-
-<pre>
-<code>  public void parse() {
-    // 若当前Mapper.xml尚未加载，则加载
-    if (!configuration.isResourceLoaded(resource)) {
-      // 解析&lt;mapper&gt;节点
-      configurationElement(parser.evalNode("/mapper"));
-      // 将当前Mapper.xml标注为『已加载』（下回就不用再加载了）
-      configuration.addLoadedResource(resource);
-      // 【关键】将Mapper Class添加至Configuration中
-      bindMapperForNamespace();
-    }
-
-    parsePendingResultMaps();
-    parsePendingCacheRefs();
-    parsePendingStatements();
-  }
-</code></pre>
-
-<p>这个函数主要做了两件事：</p>
-
-<ol><li>解析<code>&lt;mapper&gt;</code>节点，并将解析结果注册进<code>configuration</code>中；</li>
-    <li>将当前映射文件所对应的DAO接口的Class对象注册进<code>configuration</code>中<br>
-    这一步极为关键！是为了给DAO接口创建代理对象，下文会详细介绍。</li>
-</ol><p>下面再进入<code>bindMapperForNamespace()</code>函数，看一看它做了什么：</p>
-
-<p> </p>
-
-<pre>
-<code>  private void bindMapperForNamespace() {
-    // 获取当前映射文件对应的DAO接口的全限定名
-    String namespace = builderAssistant.getCurrentNamespace();
-    if (namespace != null) {
-      // 将全限定名解析成Class对象
-      Class&lt;?&gt; boundType = null;
-      try {
-        boundType = Resources.classForName(namespace);
-      } catch (ClassNotFoundException e) {
-      }
-      if (boundType != null) {
-        if (!configuration.hasMapper(boundType)) {
-          // 将当前Mapper.xml标注为『已加载』（下回就不用再加载了）
-          configuration.addLoadedResource("namespace:" + namespace);
-          // 将DAO接口的Class对象注册进configuration中
-          configuration.addMapper(boundType);
-        }
-      }
-    }
-  }
-</code></pre>
-
-<p>这个函数主要做了两件事：</p>
-
-<ol><li>将<code>&lt;mapper&gt;</code>节点上定义的<code>namespace</code>属性（即：当前映射文件所对应的DAO接口的权限定名）解析成Class对象</li>
-    <li>将该Class对象存储在<code>configuration</code>对象的<code>MapperRegistry</code>容器中。</li>
-</ol><p>可以看一下<code>MapperRegistry</code>：</p>
-
-<p> </p>
-
-<pre>
-<code>public class MapperRegistry {
-  private final Configuration config;
-  private final Map&lt;Class&lt;?&gt;, MapperProxyFactory&lt;?&gt;&gt; knownMappers = new HashMap&lt;Class&lt;?&gt;, MapperProxyFactory&lt;?&gt;&gt;();
-}
-</code></pre>
-
-<p><code>MapperRegistry</code>有且仅有两个属性：<code>Configuration</code>和<code>knownMappers</code>。<br>
-其中，<code>knownMappers</code>的类型为<code>Map&lt;Class&lt;?&gt;, MapperProxyFactory&lt;?&gt;&gt;</code>，由此可见，它是一个Map，key为DAO接口的Class对象，而Value为该DAO接口代理对象的工厂。<br>
-那么，这个代理对象工厂是何许人也？它又是如何产生的呢？我们先来看一下<code>MapperRegistry</code>的<code>addMapper()</code>函数。</p>
-
-<p> </p>
-
-<pre>
-<code>  public &lt;T&gt; void addMapper(Class&lt;T&gt; type) {
-    if (type.isInterface()) {
-      if (hasMapper(type)) {
-        throw new BindingException("Type " + type + " is already known to the MapperRegistry.");
-      }
-      boolean loadCompleted = false;
-      try {
-        // 创建MapperProxyFactory对象，并put进knownMappers中
-        knownMappers.put(type, new MapperProxyFactory&lt;T&gt;(type));
-        MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type);
-        parser.parse();
-        loadCompleted = true;
-      } finally {
-        if (!loadCompleted) {
-          knownMappers.remove(type);
-        }
-      }
-    }
-  }
-</code></pre>
-
-<p>从这个函数可知，<code>MapperProxyFactory</code>是在这里创建，并put进<code>knownMappers</code>中的。<br>
-下面我们就来看一下<code>MapperProxyFactory</code>这个类究竟有些啥：</p>
-
-<p> </p>
-
-<pre>
-<code>public class MapperProxyFactory&lt;T&gt; {
-
-  private final Class&lt;T&gt; mapperInterface;
-  private final Map&lt;Method, MapperMethod&gt; methodCache = new ConcurrentHashMap&lt;Method, MapperMethod&gt;();
-
-  public MapperProxyFactory(Class&lt;T&gt; mapperInterface) {
-    this.mapperInterface = mapperInterface;
-  }
-
-  public Class&lt;T&gt; getMapperInterface() {
-    return mapperInterface;
-  }
-
-  public Map&lt;Method, MapperMethod&gt; getMethodCache() {
-    return methodCache;
-  }
-
-  @SuppressWarnings("unchecked")
-  protected T newInstance(MapperProxy&lt;T&gt; mapperProxy) {
-    return (T) Proxy.newProxyInstance(mapperInterface.getClassLoader(), new Class[] { mapperInterface }, mapperProxy);
-  }
-
-  public T newInstance(SqlSession sqlSession) {
-    final MapperProxy&lt;T&gt; mapperProxy = new MapperProxy&lt;T&gt;(sqlSession, mapperInterface, methodCache);
-    return newInstance(mapperProxy);
-  }
-}
-</code></pre>
-
-<p>这个类有三个重要成员：</p>
-
-<ol><li>mapperInterface属性<br>
-    这个属性就是DAO接口的Class对象，当创建<code>MapperProxyFactory</code>对象的时候需要传入</li>
-    <li>methodCache属性<br>
-    这个属性用于存储当前DAO接口中所有的方法。</li>
-    <li>newInstance函数<br>
-    这个函数用于创建DAO接口的代理对象，它需要传入一个MapperProxy对象作为参数。而MapperProxy类实现了InvocationHandler接口，由此可知它是动态代理中的处理类，所有对目标函数的调用请求都会先被这个处理类截获，所以可以在这个处理类中添加目标函数调用前、调用后的逻辑。</li>
-</ol><hr><h1>DAO函数调用过程</h1>
-
-<p>当MyBatis初始化完毕后，<code>configuration</code>对象中存储了所有DAO接口的Class对象和相应的<code>MapperProxyFactory</code>对象（用于创建DAO接口的代理对象）。接下来，就到了使用DAO接口中函数的阶段了。</p>
-
-<p> </p>
-
-<pre>
-<code>SqlSession sqlSession = sqlSessionFactory.openSession();
-try {
-    ProductMapper productMapper = sqlSession.getMapper(ProductMapper.class);
-    List&lt;Product&gt; productList = productMapper.selectProductList();
-    for (Product product : productList) {
-        System.out.printf(product.toString());
-    }
-} finally {
-    sqlSession.close();
-}
-</code></pre>
-
-<p>我们首先需要从<code>sqlSessionFactory</code>对象中创建一个<code>SqlSession</code>对象，然后调用<code>sqlSession.getMapper(ProductMapper.class)</code>来获取代理对象。</p>
-
-<p><code>sqlSessionFactory.openSession()</code>创建<code>SqlSession</code>对象</p>
-
-<pre>
-<code class="language-java">public SqlSession openSession() {
-        return this.openSessionFromDataSource(this.configuration.getDefaultExecutorType(), (TransactionIsolationLevel)null, false);
-    }</code></pre>
-
-<p>会调用 openSessionFromDataSource 方法，其中执行器为初始化Configuration时默认的 SimpleExecutor，接下来看openSessionFromDataSource方法</p>
-
-<pre>
-<code class="language-java">private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
-        Transaction tx = null;
-
-        DefaultSqlSession var8;
-        try {
-            Environment environment = this.configuration.getEnvironment();
-            TransactionFactory transactionFactory = this.getTransactionFactoryFromEnvironment(environment);
-            tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
-            Executor executor = this.configuration.newExecutor(tx, execType);
-            var8 = new DefaultSqlSession(this.configuration, executor, autoCommit);
-        } catch (Exception var12) {
-            this.closeTransaction(tx);
-            throw ExceptionFactory.wrapException("Error opening session.  Cause: " + var12, var12);
-        } finally {
-            ErrorContext.instance().reset();
-        }
-
-        return var8;
-    }</code></pre>
-
-<p>会返回一个 DefaultSqlSession 对象，看一下其中的this.configuration.newExecutor(tx, execType);方法</p>
-
-<pre>
-<code class="language-java">public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
-        executorType = executorType == null ? this.defaultExecutorType : executorType;
-        executorType = executorType == null ? ExecutorType.SIMPLE : executorType;
-        Object executor;
-        if (ExecutorType.BATCH == executorType) {
-            executor = new BatchExecutor(this, transaction);
-        } else if (ExecutorType.REUSE == executorType) {
-            executor = new ReuseExecutor(this, transaction);
-        } else {
-            executor = new SimpleExecutor(this, transaction);
-        }
-
-        //缓存
-        if (this.cacheEnabled) {
-            executor = new CachingExecutor((Executor)executor);
-        }
-        //责任链模式拦截器 
-        Executor executor = (Executor)this.interceptorChain.pluginAll(executor);
-        return executor;
-    }</code></pre>
-
-<p>开启缓存这里SimpleExecutor就会被CachingExecutor替换</p>
-
-<p><br>
-我们再来看一下<code>sqlSession.getMapper()</code>是如何创建代理对象的？</p>
-
-<p> </p>
-
-<pre>
-<code>  public &lt;T&gt; T getMapper(Class&lt;T&gt; type) {
-    return configuration.&lt;T&gt;getMapper(type, this);
-  }
-</code></pre>
-
-<p><code>sqlSession.getMapper()</code>调用了<code>configuration.getMapper()</code>，那我们再看一下<code>configuration.getMapper()</code>：</p>
-
-<p> </p>
-
-<pre>
-<code>  public &lt;T&gt; T getMapper(Class&lt;T&gt; type, SqlSession sqlSession) {
-    return mapperRegistry.getMapper(type, sqlSession);
-  }
-</code></pre>
-
-<p><code>configuration.getMapper()</code>又调用了<code>mapperRegistry.getMapper()</code>，那好，我们再深入看一下<code>mapperRegistry.getMapper()</code>：</p>
-
-<p> </p>
-
-<pre>
-<code>  public &lt;T&gt; T getMapper(Class&lt;T&gt; type, SqlSession sqlSession) {
-    final MapperProxyFactory&lt;T&gt; mapperProxyFactory = (MapperProxyFactory&lt;T&gt;) knownMappers.get(type);
-    if (mapperProxyFactory == null) {
-      throw new BindingException("Type " + type + " is not known to the MapperRegistry.");
-    }
-    try {
-      return mapperProxyFactory.newInstance(sqlSession);
-    } catch (Exception e) {
-      throw new BindingException("Error getting mapper instance. Cause: " + e, e);
-    }
-  }
-</code></pre>
-
-<p>看到这里我们就恍然大悟了，原来它根据上游传递进来DAO接口的Class对象，从<code>configuration</code>中取出了该DAO接口对应的代理对象生成工厂：<code>MapperProxyFactory</code>；<br>
-在有了这个工厂后，再通过<code>newInstance</code>函数创建该DAO接口的代理对象，并返回给上游。</p>
-
-<p>OK，此时我们已经获取了代理对象，接下来就可以使用这个代理对象调用相应的函数了。</p>
-
-<p> </p>
-
-<pre>
-<code>SqlSession sqlSession = sqlSessionFactory.openSession();
-try {
-    ProductMapper productMapper = sqlSession.getMapper(ProductMapper.class);
-    List&lt;Product&gt; productList = productMapper.selectProductList();
-    for (Product product : productList) {
-        System.out.printf(product.toString());
-    }
-} finally {
-    sqlSession.close();
-}
-</code></pre>
-
-<p>以上述代码为例，当我们获取到<code>ProductMapper</code>的代理对象后，我们调用了它的<code>selectProductList()</code>函数。<br>
-下面我们就来分析下代理函数调用过程。</p>
-
-<hr><p>当调用了代理对象的某一个代理函数后，这个调用请求首先会被发送给代理对象处理类<code>MapperProxy</code>的<code>invoke()</code>函数：</p>
-
-<p> </p>
-
-<pre>
-<code>  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-    try {
-      if (Object.class.equals(method.getDeclaringClass())) {
-        return method.invoke(this, args);
-      } else if (isDefaultMethod(method)) {
-        return invokeDefaultMethod(proxy, method, args);
-      }
-    } catch (Throwable t) {
-      throw ExceptionUtil.unwrapThrowable(t);
-    }
-    // 【核心代理在这里】
-    final MapperMethod mapperMethod = cachedMapperMethod(method);
-    return mapperMethod.execute(sqlSession, args);
-  }
-</code></pre>
-
-<p>先来解释下invoke函数的几个参数：</p>
-
-<ol><li><code>Object proxy</code>：代理对象</li>
-    <li><code>Method method</code>：当前正在被调用的代理对象的函数对象</li>
-    <li><code>Object[] args</code>：调用函数的所有入参</li>
-</ol><p>然后，直接看invoke函数最核心的两行代码：</p>
-
-<ol><li><code>cachedMapperMethod(method)</code>：从当前代理对象处理类<code>MapperProxy</code>的<code>methodCache</code>属性中获取method方法的详细信息（即：<code>MapperMethod</code>对象）。如果<code>methodCache</code>中没有就创建并加进去。</li>
-    <li>有了<code>MapperMethod</code>对象后执行它的<code>execute()</code>方法，该方法就会调用JDBC执行相应的SQL语句，并将结果返回给上游调用者。至此，代理对象函数的调用过程结束！</li>
-</ol><p>MapperMethod的execute方法</p>
-
-<pre>
-<code class="language-java">public Object execute(SqlSession sqlSession, Object[] args) {
-        Object result;
-        Object param;
-        switch(this.command.getType()) {
-        case INSERT:
-            param = this.method.convertArgsToSqlCommandParam(args);
-            result = this.rowCountResult(sqlSession.insert(this.command.getName(), param));
-            break;
-        case UPDATE:
-            param = this.method.convertArgsToSqlCommandParam(args);
-            result = this.rowCountResult(sqlSession.update(this.command.getName(), param));
-            break;
-        case DELETE:
-            param = this.method.convertArgsToSqlCommandParam(args);
-            result = this.rowCountResult(sqlSession.delete(this.command.getName(), param));
-            break;
-        case SELECT:
-            if (this.method.returnsVoid() &amp;&amp; this.method.hasResultHandler()) {
-                this.executeWithResultHandler(sqlSession, args);
-                result = null;
-            } else if (this.method.returnsMany()) {
-                result = this.executeForMany(sqlSession, args);
-            } else if (this.method.returnsMap()) {
-                result = this.executeForMap(sqlSession, args);
-            } else if (this.method.returnsCursor()) {
-                result = this.executeForCursor(sqlSession, args);
-            } else {
-                param = this.method.convertArgsToSqlCommandParam(args);
-                result = sqlSession.selectOne(this.command.getName(), param);
-                if (this.method.returnsOptional() &amp;&amp; (result == null || !this.method.getReturnType().equals(result.getClass()))) {
-                    result = Optional.ofNullable(result);
-                }
-            }
-            break;
-        case FLUSH:
-            result = sqlSession.flushStatements();
-            break;
-        default:
-            throw new BindingException("Unknown execution method for: " + this.command.getName());
-        }
-
-        if (result == null &amp;&amp; this.method.getReturnType().isPrimitive() &amp;&amp; !this.method.returnsVoid()) {
-            throw new BindingException("Mapper method '" + this.command.getName() + " attempted to return null from a method with a primitive return type (" + this.method.getReturnType() + ").");
-        } else {
-            return result;
-        }
-    }</code></pre>
-
-<p>可以看出是sqlsession通过xml中的sql id和参数在做CRUD操作，再看 result = this.executeForMany(sqlSession, args);方法</p>
-
-<pre>
-<code class="language-java">private &lt;E&gt; Object executeForMany(SqlSession sqlSession, Object[] args) {
-        Object param = this.method.convertArgsToSqlCommandParam(args);
-        List result;
-        if (this.method.hasRowBounds()) {
-            RowBounds rowBounds = this.method.extractRowBounds(args);
-            result = sqlSession.selectList(this.command.getName(), param, rowBounds);
-        } else {
-            result = sqlSession.selectList(this.command.getName(), param);
-        }
-
-        if (!this.method.getReturnType().isAssignableFrom(result.getClass())) {
-            return this.method.getReturnType().isArray() ? this.convertToArray(result) : this.convertToDeclaredCollection(sqlSession.getConfiguration(), result);
-        } else {
-            return result;
-        }
-    }</code></pre>
-
-<p>进入 sqlSession.selectList(this.command.getName(), param, rowBounds);方法</p>
-
-<pre>
-<code class="language-java">public &lt;E&gt; List&lt;E&gt; selectList(String statement, Object parameter, RowBounds rowBounds) {
-        List var5;
-        try {
-            MappedStatement ms = this.configuration.getMappedStatement(statement);
-            var5 = this.executor.query(ms, this.wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
-        } catch (Exception var9) {
-            throw ExceptionFactory.wrapException("Error querying database.  Cause: " + var9, var9);
-        } finally {
-            ErrorContext.instance().reset();
-        }
-
-        return var5;
-    }</code></pre>
-
-<p>继续看 this.executor.query 方法</p>
-
-<pre>
-<code class="language-java">public &lt;E&gt; List&lt;E&gt; query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
-        BoundSql boundSql = ms.getBoundSql(parameterObject);
-        CacheKey key = this.createCacheKey(ms, parameterObject, rowBounds, boundSql);
-        return this.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
-    }</code></pre>
-
-<p>这里的cacheKey是通过 id +sql+limit+offsetxxx 等等参数确定一个缓存的key</p>
-
-<p>接着看query方法：</p>
-
-<pre>
-<code class="language-java">public &lt;E&gt; List&lt;E&gt; query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
-        // 获取二级缓存
-        Cache cache = ms.getCache();
-        if (cache != null) {
-            // 根据ms来决定是否刷新缓存
-            this.flushCacheIfRequired(ms);
-            if (ms.isUseCache() &amp;&amp; resultHandler == null) {
-                this.ensureNoOutParams(ms, boundSql);
-                List&lt;E&gt; list = (List)this.tcm.getObject(cache, key);
-                if (list == null) {
-                    list = this.delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
-                    // 放入二级缓存
-                    this.tcm.putObject(cache, key, list);
-                }
-
-                return list;
-            }
-        }
-
-        return this.delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
-    }</code></pre>
-
-<p>有缓存就从缓存中取，无缓存就调用初始化CachingExecutor时传入的SimpleExecutor的query方法，继续看 this.delegate.query 方法：</p>
-
-<pre>
-<code class="language-java">public &lt;E&gt; List&lt;E&gt; query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
-        ErrorContext.instance().resource(ms.getResource()).activity("executing a query").object(ms.getId());
-        if (this.closed) {
-            throw new ExecutorException("Executor was closed.");
-        } else {
-            // 上一个查询执行完成 并且 &lt;select&gt;标签增加了flushCache="true" 刷新一级缓存
-            if (this.queryStack == 0 &amp;&amp; ms.isFlushCacheRequired()) {
-                this.clearLocalCache();
-            }
-
-            List list;
-            try {
-                ++this.queryStack;
-                // 对于指定了resultHandler的查询，不走缓存。否则从缓存中查询。
-                list = resultHandler == null ? (List)this.localCache.getObject(key) : null;
-                if (list != null) {
-                    // 如果存在缓存参数值，取出来覆盖当前参数值，只针对Callable
-                    this.handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
-                } else {
-                    // 缓存中没有，从数据库中查询放入缓存
-                    list = this.queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
-                }
-            } finally {
-                --this.queryStack;
-            }
-
-            if (this.queryStack == 0) {
-                Iterator var8 = this.deferredLoads.iterator();
-
-                while(var8.hasNext()) {
-                    BaseExecutor.DeferredLoad deferredLoad = (BaseExecutor.DeferredLoad)var8.next();
-                    deferredLoad.load();
-                }
-
-                this.deferredLoads.clear();
-                // 如果cacheScope配置了statement，查询完后清除缓存
-                if (this.configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) {
-                    this.clearLocalCache();
-                }
-            }
-
-            return list;
-        }
-    }</code></pre>
-
-<p>再看 queryFromDatabase 方法：</p>
-
-<pre>
-<code class="language-java">private &lt;E&gt; List&lt;E&gt; queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
-        // 放入一个初始值
-        this.localCache.putObject(key, ExecutionPlaceholder.EXECUTION_PLACEHOLDER);
-
-        List list;
-        try {
-            list = this.doQuery(ms, parameter, rowBounds, resultHandler, boundSql);
-        } finally {
-            this.localCache.removeObject(key);
-        }
-        // 放入一级缓存
-        this.localCache.putObject(key, list);
-        if (ms.getStatementType() == StatementType.CALLABLE) {
-            this.localOutputParameterCache.putObject(key, parameter);
-        }
-
-        return list;
-    }</code></pre>
-
-<p>可以看到上面的查询方法先是看&lt;select&gt;有没有flushCache=”true”，有就刷新一级缓存，没有的话先去从一级缓存取数据，如果一级缓存里没有结果，调用<code>queryFromDatabase</code>方法，从数据库查询结果并返回。</p>
-
-<p>一级缓存的范围有 <code>SESSION</code> 和 <code>STATEMENT</code> 两种，默认是 <code>SESSION</code> ，如果我们不需要使用一级缓存，那么我们可以把一级缓存的范围指定为STATEMENT，这样每次执行完一个Mapper语句后都会将一级缓存清除。如果需要更改一级缓存的范围，请在Mybatis的配置文件中，在&lt;settings&gt;下通过localCacheScope指定。</p>
-
-<p>至此，一次完整的Mybatis执行过程到此结束。</p>
-
-<p> </p>
-
-<p>需要注意的是与spring整合之后，mybatis的一级缓存就失效了</p>
-
-<p>1.mybatis的一级缓存生效的范围是sqlsession，是为了在sqlsession没有关闭时，业务需要重复查询相同数据使用的。一旦sqlsession关闭，则由这个sqlsession缓存的数据将会被清空。</p>
-
-<p>2.spring对mybatis的sqlsession的使用是由template控制的，sqlSessionTemplate又被spring当作resource放在当前线程的上下文里（threadlocal),spring通过mybatis调用数据库的过程如下：</p>
-
-<blockquote>
-<ol><li>我们需要访问数据</li>
-    <li>spring检查到了这种需求，于是去申请一个mybatis的sqlsession（资源池），并将申请到的sqlsession与当前线程绑定，放入threadlocal里面</li>
-    <li>sqlSessionTemplate从threadlocal获取到sqlsession，去执行查询</li>
-    <li>查询结束，清空threadlocal中与当前线程绑定的sqlsession，释放资源</li>
-    <li>我们又需要访问数据</li>
-    <li>返回到步骤2</li>
-</ol><p>通过以上步骤后发现，同一线程里面两次查询同一数据所使用的sqlsession是不相同的，所以，给人的印象就是结合spring后，mybatis的一级缓存失效了。</p>
-</blockquote>
-
-<p>对于spring开启事务时，getSqlSession方法里面维护了个SqlSessionHolder，关联了事务与session，如果存在则直接取出，否则则新建个session，所以在有事务的里，每个session都是同一个，故能用上缓存了。</p>
-
-<p> </p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -2458,7 +1992,7 @@ try {
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">27</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

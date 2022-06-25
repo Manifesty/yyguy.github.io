@@ -188,6 +188,636 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2020/03/01/MyBatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%BA%8C)%E2%80%94%E2%80%94%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E5%AE%9E%E7%8E%B0%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/03/01/MyBatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%BA%8C)%E2%80%94%E2%80%94%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86%E5%AE%9E%E7%8E%B0%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8/" class="post-title-link" itemprop="url">MyBatis源码解析(二)——动态代理实现函数调用</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-01 15:04:38" itemprop="dateCreated datePublished" datetime="2020-03-01T15:04:38+08:00">2020-03-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 19:03:21" itemprop="dateModified" datetime="2020-05-01T19:03:21+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mybatis/" itemprop="url" rel="index"><span itemprop="name">Mybatis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <a id="more"></a>
+
+<p>如果我们要使用MyBatis进行数据库操作的话，大致要做两件事情：</p>
+
+<ol><li>定义DAO接口<br>
+    在DAO接口中定义需要进行的数据库操作。</li>
+    <li>创建映射文件<br>
+    当有了DAO接口后，还需要为该接口创建映射文件。映射文件中定义了一系列SQL语句，这些SQL语句和DAO接口一一对应。</li>
+</ol><p>MyBatis在初始化的时候会将映射文件与DAO接口一一对应，并根据映射文件的内容为每个函数创建相应的数据库操作能力。而我们作为MyBatis使用者，只需将DAO接口注入给Service层使用即可。<br>
+那么MyBatis是如何根据映射文件为每个DAO接口创建具体实现的？答案是——动态代理。<br>
+下面进入正题。</p>
+
+<hr><p>首先来回顾一项MyBatis在初始化过程中所做的事情。<br>
+MyBatis在初始化过程中，首先会读取我们的配置文件流程，并使用<code>XMLConfigBuilder</code>来解析配置文件。<code>XMLConfigBuilder</code>会依次解析配置文件中的各个子节点，如：<code>&lt;settings&gt;</code>、<code>&lt;typeAliases&gt;</code>、<code>&lt;mappers&gt;</code>等。这些子节点在解析完成后都会被注册进<code>configuration</code>对象。然后<code>configuration</code>对象将作为参数，创建<code>SqlSessionFactory</code>对象。至此，初始化过程完毕！<br>
+下面我们重点分析<code>&lt;mapper&gt;</code>节点解析的过程。</p>
+
+<p>PS：MyBatis详细的初始化过程请移步至：<a href="https://www.jianshu.com/p/7bc6d3b7fb45" target="_blank" rel="external nofollow noopener noreferrer">MyBatis源码解析(一)——MyBatis初始化过程解析</a></p>
+
+<hr><h1>&lt;mapper&gt;节点解析过程</h1>
+
+<p> </p>
+
+<pre>
+<code>XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
+mapperParser.parse();
+</code></pre>
+
+<p>由上述代码可知，解析mapper节点的解析是由<code>XMLMapperBuilder</code>类的<code>parse()</code>函数来完成的，下面我们就详细看一下<code>parse()</code>函数。</p>
+
+<p> </p>
+
+<pre>
+<code>  public void parse() {
+    // 若当前Mapper.xml尚未加载，则加载
+    if (!configuration.isResourceLoaded(resource)) {
+      // 解析&lt;mapper&gt;节点
+      configurationElement(parser.evalNode("/mapper"));
+      // 将当前Mapper.xml标注为『已加载』（下回就不用再加载了）
+      configuration.addLoadedResource(resource);
+      // 【关键】将Mapper Class添加至Configuration中
+      bindMapperForNamespace();
+    }
+
+    parsePendingResultMaps();
+    parsePendingCacheRefs();
+    parsePendingStatements();
+  }
+</code></pre>
+
+<p>这个函数主要做了两件事：</p>
+
+<ol><li>解析<code>&lt;mapper&gt;</code>节点，并将解析结果注册进<code>configuration</code>中；</li>
+    <li>将当前映射文件所对应的DAO接口的Class对象注册进<code>configuration</code>中<br>
+    这一步极为关键！是为了给DAO接口创建代理对象，下文会详细介绍。</li>
+</ol><p>下面再进入<code>bindMapperForNamespace()</code>函数，看一看它做了什么：</p>
+
+<p> </p>
+
+<pre>
+<code>  private void bindMapperForNamespace() {
+    // 获取当前映射文件对应的DAO接口的全限定名
+    String namespace = builderAssistant.getCurrentNamespace();
+    if (namespace != null) {
+      // 将全限定名解析成Class对象
+      Class&lt;?&gt; boundType = null;
+      try {
+        boundType = Resources.classForName(namespace);
+      } catch (ClassNotFoundException e) {
+      }
+      if (boundType != null) {
+        if (!configuration.hasMapper(boundType)) {
+          // 将当前Mapper.xml标注为『已加载』（下回就不用再加载了）
+          configuration.addLoadedResource("namespace:" + namespace);
+          // 将DAO接口的Class对象注册进configuration中
+          configuration.addMapper(boundType);
+        }
+      }
+    }
+  }
+</code></pre>
+
+<p>这个函数主要做了两件事：</p>
+
+<ol><li>将<code>&lt;mapper&gt;</code>节点上定义的<code>namespace</code>属性（即：当前映射文件所对应的DAO接口的权限定名）解析成Class对象</li>
+    <li>将该Class对象存储在<code>configuration</code>对象的<code>MapperRegistry</code>容器中。</li>
+</ol><p>可以看一下<code>MapperRegistry</code>：</p>
+
+<p> </p>
+
+<pre>
+<code>public class MapperRegistry {
+  private final Configuration config;
+  private final Map&lt;Class&lt;?&gt;, MapperProxyFactory&lt;?&gt;&gt; knownMappers = new HashMap&lt;Class&lt;?&gt;, MapperProxyFactory&lt;?&gt;&gt;();
+}
+</code></pre>
+
+<p><code>MapperRegistry</code>有且仅有两个属性：<code>Configuration</code>和<code>knownMappers</code>。<br>
+其中，<code>knownMappers</code>的类型为<code>Map&lt;Class&lt;?&gt;, MapperProxyFactory&lt;?&gt;&gt;</code>，由此可见，它是一个Map，key为DAO接口的Class对象，而Value为该DAO接口代理对象的工厂。<br>
+那么，这个代理对象工厂是何许人也？它又是如何产生的呢？我们先来看一下<code>MapperRegistry</code>的<code>addMapper()</code>函数。</p>
+
+<p> </p>
+
+<pre>
+<code>  public &lt;T&gt; void addMapper(Class&lt;T&gt; type) {
+    if (type.isInterface()) {
+      if (hasMapper(type)) {
+        throw new BindingException("Type " + type + " is already known to the MapperRegistry.");
+      }
+      boolean loadCompleted = false;
+      try {
+        // 创建MapperProxyFactory对象，并put进knownMappers中
+        knownMappers.put(type, new MapperProxyFactory&lt;T&gt;(type));
+        MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type);
+        parser.parse();
+        loadCompleted = true;
+      } finally {
+        if (!loadCompleted) {
+          knownMappers.remove(type);
+        }
+      }
+    }
+  }
+</code></pre>
+
+<p>从这个函数可知，<code>MapperProxyFactory</code>是在这里创建，并put进<code>knownMappers</code>中的。<br>
+下面我们就来看一下<code>MapperProxyFactory</code>这个类究竟有些啥：</p>
+
+<p> </p>
+
+<pre>
+<code>public class MapperProxyFactory&lt;T&gt; {
+
+  private final Class&lt;T&gt; mapperInterface;
+  private final Map&lt;Method, MapperMethod&gt; methodCache = new ConcurrentHashMap&lt;Method, MapperMethod&gt;();
+
+  public MapperProxyFactory(Class&lt;T&gt; mapperInterface) {
+    this.mapperInterface = mapperInterface;
+  }
+
+  public Class&lt;T&gt; getMapperInterface() {
+    return mapperInterface;
+  }
+
+  public Map&lt;Method, MapperMethod&gt; getMethodCache() {
+    return methodCache;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected T newInstance(MapperProxy&lt;T&gt; mapperProxy) {
+    return (T) Proxy.newProxyInstance(mapperInterface.getClassLoader(), new Class[] { mapperInterface }, mapperProxy);
+  }
+
+  public T newInstance(SqlSession sqlSession) {
+    final MapperProxy&lt;T&gt; mapperProxy = new MapperProxy&lt;T&gt;(sqlSession, mapperInterface, methodCache);
+    return newInstance(mapperProxy);
+  }
+}
+</code></pre>
+
+<p>这个类有三个重要成员：</p>
+
+<ol><li>mapperInterface属性<br>
+    这个属性就是DAO接口的Class对象，当创建<code>MapperProxyFactory</code>对象的时候需要传入</li>
+    <li>methodCache属性<br>
+    这个属性用于存储当前DAO接口中所有的方法。</li>
+    <li>newInstance函数<br>
+    这个函数用于创建DAO接口的代理对象，它需要传入一个MapperProxy对象作为参数。而MapperProxy类实现了InvocationHandler接口，由此可知它是动态代理中的处理类，所有对目标函数的调用请求都会先被这个处理类截获，所以可以在这个处理类中添加目标函数调用前、调用后的逻辑。</li>
+</ol><hr><h1>DAO函数调用过程</h1>
+
+<p>当MyBatis初始化完毕后，<code>configuration</code>对象中存储了所有DAO接口的Class对象和相应的<code>MapperProxyFactory</code>对象（用于创建DAO接口的代理对象）。接下来，就到了使用DAO接口中函数的阶段了。</p>
+
+<p> </p>
+
+<pre>
+<code>SqlSession sqlSession = sqlSessionFactory.openSession();
+try {
+    ProductMapper productMapper = sqlSession.getMapper(ProductMapper.class);
+    List&lt;Product&gt; productList = productMapper.selectProductList();
+    for (Product product : productList) {
+        System.out.printf(product.toString());
+    }
+} finally {
+    sqlSession.close();
+}
+</code></pre>
+
+<p>我们首先需要从<code>sqlSessionFactory</code>对象中创建一个<code>SqlSession</code>对象，然后调用<code>sqlSession.getMapper(ProductMapper.class)</code>来获取代理对象。</p>
+
+<p><code>sqlSessionFactory.openSession()</code>创建<code>SqlSession</code>对象</p>
+
+<pre>
+<code class="language-java">public SqlSession openSession() {
+        return this.openSessionFromDataSource(this.configuration.getDefaultExecutorType(), (TransactionIsolationLevel)null, false);
+    }</code></pre>
+
+<p>会调用 openSessionFromDataSource 方法，其中执行器为初始化Configuration时默认的 SimpleExecutor，接下来看openSessionFromDataSource方法</p>
+
+<pre>
+<code class="language-java">private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
+        Transaction tx = null;
+
+        DefaultSqlSession var8;
+        try {
+            Environment environment = this.configuration.getEnvironment();
+            TransactionFactory transactionFactory = this.getTransactionFactoryFromEnvironment(environment);
+            tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
+            Executor executor = this.configuration.newExecutor(tx, execType);
+            var8 = new DefaultSqlSession(this.configuration, executor, autoCommit);
+        } catch (Exception var12) {
+            this.closeTransaction(tx);
+            throw ExceptionFactory.wrapException("Error opening session.  Cause: " + var12, var12);
+        } finally {
+            ErrorContext.instance().reset();
+        }
+
+        return var8;
+    }</code></pre>
+
+<p>会返回一个 DefaultSqlSession 对象，看一下其中的this.configuration.newExecutor(tx, execType);方法</p>
+
+<pre>
+<code class="language-java">public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
+        executorType = executorType == null ? this.defaultExecutorType : executorType;
+        executorType = executorType == null ? ExecutorType.SIMPLE : executorType;
+        Object executor;
+        if (ExecutorType.BATCH == executorType) {
+            executor = new BatchExecutor(this, transaction);
+        } else if (ExecutorType.REUSE == executorType) {
+            executor = new ReuseExecutor(this, transaction);
+        } else {
+            executor = new SimpleExecutor(this, transaction);
+        }
+
+        //缓存
+        if (this.cacheEnabled) {
+            executor = new CachingExecutor((Executor)executor);
+        }
+        //责任链模式拦截器 
+        Executor executor = (Executor)this.interceptorChain.pluginAll(executor);
+        return executor;
+    }</code></pre>
+
+<p>开启缓存这里SimpleExecutor就会被CachingExecutor替换</p>
+
+<p><br>
+我们再来看一下<code>sqlSession.getMapper()</code>是如何创建代理对象的？</p>
+
+<p> </p>
+
+<pre>
+<code>  public &lt;T&gt; T getMapper(Class&lt;T&gt; type) {
+    return configuration.&lt;T&gt;getMapper(type, this);
+  }
+</code></pre>
+
+<p><code>sqlSession.getMapper()</code>调用了<code>configuration.getMapper()</code>，那我们再看一下<code>configuration.getMapper()</code>：</p>
+
+<p> </p>
+
+<pre>
+<code>  public &lt;T&gt; T getMapper(Class&lt;T&gt; type, SqlSession sqlSession) {
+    return mapperRegistry.getMapper(type, sqlSession);
+  }
+</code></pre>
+
+<p><code>configuration.getMapper()</code>又调用了<code>mapperRegistry.getMapper()</code>，那好，我们再深入看一下<code>mapperRegistry.getMapper()</code>：</p>
+
+<p> </p>
+
+<pre>
+<code>  public &lt;T&gt; T getMapper(Class&lt;T&gt; type, SqlSession sqlSession) {
+    final MapperProxyFactory&lt;T&gt; mapperProxyFactory = (MapperProxyFactory&lt;T&gt;) knownMappers.get(type);
+    if (mapperProxyFactory == null) {
+      throw new BindingException("Type " + type + " is not known to the MapperRegistry.");
+    }
+    try {
+      return mapperProxyFactory.newInstance(sqlSession);
+    } catch (Exception e) {
+      throw new BindingException("Error getting mapper instance. Cause: " + e, e);
+    }
+  }
+</code></pre>
+
+<p>看到这里我们就恍然大悟了，原来它根据上游传递进来DAO接口的Class对象，从<code>configuration</code>中取出了该DAO接口对应的代理对象生成工厂：<code>MapperProxyFactory</code>；<br>
+在有了这个工厂后，再通过<code>newInstance</code>函数创建该DAO接口的代理对象，并返回给上游。</p>
+
+<p>OK，此时我们已经获取了代理对象，接下来就可以使用这个代理对象调用相应的函数了。</p>
+
+<p> </p>
+
+<pre>
+<code>SqlSession sqlSession = sqlSessionFactory.openSession();
+try {
+    ProductMapper productMapper = sqlSession.getMapper(ProductMapper.class);
+    List&lt;Product&gt; productList = productMapper.selectProductList();
+    for (Product product : productList) {
+        System.out.printf(product.toString());
+    }
+} finally {
+    sqlSession.close();
+}
+</code></pre>
+
+<p>以上述代码为例，当我们获取到<code>ProductMapper</code>的代理对象后，我们调用了它的<code>selectProductList()</code>函数。<br>
+下面我们就来分析下代理函数调用过程。</p>
+
+<hr><p>当调用了代理对象的某一个代理函数后，这个调用请求首先会被发送给代理对象处理类<code>MapperProxy</code>的<code>invoke()</code>函数：</p>
+
+<p> </p>
+
+<pre>
+<code>  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    try {
+      if (Object.class.equals(method.getDeclaringClass())) {
+        return method.invoke(this, args);
+      } else if (isDefaultMethod(method)) {
+        return invokeDefaultMethod(proxy, method, args);
+      }
+    } catch (Throwable t) {
+      throw ExceptionUtil.unwrapThrowable(t);
+    }
+    // 【核心代理在这里】
+    final MapperMethod mapperMethod = cachedMapperMethod(method);
+    return mapperMethod.execute(sqlSession, args);
+  }
+</code></pre>
+
+<p>先来解释下invoke函数的几个参数：</p>
+
+<ol><li><code>Object proxy</code>：代理对象</li>
+    <li><code>Method method</code>：当前正在被调用的代理对象的函数对象</li>
+    <li><code>Object[] args</code>：调用函数的所有入参</li>
+</ol><p>然后，直接看invoke函数最核心的两行代码：</p>
+
+<ol><li><code>cachedMapperMethod(method)</code>：从当前代理对象处理类<code>MapperProxy</code>的<code>methodCache</code>属性中获取method方法的详细信息（即：<code>MapperMethod</code>对象）。如果<code>methodCache</code>中没有就创建并加进去。</li>
+    <li>有了<code>MapperMethod</code>对象后执行它的<code>execute()</code>方法，该方法就会调用JDBC执行相应的SQL语句，并将结果返回给上游调用者。至此，代理对象函数的调用过程结束！</li>
+</ol><p>MapperMethod的execute方法</p>
+
+<pre>
+<code class="language-java">public Object execute(SqlSession sqlSession, Object[] args) {
+        Object result;
+        Object param;
+        switch(this.command.getType()) {
+        case INSERT:
+            param = this.method.convertArgsToSqlCommandParam(args);
+            result = this.rowCountResult(sqlSession.insert(this.command.getName(), param));
+            break;
+        case UPDATE:
+            param = this.method.convertArgsToSqlCommandParam(args);
+            result = this.rowCountResult(sqlSession.update(this.command.getName(), param));
+            break;
+        case DELETE:
+            param = this.method.convertArgsToSqlCommandParam(args);
+            result = this.rowCountResult(sqlSession.delete(this.command.getName(), param));
+            break;
+        case SELECT:
+            if (this.method.returnsVoid() &amp;&amp; this.method.hasResultHandler()) {
+                this.executeWithResultHandler(sqlSession, args);
+                result = null;
+            } else if (this.method.returnsMany()) {
+                result = this.executeForMany(sqlSession, args);
+            } else if (this.method.returnsMap()) {
+                result = this.executeForMap(sqlSession, args);
+            } else if (this.method.returnsCursor()) {
+                result = this.executeForCursor(sqlSession, args);
+            } else {
+                param = this.method.convertArgsToSqlCommandParam(args);
+                result = sqlSession.selectOne(this.command.getName(), param);
+                if (this.method.returnsOptional() &amp;&amp; (result == null || !this.method.getReturnType().equals(result.getClass()))) {
+                    result = Optional.ofNullable(result);
+                }
+            }
+            break;
+        case FLUSH:
+            result = sqlSession.flushStatements();
+            break;
+        default:
+            throw new BindingException("Unknown execution method for: " + this.command.getName());
+        }
+
+        if (result == null &amp;&amp; this.method.getReturnType().isPrimitive() &amp;&amp; !this.method.returnsVoid()) {
+            throw new BindingException("Mapper method '" + this.command.getName() + " attempted to return null from a method with a primitive return type (" + this.method.getReturnType() + ").");
+        } else {
+            return result;
+        }
+    }</code></pre>
+
+<p>可以看出是sqlsession通过xml中的sql id和参数在做CRUD操作，再看 result = this.executeForMany(sqlSession, args);方法</p>
+
+<pre>
+<code class="language-java">private &lt;E&gt; Object executeForMany(SqlSession sqlSession, Object[] args) {
+        Object param = this.method.convertArgsToSqlCommandParam(args);
+        List result;
+        if (this.method.hasRowBounds()) {
+            RowBounds rowBounds = this.method.extractRowBounds(args);
+            result = sqlSession.selectList(this.command.getName(), param, rowBounds);
+        } else {
+            result = sqlSession.selectList(this.command.getName(), param);
+        }
+
+        if (!this.method.getReturnType().isAssignableFrom(result.getClass())) {
+            return this.method.getReturnType().isArray() ? this.convertToArray(result) : this.convertToDeclaredCollection(sqlSession.getConfiguration(), result);
+        } else {
+            return result;
+        }
+    }</code></pre>
+
+<p>进入 sqlSession.selectList(this.command.getName(), param, rowBounds);方法</p>
+
+<pre>
+<code class="language-java">public &lt;E&gt; List&lt;E&gt; selectList(String statement, Object parameter, RowBounds rowBounds) {
+        List var5;
+        try {
+            MappedStatement ms = this.configuration.getMappedStatement(statement);
+            var5 = this.executor.query(ms, this.wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
+        } catch (Exception var9) {
+            throw ExceptionFactory.wrapException("Error querying database.  Cause: " + var9, var9);
+        } finally {
+            ErrorContext.instance().reset();
+        }
+
+        return var5;
+    }</code></pre>
+
+<p>继续看 this.executor.query 方法</p>
+
+<pre>
+<code class="language-java">public &lt;E&gt; List&lt;E&gt; query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
+        BoundSql boundSql = ms.getBoundSql(parameterObject);
+        CacheKey key = this.createCacheKey(ms, parameterObject, rowBounds, boundSql);
+        return this.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+    }</code></pre>
+
+<p>这里的cacheKey是通过 id +sql+limit+offsetxxx 等等参数确定一个缓存的key</p>
+
+<p>接着看query方法：</p>
+
+<pre>
+<code class="language-java">public &lt;E&gt; List&lt;E&gt; query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
+        // 获取二级缓存
+        Cache cache = ms.getCache();
+        if (cache != null) {
+            // 根据ms来决定是否刷新缓存
+            this.flushCacheIfRequired(ms);
+            if (ms.isUseCache() &amp;&amp; resultHandler == null) {
+                this.ensureNoOutParams(ms, boundSql);
+                List&lt;E&gt; list = (List)this.tcm.getObject(cache, key);
+                if (list == null) {
+                    list = this.delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+                    // 放入二级缓存
+                    this.tcm.putObject(cache, key, list);
+                }
+
+                return list;
+            }
+        }
+
+        return this.delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+    }</code></pre>
+
+<p>有缓存就从缓存中取，无缓存就调用初始化CachingExecutor时传入的SimpleExecutor的query方法，继续看 this.delegate.query 方法：</p>
+
+<pre>
+<code class="language-java">public &lt;E&gt; List&lt;E&gt; query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
+        ErrorContext.instance().resource(ms.getResource()).activity("executing a query").object(ms.getId());
+        if (this.closed) {
+            throw new ExecutorException("Executor was closed.");
+        } else {
+            // 上一个查询执行完成 并且 &lt;select&gt;标签增加了flushCache="true" 刷新一级缓存
+            if (this.queryStack == 0 &amp;&amp; ms.isFlushCacheRequired()) {
+                this.clearLocalCache();
+            }
+
+            List list;
+            try {
+                ++this.queryStack;
+                // 对于指定了resultHandler的查询，不走缓存。否则从缓存中查询。
+                list = resultHandler == null ? (List)this.localCache.getObject(key) : null;
+                if (list != null) {
+                    // 如果存在缓存参数值，取出来覆盖当前参数值，只针对Callable
+                    this.handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
+                } else {
+                    // 缓存中没有，从数据库中查询放入缓存
+                    list = this.queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
+                }
+            } finally {
+                --this.queryStack;
+            }
+
+            if (this.queryStack == 0) {
+                Iterator var8 = this.deferredLoads.iterator();
+
+                while(var8.hasNext()) {
+                    BaseExecutor.DeferredLoad deferredLoad = (BaseExecutor.DeferredLoad)var8.next();
+                    deferredLoad.load();
+                }
+
+                this.deferredLoads.clear();
+                // 如果cacheScope配置了statement，查询完后清除缓存
+                if (this.configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) {
+                    this.clearLocalCache();
+                }
+            }
+
+            return list;
+        }
+    }</code></pre>
+
+<p>再看 queryFromDatabase 方法：</p>
+
+<pre>
+<code class="language-java">private &lt;E&gt; List&lt;E&gt; queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
+        // 放入一个初始值
+        this.localCache.putObject(key, ExecutionPlaceholder.EXECUTION_PLACEHOLDER);
+
+        List list;
+        try {
+            list = this.doQuery(ms, parameter, rowBounds, resultHandler, boundSql);
+        } finally {
+            this.localCache.removeObject(key);
+        }
+        // 放入一级缓存
+        this.localCache.putObject(key, list);
+        if (ms.getStatementType() == StatementType.CALLABLE) {
+            this.localOutputParameterCache.putObject(key, parameter);
+        }
+
+        return list;
+    }</code></pre>
+
+<p>可以看到上面的查询方法先是看&lt;select&gt;有没有flushCache=”true”，有就刷新一级缓存，没有的话先去从一级缓存取数据，如果一级缓存里没有结果，调用<code>queryFromDatabase</code>方法，从数据库查询结果并返回。</p>
+
+<p>一级缓存的范围有 <code>SESSION</code> 和 <code>STATEMENT</code> 两种，默认是 <code>SESSION</code> ，如果我们不需要使用一级缓存，那么我们可以把一级缓存的范围指定为STATEMENT，这样每次执行完一个Mapper语句后都会将一级缓存清除。如果需要更改一级缓存的范围，请在Mybatis的配置文件中，在&lt;settings&gt;下通过localCacheScope指定。</p>
+
+<p>至此，一次完整的Mybatis执行过程到此结束。</p>
+
+<p> </p>
+
+<p>需要注意的是与spring整合之后，mybatis的一级缓存就失效了</p>
+
+<p>1.mybatis的一级缓存生效的范围是sqlsession，是为了在sqlsession没有关闭时，业务需要重复查询相同数据使用的。一旦sqlsession关闭，则由这个sqlsession缓存的数据将会被清空。</p>
+
+<p>2.spring对mybatis的sqlsession的使用是由template控制的，sqlSessionTemplate又被spring当作resource放在当前线程的上下文里（threadlocal),spring通过mybatis调用数据库的过程如下：</p>
+
+<blockquote>
+<ol><li>我们需要访问数据</li>
+    <li>spring检查到了这种需求，于是去申请一个mybatis的sqlsession（资源池），并将申请到的sqlsession与当前线程绑定，放入threadlocal里面</li>
+    <li>sqlSessionTemplate从threadlocal获取到sqlsession，去执行查询</li>
+    <li>查询结束，清空threadlocal中与当前线程绑定的sqlsession，释放资源</li>
+    <li>我们又需要访问数据</li>
+    <li>返回到步骤2</li>
+</ol><p>通过以上步骤后发现，同一线程里面两次查询同一数据所使用的sqlsession是不相同的，所以，给人的印象就是结合spring后，mybatis的一级缓存失效了。</p>
+</blockquote>
+
+<p>对于spring开启事务时，getSqlSession方法里面维护了个SqlSessionHolder，关联了事务与session，如果存在则直接取出，否则则新建个session，所以在有事务的里，每个session都是同一个，故能用上缓存了。</p>
+
+<p> </p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2020/03/01/MyBatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90(%E4%B8%80)%E2%80%94%E2%80%94MyBatis%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E8%A7%A3%E6%9E%90/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2535,7 +3165,7 @@ Master接到命令启动后台的存盘进程，同时收集所有接收到的�
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">27</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

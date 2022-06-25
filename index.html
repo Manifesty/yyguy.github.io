@@ -188,6 +188,126 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2022/06/25/Docker/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="yyguy123">
+      <meta itemprop="description" content>
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yyguy123的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/06/25/Docker/" class="post-title-link" itemprop="url">Docker</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-06-25 19:42:41" itemprop="dateCreated datePublished" datetime="2022-06-25T19:42:41+08:00">2022-06-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-26 19:25:23" itemprop="dateModified" datetime="2021-12-26T19:25:23+08:00">2021-12-26</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h1><h2 id="Docker概述"><a href="#Docker概述" class="headerlink" title="Docker概述"></a>Docker概述</h2><h3 id="基本概述"><a href="#基本概述" class="headerlink" title="基本概述"></a>基本概述</h3><p>Docker是一个开源应用容器引擎，基于Go语言并遵从Apache2.0协议开源。可以让开发者打包他们的应用以及依赖包到一个轻量级、可移植的容器中，然后发布到任何流行的linux机器上，也可以实现虚拟化。</p>
+<h3 id="虚拟化技术和容器技术"><a href="#虚拟化技术和容器技术" class="headerlink" title="虚拟化技术和容器技术"></a>虚拟化技术和容器技术</h3><p>虚拟化技术特点：1、资源占用多 2、冗余步骤多 3、启动慢<br>容器化技术：容器化技术不是模拟的一个完整的操作系统<br>比较Docker和虚拟机的不同：</p>
+<ol>
+<li><p>传统虚拟机，虚拟出硬件，运行一个完整的操作系统，然后在这个系统上安装和运行软件</p>
+</li>
+<li><p>Docker容器内的应用直接运行在宿主机的内容，容器是没有自己的内核的，也没有虚拟硬件。</p>
+</li>
+<li><p>每个容器都是互相隔离的，每个容器都有属于自己的文件系统，互不影响。</p>
+<p>Docker比虚拟机更少的抽象层，docker利用宿主机的内核，VM需要的是GuestOS，Docker新建一个容器的时候不需要像虚拟机一样重新加载一个操作系统内核。</p>
+</li>
+</ol>
+<h3 id="Docker的基本组成"><a href="#Docker的基本组成" class="headerlink" title="Docker的基本组成"></a>Docker的基本组成</h3><h5 id="镜像"><a href="#镜像" class="headerlink" title="镜像"></a>镜像</h5><p>docker镜像好比是一个模板，可以通过这个模板创建容器服务，tomcat镜像 ==&gt;run ==&gt; tomcat01容器（提供服务），通过这个镜像可创建多个容器。</p>
+<h5 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h5><p>Docker利用容器技术，独立运行一个或者一组应用，通过镜像来创建，目前可以将容器视为一个简单的linux系统</p>
+<h5 id="仓库"><a href="#仓库" class="headerlink" title="仓库"></a>仓库</h5><p>仓库就是存放镜像的地方，分为公有仓库和私有仓库。</p>
+<h3 id="Docker容器运行流程"><a href="#Docker容器运行流程" class="headerlink" title="Docker容器运行流程"></a>Docker容器运行流程</h3><p>启动一个容器，run 运行流程：Docker会首先在本地寻找镜像，判断本机是否有这个镜像，有就用这个镜像运行，没有就去DockerHub下载；如果DockerHub找不到此镜像会返回错误，若DockerHub有此镜像就会下载到本地运行。</p>
+<p>Docker是一个Client-Server结构的系统，Docker守护进程运行在主机，通过Socker从客户端访问，Docker Server接收到Docker client指令就会执行这个命令。</p>
+<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><p>docker images  查看本地主机所有镜像</p>
+<p>docker search 搜索镜像</p>
+<p>docker pull 镜像名[:tag] 下载镜像</p>
+<p>docker rmi -f 镜像id    删除镜像</p>
+<p>docker rmi -f $(docker images -aq)</p>
+<h4 id="容器命令"><a href="#容器命令" class="headerlink" title="容器命令"></a>容器命令</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">docker run [可选参数] image</span><br><span class="line">--name="名字"    指定容器名字</span><br><span class="line">-d                        后台方式运行</span><br><span class="line">-it                        使用交互方式运行，进入容器内查看内容</span><br><span class="line">-p                        指定容器端口</span><br><span class="line">（-p ip:主机端口:容器端口 配置主机端口映射到容器端口</span><br><span class="line">   -p  主机端口:容器端口</span><br><span class="line">   -p   容器端口）</span><br><span class="line">-P                        随机指定端口</span><br><span class="line"><span class="meta">#</span><span class="bash">docker run -it centos /bin/bash  进入容器</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="built_in">exit</span> 停止并退出容器</span></span><br><span class="line"><span class="meta">#</span><span class="bash">Ctrl+P+Q   不停止容器退出</span></span><br><span class="line"><span class="meta">#</span><span class="bash">docker ps   列出运行过的容器</span></span><br><span class="line">删除容器</span><br><span class="line">docker rm  容器id</span><br><span class="line">docker rm  -f $(docker ps -aq)</span><br><span class="line">docker ps -aq | xargs docker rm</span><br><span class="line">启动和停止容器</span><br><span class="line">docker start 容器id</span><br><span class="line">docker restart 容器id</span><br><span class="line">docker stop  容器id</span><br><span class="line">docker kill 容器id</span><br><span class="line">查看日志</span><br><span class="line">docker logs -tf --tail 10 容器id</span><br><span class="line">docker top  容器id  查看容器中进程信息</span><br><span class="line">docker inspect 容器id 查看容器中元数据</span><br><span class="line">进入当前正在运行的容器</span><br><span class="line">docker exec -it 容器id /bin/bash  进入容器后会开启一个新的终端可以在里面操作</span><br><span class="line">docker attach 容器id           进入容器正在执行的终端，不会启动新进程</span><br><span class="line">拷贝操作</span><br><span class="line">docker cp 容器id:容器内部路径  目的主机路径</span><br><span class="line">docker cp  目的主机路径  容器id:容器内部路径</span><br><span class="line"></span><br><span class="line">Docker容器后台运行(后台运行必须有前台进程)</span><br><span class="line">docker run -dit --name mytomcat tomcat /bin/bash   （-t提供一个伪终端，类似前台进程）</span><br><span class="line"></span><br><span class="line">commit镜像</span><br><span class="line">docker commit -m="提交的描述信息" -a="作者" 容器id 目标镜像名:[tag]</span><br></pre></td></tr></table></figure>
+
+<h3 id="Docker镜像"><a href="#Docker镜像" class="headerlink" title="Docker镜像"></a>Docker镜像</h3><p>Docker镜像实际上由一层一层的文件系统组成，这种层级的文件系统是UnionFS联合文件系统。</p>
+<p>所有的Docker镜像都起始于一个基础镜像层，当进行修改或增加新内容时，就会在当前镜像层之上，创建新的镜像层。Docker镜像都是只读的，当容器启动时，一个新的可写层被加载到镜像的顶部，这一层就是容器层，容器层之下的都叫镜像层。</p>
+<h3 id="容器数据卷"><a href="#容器数据卷" class="headerlink" title="容器数据卷"></a>容器数据卷</h3><p>容器的持久化和同步操作及荣期间的数据共享。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -it -v 主机目录:容器内目录</span><br></pre></td></tr></table></figure>
+
+<p>匿名挂载和具名挂载</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">-v 容器内路径    #匿名挂载</span><br><span class="line">-v 卷名：容器内路径  #具名挂载</span><br><span class="line">-v /宿主机路径：容器内路径  #指定路径挂载</span><br><span class="line"><span class="meta">#</span><span class="bash">匿名挂载</span></span><br><span class="line">docker run -d -P --name nginx01 -v /etc/nginx nginx</span><br><span class="line"><span class="meta">#</span><span class="bash">查看所有volume情况</span></span><br><span class="line">docker volume ls</span><br><span class="line"><span class="meta">#</span><span class="bash">具名挂载</span></span><br><span class="line">docker run -d -P --name nginx02 -v juming-nginx:/etc/nginx nginx</span><br><span class="line"><span class="meta">#</span><span class="bash">拓展  ro说明这个路径只能通过宿主机来操作，容器内无法操作   默认rw读写权限</span></span><br><span class="line">docker run -d -P --name nginx02 -v juming-nginx:/etc/nginx:ro nginx</span><br><span class="line"><span class="meta">#</span><span class="bash"> --volumes-from 共享数据卷  删除docker01容器不会影响docker02中的数据 （使用inspect查看就会发现文件挂载在宿主机，但是删除docker01数据卷中的文件，宿主机及docker02中都会删除）</span></span><br><span class="line">docker run -it --name docker02 --volumes-from docker01 centos</span><br></pre></td></tr></table></figure>
+
+<p>所有的docker容器内的卷，没有指定目录的情况下都是在/var/lib/docker/volumes/xxxx/_data<br>通过具名挂载可以方便的找到我们的卷，大多数情况使用具名挂载</p>
+<h3 id="DockerFile"><a href="#DockerFile" class="headerlink" title="DockerFile"></a>DockerFile</h3><p>DockerFile就是用来构建docker镜像的构建文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">FROM              #基础镜像 一切从这里开始构建</span><br><span class="line">MAINTAINER        #镜像是谁写的   姓名+邮箱</span><br><span class="line">RUN               #镜像构建时需要运行的命令</span><br><span class="line">ADD               #添加内容 COPY文件 例如添加tomcat压缩包，会自动解压</span><br><span class="line">WORKDIR           #镜像的工作目录</span><br><span class="line">VOLUME            #挂载的目录</span><br><span class="line">EXPOSE            #指定对外端口</span><br><span class="line">CMD               #指定容器启动的时候要运行的命令   只有最后一个会生效</span><br><span class="line">ENTRYPOINT        #指定容器启动的时候要运行的命令   可以追加命令</span><br><span class="line">ONBUILD           #是一个特殊的指令 它后面跟的是其它命令RUN、COPY等，这些指令在当前镜像被构建时并不会执行，只有以当前镜像为基础镜像去构建下一级镜像时才会被执行</span><br><span class="line">COPY              #类似ADD  将文件拷贝到镜像中</span><br><span class="line">ENV               #构建的时候配置环境变量</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">示例</span></span><br><span class="line">FROM centos</span><br><span class="line">MAINTAINER dh&lt;bean_d@126.com&gt;</span><br><span class="line">COPY readme.txt /usr/local/readme.txt</span><br><span class="line">ADD jdk-8u11-linux-x64.tar.gz /usr/local</span><br><span class="line">ADD apache-tomcat-9.0.22.tar.gz /usr/local</span><br><span class="line">ENV MYPATH /usr/local</span><br><span class="line">WORKDIR $MYPATH</span><br><span class="line">RUN yum -y install vim</span><br><span class="line">RUN yum -y install net-tools</span><br><span class="line">ENV JAVA_HOME /usr/local/jdk1.8.0_11</span><br><span class="line">ENV CLASSPATH $JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar</span><br><span class="line">ENV CATALINE_HOME /usr/local/apache-tomcat-9.0.22</span><br><span class="line">ENV CATALINE_BASE /usr/local/apache-tomcat-9.0.22</span><br><span class="line">ENV PATH $PATH:$JAVA_HOME/bin:$CATALINE_HOME/lib:$CATALINE_HOME/bin</span><br><span class="line">EXPOSE 8080</span><br><span class="line">CMD echo $MYPATH</span><br><span class="line">CMD echo "---end---"</span><br><span class="line">CMD /bin/bash    #最后一个CMD命令会覆盖之前的CMD</span><br><span class="line">CMD /usr/local/apache-tomcat-9.0.22/bin/startup.sh &amp;&amp; tail -f /usr/local/apache-tomcat-9.0.22/bin/logs/catalina.out</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">通过DockerFile构建镜像  -f指定dockerfile（若文件名为Dockerfile可不加-f指定） -t指定镜像名和标记  .表示根据当前目录下的dockerfile文件生成镜像 --rm表示构建成功后删除中间环节的容器</span></span><br><span class="line">docker build -t /test/demo:latest --rm .  </span><br><span class="line">docker build -f dockerfile文件路径 -t 镜像名:[tag] .</span><br><span class="line"><span class="meta">#</span><span class="bash">docker <span class="built_in">history</span> 镜像id  查看镜像生成过程命令</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">CMD和ENTRYPOINT区别</span></span><br><span class="line">FROM centos</span><br><span class="line">CMD ["ls","-a"]</span><br><span class="line"><span class="meta">#</span><span class="bash">docker run 镜像id -l  追加一个-l 命令会报错  CMD情况下-l替换了CMD [<span class="string">"ls"</span>,<span class="string">"-a"</span>]命令</span></span><br><span class="line">FROM centos</span><br><span class="line">ENTRYPOINT ["ls","-a"]</span><br><span class="line"><span class="meta">#</span><span class="bash">docker run 镜像id -l  追加一个-l  ENTRYPOINT情况下不会报错  相当于ls -al</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="发布镜像"><a href="#发布镜像" class="headerlink" title="发布镜像"></a>发布镜像</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker login -u 用户名</span><br><span class="line">docker push mytomcat:1.0</span><br></pre></td></tr></table></figure>
+
+<h3 id="Docker网络"><a href="#Docker网络" class="headerlink" title="Docker网络"></a>Docker网络</h3><p>我们每启动一个docker容器，docker就会给docker容器分配一个ip，我们只要安装了docker，就会有一个网卡docekr0桥接模式，使用的技术是veth-pair技术。veth-pair就是一对的虚拟设备接口，他们都是成对出现的，一段连着协议，一段彼此相连，正因为有这个特性，veth-pair充当一个桥梁，连接各种虚拟设备。容器与容器间是可以互ping通的，所有容器间不指定网络的情况下，都是docker0路由的，docker会给我们的容器分配一个默认的可用IP。只要容器删除，对应网桥就没了。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">使tomcat03到tomcat02的网络连通（tomcat02到tomcat03是不通的）</span></span><br><span class="line">docker run -d -P --name tomcat03 --link tomcat02 tomcat</span><br><span class="line"><span class="meta">#</span><span class="bash">--link就是在hosts中添加了配置 现在已经不建议使用这种方式</span></span><br><span class="line"><span class="meta">#</span><span class="bash">docker0问题：不支持容器名连接访问</span></span><br></pre></td></tr></table></figure>
+
+<p>自定义网络</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">docker network ls   查看所有的docker网络</span></span><br><span class="line">网络模式</span><br><span class="line">bridge：桥接  docker默认</span><br><span class="line">none：不配置网络</span><br><span class="line">host：和宿主机共享网络</span><br><span class="line">container：容器网络连通（用的少）</span><br><span class="line"><span class="meta">#</span><span class="bash">docker run -d -P --name tomcat01 --net bridge tomcat</span></span><br><span class="line"><span class="meta">#</span><span class="bash">docker network create --driver bridge --subnet 192.168.0.0/16 --gateway 192.168.0.1 mynet           自定义网络</span></span><br><span class="line"><span class="meta">#</span><span class="bash">docker run -d -P --name tomcat-net-01 --net mynet tomcat</span></span><br><span class="line"><span class="meta">#</span><span class="bash">docker run -d -P --name tomcat-net-02 --net mynet tomcat</span></span><br><span class="line"><span class="meta">#</span><span class="bash">tomcat-net-01和tomcat-net-02之间可以用ip或容器名访问</span></span><br></pre></td></tr></table></figure>
+
+<p>网络连通</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">示例  打通tomcat01（默认docker0的网络） 到 mynet的网络 (tomcat02还是不通的)</span></span><br><span class="line"><span class="meta">#</span><span class="bash">docker network connect mynet tomcat01</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2022/06/25/Kubernetes/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1149,170 +1269,6 @@ server {
   
   
 
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yyguy123.github.io/2022/06/25/Nacos/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/uploads/avatar.png">
-      <meta itemprop="name" content="yyguy123">
-      <meta itemprop="description" content>
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="yyguy123的个人博客">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/06/25/Nacos/" class="post-title-link" itemprop="url">Nacos</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-06-25 18:33:33" itemprop="dateCreated datePublished" datetime="2022-06-25T18:33:33+08:00">2022-06-25</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-08-26 19:28:16" itemprop="dateModified" datetime="2021-08-26T19:28:16+08:00">2021-08-26</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Nacos：针对微服务架构中服务发现、配置管理、服务治理的综合型解决方案"><a href="#Nacos：针对微服务架构中服务发现、配置管理、服务治理的综合型解决方案" class="headerlink" title="Nacos：针对微服务架构中服务发现、配置管理、服务治理的综合型解决方案"></a>Nacos：针对微服务架构中服务发现、配置管理、服务治理的综合型解决方案</h1><h2 id="配置中心"><a href="#配置中心" class="headerlink" title="配置中心"></a>配置中心</h2><p>配置中心：在微服务架构中，当系统从一个单体应用，被拆分成分布式系统上一个个服务节点后，配置文件也必须跟着迁移（分割），这样配置就分散了，不仅如此，分散中还包含着冗余。配置中心将配置从各应用中剥离出来，对配置进行统一管理。</p>
-<ol>
-<li>在配置中心发布/修改配置</li>
-<li>配置中心将配置更新通知到各客户端</li>
-<li>客户端从配置中心获取最新配置</li>
-</ol>
-<p>主流配置中心对比：从配置中心角度看，性能方面Nacos读写性能最高，Apollo次之，SpringCloud Config依赖git场景不适合开放大规模自动化运维API，功能方面Apollo最为完善，Nacos具有Apollo大部分配置管理功能（Nacos不支持灰度发布和权限管理），而SpringCloud Config不带运维管理界面。Nacos一大优势是整合了注册中心、配置中心功能，部署和操作相比Apollo都要直观简单。</p>
-<h2 id="Nacos特性"><a href="#Nacos特性" class="headerlink" title="Nacos特性"></a>Nacos特性</h2><p>Nacos主要提供以下四大功能：</p>
-<ol>
-<li><p>服务发现与服务健康检查</p>
-<p>Nacos使服务更容易注册，并通过DNS或Http接口发现其他服务，Nacos还提供服务的实时健康检查，以防止向不健康的主机或服务实例发送请求 </p>
-</li>
-<li><p>动态配置管理</p>
-<p>动态配置服务允许在所有环境中以集中和动态的方式管理所有服务的配置，Nacos消除了在更新配置时重新部署应用程序，这使配置的更改更加高效和灵活</p>
-</li>
-<li><p>动态DNS服务</p>
-<p>Nacos提供基于DNS协议的服务发现能力，旨在支持异构语言的服务发现，支持将注册在Nacos上的服务以域名的方式暴露端点，让三方应用方便的查阅及发现</p>
-</li>
-<li><p>服务和元数据管理</p>
-<p>Nacos从微服务平台建设的视角管理数据中心的所有服务及元数据，包括管理服务的描述，生命周期，服务的静态依赖分析，服务的健康状态，服务的流量管理、路由及安全策略。</p>
-</li>
-</ol>
-<p>单机模式时Nacos默认使用嵌入式数据库实现数据的存储，若想使用外部mysql存储Nacos数据：</p>
-<ol>
-<li>安装数据库 5.6.5+  mysql8以下</li>
-<li>初始化mysql数据库，新建数据库nacos_config，数据库初始化文件：${nacoshome}/conf/nacos-mysql.sql</li>
-<li>修改${nacoshome}/conf/application.properties文件，增加mysql数据源配置</li>
-</ol>
-<h5 id="Nacos配置"><a href="#Nacos配置" class="headerlink" title="Nacos配置"></a>Nacos配置</h5><p>​    发布配置： dataId、group、配置格式（text/json/xml/yaml/html/properties）、配置内容</p>
-<h5 id="Nacos客户端获取配置"><a href="#Nacos客户端获取配置" class="headerlink" title="Nacos客户端获取配置"></a>Nacos客户端获取配置</h5><p>​    通过Nacos服务地址端口及dataId和group可通过Nacos的API获取配置<code>NacosFactory.createConfigService(properties).getConfig(dataId,group,5000);</code><br>​    监听配置<br><code>NacosFactory.createConfigService(properties).addListener(dataId,group,new Listener(){</code><br>​    <code>public Executor getExecutor(){</code><br>​          <code>return null;    
-​    }</code><br>​    <code>public void receiveConfigInfo(String s){</code><br>​         <code>System.out.println(s);</code><br>​    <code>}</code><br><code>});</code></p>
-<p>})</p>
-<h4 id="Nacos配置管理模型"><a href="#Nacos配置管理模型" class="headerlink" title="Nacos配置管理模型"></a>Nacos配置管理模型</h4><p>​    通过Namespace、group、Data ID能够定位到一个配置集</p>
-<h6 id="配置集（Data-ID）"><a href="#配置集（Data-ID）" class="headerlink" title="配置集（Data ID）"></a>配置集（Data ID）</h6><p>​    在系统中，一个配置文件通常就是一个配置集，一个配置集可以包含系统的各种配置信息，例如一个配置集可能包含了数据源、线程池、日志级别等配置项，每个配置集都可以定义一个有意义的名称，就是配置集的ID即Data ID。</p>
-<h6 id="配置项"><a href="#配置项" class="headerlink" title="配置项"></a>配置项</h6><p>​    配置集中包含的一个个配置内容即配置项，代表一个具体的可配置的参数与其值域，通常以key=value的形式存在</p>
-<h6 id="配置分组（group）"><a href="#配置分组（group）" class="headerlink" title="配置分组（group）"></a>配置分组（group）</h6><p>​    对配置集进行分组，通过一个有意义的字符串来表示，不同配置费分组下可以有相同配置集。默认采用DEFAULT_GROUP。常用来区分不同的项目或应用</p>
-<h6 id="命名空间（Namespace）"><a href="#命名空间（Namespace）" class="headerlink" title="命名空间（Namespace）"></a>命名空间（Namespace）</h6><p>​    可用于进行不同环境的配置隔离，例如可以隔开开发环境、测试环境和生产环境，或者隔离不同用户，不同开发人员使用同一nacos管理各自配置，通过namespace隔离，不同namespace下可存在相同名称的配置分组或配置集。默认有一个public命名空间。</p>
-<h6 id="最佳实践"><a href="#最佳实践" class="headerlink" title="最佳实践"></a>最佳实践</h6><p>Namespace：代表不同环境<br>Group：代表不同项目<br>Data ID：每个项目下往往有若干工程，每个配置集（Data ID）是一个工程的主配置文件</p>
-<p>支持配置的动态刷新：<br>    客户端配置nacos配置中心的地址后，直接使用@value注解获取配置文件的配置，但无法动态刷新，需注入配置文件上下文<br><code>@Autowired</code><br><code>private ConfigurableApplicationContext applicationContext；</code><br><code>applicationContext.getEnvironment().getProperty(&quot;xxx.xx&quot;);</code><br>类上加@RefreshScope注解时使用@Value也可动态刷新</p>
-<p>Nacos客户端resources下新建bootstrap.yaml，<font color="red">dataId的名称就是application的name + file-extension</font></p>
-<h6 id="自定义扩展dataId"><a href="#自定义扩展dataId" class="headerlink" title="自定义扩展dataId"></a>自定义扩展dataId</h6><p>对于一个项目需多个配置文件的情况可自定义扩展dataId<br><code>ext-config[0]:</code><br>    <code>data-id: test1.properties  (默认DEFAULT_GROUP，namespace即当前配置文件中的namespace)</code><br><code>ext-config[1]:</code><br>    <code>data-id: test2.properties</code><br>    <code>group: group2</code><br><code>ext-config[2]:</code><br>    <code>data-id: test3.properties</code><br>    <code>group: group3</code><br>    <code>refresh: true  (上面两种都不支持动态刷新)</code></p>
-<p>或者使用以下方式更为方便：但是此种方法只认DEFAULT_GROUP的dataid</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">	cloud:</span><br><span class="line">		nacos:</span><br><span class="line">			config:</span><br><span class="line">				shared-dataids: test1.properties,test2.properties,test3.properties</span><br><span class="line">				refreshable-dataids: test3.properties</span><br></pre></td></tr></table></figure>
-
-<p>配置的优先级： C&gt;B&gt;A<br>A：通过<code>spring.cloud.nacos.config.shared-dataids</code>支持多个共享Dataid的配置<br>B：通过<code>spring.cloud.nacos.config.ext-config[n].data-id</code>方式支持多个扩展data id，多个Data Id同时配置时，config[n]的n越大，优先级越高<br>C：通过内部相关规则（应用名+扩展名）自动获取相关的Data Id配置</p>
-<h6 id="完全关闭配置"><a href="#完全关闭配置" class="headerlink" title="完全关闭配置"></a>完全关闭配置</h6><p>通过设置<code>spring.cloud.nacos.config.enabled=false</code>来完全关闭Nacos Config</p>
-<h4 id="Nacos集群部署"><a href="#Nacos集群部署" class="headerlink" title="Nacos集群部署"></a>Nacos集群部署</h4><pre><code>1. 安装3个以上的Nacos服务
- 2. 在所有Nacos目录的conf目录下，将文件cluster.conf.example重命名为cluster.conf，将所有机器以ip：port格式配置进去
- 3. 所有客户端分别指定nacos集群中的若干节点
- spring.cloud.nacos.config.server-addr: xx.xx.xx.xx:8848,xx.xx.xx.xx:8849,xx.xx.xx.xx:8850</code></pre><p>生产环境部署建议：<br>      通过域名+VIP（虚拟IP）模式来实现，一个域名对应一个VIP，一个VIP对应多个Nacos节点。当Nacos集群迁移时，客户端无需修改。数据库，生产环境下建议至少主备模式，通过修改${nacoshome}/conf/application.properties文件，使nacos拥有多个数据源。</p>
-<h2 id="服务发现"><a href="#服务发现" class="headerlink" title="服务发现"></a>服务发现</h2><p>微服务架构中，通过服务间的协作来实现业务目标，代码中免不了远程调用。服务消费方获取服务提供方的地址及端口就是服务发现。</p>
-<p>Ribbon：客户端负载均衡<br>Feign：远程调用<br>客户端启动类添加@EnableDiscoveryClient、@EnableFeignClients</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">	application:</span><br><span class="line">		name: xxx</span><br><span class="line">	cloud:</span><br><span class="line">		nacos:</span><br><span class="line">			discovery:</span><br><span class="line">				server-addr: xx.xx.xx.xx:8848</span><br><span class="line">				namespace: dev_test</span><br><span class="line">				cluster-name: DEFAULT</span><br></pre></td></tr></table></figure>
-
-<p>Provider实现</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProviderController</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOG = LoggerFactory.getLogger(ProviderController.calss);</span><br><span class="line">    <span class="meta">@Getmapping</span>(<span class="string">"/service"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">service</span><span class="params">()</span></span>&#123;</span><br><span class="line">        LOG.info(<span class="string">"provider invoke"</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"provider invoke"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>Consumer实现</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FeignClient</span>(value=<span class="string">"xxx"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ServiceAgent</span></span>&#123;</span><br><span class="line">    <span class="meta">@Getmapping</span>(value=<span class="string">"/service"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">service</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConsumerController</span></span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span>  ServiceAgent serviceAgent;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/service"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">service</span><span class="params">()</span></span>&#123;</span><br><span class="line">        String result = serviceAgent.service();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>服务根据name分组，同一服务可有多个实例，即集群</p>
-<h2 id="Nacos原理"><a href="#Nacos原理" class="headerlink" title="Nacos原理"></a>Nacos原理</h2><h4 id="Nacos配置中心原理"><a href="#Nacos配置中心原理" class="headerlink" title="Nacos配置中心原理"></a>Nacos配置中心原理</h4><p>Nacos通过推+拉的方式解决长轮询时间间隔问题。</p>
-<p>拉的优势：如果用推的方式，服务端需维持与客户端的长连接，需消耗大量资源，还要考虑连接的有效性。例如需心跳保活，而用拉的方式客户端只需通过一个无状态的http请求即可获取到服务端的数据。</p>
-<p>在长轮询任务中，当服务端配置信息发生变更时，客户端将最新数据拉取下来后保存在CacheData中，同时更新了该CacheData的md5值，当下次触发checkListenerMd5方法时，会发现当前listener所持有的md5值和CacheData的md5值不一样了，即意味着服务端配置发生变更，这时就需将最新数据通知给Listener的持有者。</p>
-<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><p>Nacos服务端创建了相关配置项后，客户端就可以进行监听了，客户端是通过一个定时任务来检查自己监听的配置项数据的，一旦服务端数据发生变化时，客户端将会获取最新的数据，并将最新的数据保存在一个CacheData对象中，然后重新计算CacheData中的md5属性值，此时就会对该CacheData所绑定的Listener触发receiveConfigInfo回调。</p>
-<p>1、先从本地磁盘加载配置，因为应用启动时会加载远程配置到本地，如果本地文件的内容不为空，直接返回；<br>2、如果本地文件内容为空，则调用worker.getServiceConfig加载远程配置<br>3、如果出现异常，则调用本地快照文件加载配置</p>
-<p>客户端长轮询主要做两件事：</p>
-<ol>
-<li><p>检查本地配置checkLocalConfig<br>a. 如果isUseLocalConfigInfo为false，但本地缓存路径的文件是存在的，则将           isUseLocalConfigInfo设为true，并更新cacheData的内容及文件的更新时间</p>
-<p>b. 如果isUseLocalConfigInfo为true，但本地缓存文件不存在则设为false，不通知监听器<br>c. 如果isUseLocalConfigInfo为true，本地缓存文件也存在，但是缓存时间与文件更新时间不一致，则更新cacheData中的内容，isUseLocalConfigInfo设为true。<br>若isUseLocalConfigInfo为true，则检查本地文件缓存的md5与cacheData的md5是否一致，不一致则会触发safeNotifyListener回调方法，listener.receiveConfigInfo(contentTmp)  listener的使用者就能接收到最新的配置信息了。</p>
-<ol start="2">
-<li>检查服务端配置checkUpdateDataIds:获取远程服务器上数据变更的dataId，遍历变化的集合，通过getServerConfig从远程服务器获取相应内容，更新本地cache为服务器端返回的内容，最后遍历cacheDatas，找到变化的数据进行通知。</li>
-</ol>
-</li>
-</ol>
-<p>服务端：</p>
-<p>客户端发起长轮询请求，服务端收到请求后，先比较客户端请求过来的md5和服务端是否一致，如果不同则直接返回，如果相同则通过schedule延迟29.5s后再比较，为了保证服务端在29.5s内数据变化能及时通知客户端，服务端采用事件订阅的方式来监听服务端本地数据变化的事件，一旦收到事件，则触发DataChangeTask的通知，并遍历allSubs队列中的ClientLongPolling(客户端的长轮询任务)，将结果写回客户端，就完成了一次数据的推送。如果DataChangeTask完成数据“推送”后，ClientLongPolling中的调度任务又开始执行了怎么办？在”推送“前将原等待执行的调度任务取消就可以了，所以在ClientLongPolling方法中最开始的一个步骤就是删除订阅事件。</p>
-<h4 id="选举机制"><a href="#选举机制" class="headerlink" title="选举机制"></a>选举机制</h4><p>角色：</p>
-<pre><code>1. leader：所有请求处理者，leader副本接受client的更新请求，本地处理后再同步至其他多个副本
- 2. follower：请求的被动更新者，从leader接受更新请求，然后写入本地日志文件
- 3. candidate：如果follower副本在一段时间内没有收到leader副本的心跳，则判断leader副本可能已经故障，此时启动选举过程，此时副本会变为candidate状态，直到选举结束
- 4. term：每一届新的履职期称之为一届任期</code></pre><p>每隔500ms发起一次选举任务和心跳任务</p>
-<p>选举过程：</p>
-<pre><code>1. 系统刚启动，所有节点任期为0，大家的role都为follower
- 2. 一个启动的节点第一个触发未检测到心跳超时，自增任期为1，并且重新计时，给自己投一票，然后向所有其他节点发起投票
- 3. 其他节点当前任期为0，收到candidate的投票选举，清零自己的心跳空白等待时间，未超时前不会发起投票，从而避免多重投票导致无效投票的可能性。
- 4. 第一个发起投票的节点收到半数投票，成为leader</code></pre><ol>
-<li>每次follower收到leader的一次heartbeat，都会清零自己的心跳计时，如果当前心跳计时超时了，仍未收到leader心跳，就会从follower变成candidate</li>
-<li>自增当前任期且开始计时，向其它节点发起投票</li>
-<li>其它节点会比较任期和日志的序号，至少不能比自己的数据旧才会投票给第一个发起投票的节点</li>
-<li>超过半数节点投票成功才会成为leader，否则等待选举超时，再发起第二轮投票</li>
-</ol>
-<p>在leaderDue内自己是不会发起选举的，只有到期后才会重置leaderDue和heartbeatDue,然后发送投票。每个节点的leaderDusMs设的是随机值，即每个节点的leader任期不一样，从而避免大家同时发起投票，提高选举成功率。某个节点leaderDusMs先减为0, 先自增term，然后发起投票，该节点term+1比其它节点term大，从而成功成为leader。</p>
-<p>发起投票的过程为投票发起方向不包含自己的其它节点发起投票请求，其它节点收到请求后，看term是否比自己term大，大则投给他，然后将自己term设为投票发起方的term，重置leaderDueMs（避免自己再发起一轮投票），最后将投票结果返回投票发起方，根据结果有半数投票的leader成为真正的leader。</p>
-<p>心跳过程：</p>
-<p>​    和选举类似，只有heartBeatDueMs到期后才会发起心跳处理，这里心跳周期远远小于选举的term周期，而且在心跳处理过程中心跳发起方和接收方都会重置选举时间，通过时间的延长阻止各节点发起投票请求。某一节点成为leader后，通过心跳的方式将leader信息传给其他节点。</p>
-<p>follower超时：<br>    自身会重新发起选举，如果与其它节点不通，会一直处于选举状态，如果超时一段时间后恢复，会通过选举成为新的leader或者成为原leader的follower（发选举请求前收到了心跳消息），此时有两个leader，但由于旧leader的term较小，最终被新leader同步为follower（为分析结果，待验证）</p>
-<p>leader超时：<br>    leader超时重新选举，产生新leader，旧leader恢复后会通过心跳被同步为follower</p>
-<h4 id="服务发现-1"><a href="#服务发现-1" class="headerlink" title="服务发现"></a>服务发现</h4><p>​    服务注册：服务提供者会通过轮询配置的注册中心集群地址进行服务的注册，失败则请求下一个节点；nacos client这边在spring容器启动后执行一个服务订阅操作的延时任务，这个任务执行时先拉取nacos server最新的服务列表，然后与本地缓存的服务列表进行比较，取消订阅下线的服务，然后向nacos server发起订阅操作，订阅所有服务。</p>
-<p>服务消费者订阅后会执行一个轮训任务（每10s一次）用来拉取最新的服务提供者信息并实时更新，服务提供者注册时nacos服务端也会有一个相应的心跳检测，当心跳检测超时也就是未及时收到服务提供者的心跳包，nacos server判定该服务状态异常，随后通过UDP推送服务信息来告知对应的服务消费者，服务消费者通过PushReceiver来处理udp协议，HostReactor.processServiceJson(String json)来更新本地服务列表。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
   </div>
 
   
@@ -1384,7 +1340,7 @@ server {
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">27</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
