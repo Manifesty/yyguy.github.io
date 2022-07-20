@@ -472,7 +472,7 @@ server {
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-01-04 14:59:18" itemprop="dateModified" datetime="2021-01-04T14:59:18+08:00">2021-01-04</time>
+                <time title="修改时间：2022-07-20 18:17:14" itemprop="dateModified" datetime="2022-07-20T18:17:14+08:00">2022-07-20</time>
               </span>
 
           
@@ -511,6 +511,17 @@ server {
 <p>并发事务处理带来的问题<br>更新丢失：当两个或多个事务选择同一行进行更新，最后的事务更新覆盖了之前事务的更新操作 （可用乐观锁解决）<br>脏读：一个事务读取到另一个事务修改了但未提交的数据  （解决：事务隔离级别设为已提交读）<br>不可重复读：事务A中两次执行同一条查询sql结果不一致（数据被其他事务修改）  （解决：事务隔离级别设为可重复读）<br>幻读：事务A读到了事务B提交的新增数据</p>
 <p>查看当前数据库事务隔离级别： show variables like ‘tx_isolation’;<br>设置事务隔离级别： set tx_isolation=‘REPEATABLE-READ’；<br>可重复读   MVCC机制：select操作不会更新版本号，是快照读，增删改会更新版本号，是当前版本。</p>
 <p>Oracle默认隔离级别为已提交读，Mysql默认隔离级别为可重复读<br>Spring设置的隔离级别与数据库默认级别不一致，以Spring为准，若Spring设置的隔离级别数据库本身不支持，则以数据库为准<br>Oracle支持两种：已提交读和串行化<br>Mysql四种都支持</p>
+<p>​    </p>
+<p><strong>in  &amp;&amp; join &amp;&amp; exist</strong></p>
+<p>exists：查询exists对外表采用遍历方式逐条查询，每次查询都会比较exists语句，当exists里的条件语句返回记录行时则条件为真，此次返回当前遍历到的记录。</p>
+<p>exist执行原理：对外表做loop循环，每次loop循环再对内表（子查询）进行查询，那么因为对内表的查询使用的索引（内表效率高，故可用大表），而外表有多大都需要遍历，不可避免（尽量使用小表），故内表大的使用exists可加快效率。</p>
+<p>in执行原理：把外表和内表做连接，先查询内表，再把内表结果与外表匹配，对外表使用索引（外表效率高，可用大表），而内表多大都需要查询，不可避免，故外表大的使用in，可加快效率。</p>
+<p>join执行原理：</p>
+<p>简单嵌套循环连接：笛卡尔乘积，以t1作为驱动表遍历t1每条数据查找t2中与之匹配的数据存到结果集。</p>
+<p>索引嵌套循环连接：在简单嵌套循环的基础上，被驱动表t2中的字段加了索引，这个字段就是t1中遍历的字段；假设有两0<br>个表主表main和从表second，主键均是id且second表的main_id加了索引</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> m.* <span class="keyword">from</span> <span class="keyword">main</span> m <span class="keyword">inner</span> <span class="keyword">join</span> <span class="keyword">second</span> s <span class="keyword">on</span> s.main_id = m.id</span><br></pre></td></tr></table></figure>
+
+<p>块嵌套循环连接：mysql中使用了一个join buffer缓冲区去减少循环次数 默认256KB，可用show variables like ‘join_%’查看<br>具体做法是，将驱动表t1中符合条件的列一次性查询到缓冲区中，然后遍历一次被驱动表t2.并逐一和缓冲区的所有值比较，将比较结果加入结果集中</p>
 
       
     </div>
